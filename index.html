@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Songül Bayramcı | Konser & Etkinlik Çekimi</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Cursor -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
+
+    <!-- Scroll Progress -->
+    <div class="scroll-progress" id="scrollProgress"></div>
+
+    <!-- Navigation -->
+    <nav class="main-nav" id="mainNav">
+        <div class="nav-container">
+            <a href="#home" class="nav-logo">SB</a>
+            <div class="nav-links">
+                <a href="#home" class="nav-link active">ANA SAYFA</a>
+                <a href="#portfolio" class="nav-link">ÇALIŞMALARIM</a>
+                <a href="#hakkimda" class="nav-link">HAKKIMDA</a>
+                <a href="#iletisim" class="nav-link">İLETİŞİM</a>
+            </div>
+            <button class="nav-toggle" id="navToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero-section">
+        <div class="hero-bg">
+            <video class="hero-video" autoplay muted loop playsinline poster="Görsel/Zeynep bastık 4.PNG">
+                <source src="assets/hero_bg.mp4" type="video/mp4">
+            </video>
+            <div class="hero-overlay"></div>
+            <div class="hero-gradient"></div>
+        </div>
+        <div class="hero-content">
+            <p class="hero-tag">KONSER & ETKİNLİK ÇEKİMİ</p>
+            <h1 class="hero-title">
+                <span class="title-line">HER ANI</span>
+                <span class="title-line accent">YAKALA</span>
+            </h1>
+            <p class="hero-subtitle">Profesyonel konser, klip ve etkinlik görüntüleme çekimi</p>
+            <div class="hero-cta">
+                <a href="#portfolio" class="btn btn-primary">Çalışmalarımı Gör <i class="fas fa-arrow-right"></i></a>
+                <a href="#iletisim" class="btn btn-outline">İletişime Geç <i class="fas fa-phone"></i></a>
+            </div>
+        </div>
+        <div class="scroll-down">
+            <span>KEŞFET</span>
+            <div class="scroll-line"></div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats-section">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-item reveal">
+                    <span class="stat-number">50+</span>
+                    <span class="stat-label">Etkinlik Çekimi</span>
+                </div>
+                <div class="stat-item reveal delay-1">
+                    <span class="stat-number">100+</span>
+                    <span class="stat-label">Konser Videosu</span>
+                </div>
+                <div class="stat-item reveal delay-2">
+                    <span class="stat-number">25+</span>
+                    <span class="stat-label">Mutlu Müşteri</span>
+                </div>
+                <div class="stat-item reveal delay-3">
+                    <span class="stat-number">5+</span>
+                    <span class="stat-label">Yıllık Deneyim</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Portfolio Section -->
+    <section id="portfolio" class="portfolio-section">
+        <div class="container">
+            <div class="section-header reveal">
+                <span class="section-tag">PORTFÖYÜM</span>
+                <h2 class="section-title">ÇALIŞMALARIM</h2>
+                <p class="section-desc">Konser, klip ve etkinlik çekimlerimden kareler</p>
+            </div>
+
+            <!-- Filter Buttons -->
+            <div class="portfolio-filter reveal delay-1">
+                <button class="filter-btn active" data-filter="all">Tümü</button>
+                <button class="filter-btn" data-filter="konser">Konser</button>
+                <button class="filter-btn" data-filter="klip">Müzik Klibi</button>
+                <button class="filter-btn" data-filter="etkinlik">Etkinlik</button>
+            </div>
+
+            <!-- Portfolio Grid -->
+            <div class="portfolio-grid" id="portfolioGrid">
+                <!-- Images will be loaded dynamically -->
+            </div>
+
+            <!-- Video Section -->
+            <div class="video-showcase reveal">
+                <div class="section-header">
+                    <span class="section-tag">VIDEOS</span>
+                    <h2 class="section-title">ÇEKİM STİLİM</h2>
+                </div>
+                <div class="video-grid">
+                    <div class="video-card">
+                        <div class="video-placeholder">
+                            <i class="fas fa-play-circle"></i>
+                            <span>4K Çözünürlük</span>
+                        </div>
+                        <div class="video-info">
+                            <h3>Dinamik Açılar</h3>
+                            <p>Profesyonel kamera açıları ile etkileyici görüntüler</p>
+                        </div>
+                    </div>
+                    <div class="video-card">
+                        <div class="video-placeholder">
+                            <i class="fas fa-microphone-alt"></i>
+                            <span>Canlı Ses Kaydı</span>
+                        </div>
+                        <div class="video-info">
+                            <h3>Kaliteli Ses</h3>
+                            <p>HD ses kaydı ile profesyonel prodüksiyon</p>
+                        </div>
+                    </div>
+                    <div class="video-card">
+                        <div class="video-placeholder">
+                            <i class="fas fa-film"></i>
+                            <span>Sinematik</span>
+                        </div>
+                        <div class="video-info">
+                            <h3>Sinematik Görüntüler</h3>
+                            <p>Film kalitesinde çekim ve post-prodüksiyon</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="hakkimda" class="about-section">
+        <div class="container">
+            <div class="about-grid">
+                <div class="about-image reveal-left">
+                    <div class="image-frame">
+                        <img src="Görsel/Zeynep bastık 4.PNG" alt="Songül Bayramcı">
+                    </div>
+                </div>
+                <div class="about-content reveal-right">
+                    <span class="section-tag">HAKKIMDA</span>
+                    <h2>Songül Bayramcı</h2>
+                    <p class="lead">Konser ve etkinlik görüntüleme alanında tutkulu bir profesyonelim.</p>
+                    <p>Kamera arkasında geçen her an, hikayeyi anlatmak için bir fırsat. Işık, gölge, hareket - bunların hepsini ustalıkla birleştirerek unutulmaz anları ölümsüzleştiriyorum.</p>
+                    <p>Her çekim, bir hikaye anlatma süreci. Sahnenin enerjisini, sanatçının ifadesini ve izleyicinin kalbine dokunan anları yakalamak için buradayım.</p>
+
+                    <div class="skills-grid">
+                        <div class="skill-item">
+                            <i class="fas fa-video"></i>
+                            <span>Video Çekimi</span>
+                        </div>
+                        <div class="skill-item">
+                            <i class="fas fa-camera"></i>
+                            <span>Fotoğrafçılık</span>
+                        </div>
+                        <div class="skill-item">
+                            <i class="fas fa-cut"></i>
+                            <span>Kurgu & Montaj</span>
+                        </div>
+                        <div class="skill-item">
+                            <i class="fas fa-lightbulb"></i>
+                            <span>Işık Yönetimi</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="testimonials-section">
+        <div class="container">
+            <div class="section-header reveal">
+                <span class="section-tag">REFERANSLARIM</span>
+                <h2 class="section-title">NE DİYORLAR?</h2>
+            </div>
+            <div class="testimonials-grid">
+                <div class="testimonial-card reveal">
+                    <div class="quote-icon"><i class="fas fa-quote-left"></i></div>
+                    <p class="testimonial-text">Songül hanım, konser çekimlerimizde profesyonellik ve yaratıcılığı bir arada sundu. Görüntüler tam istediğimiz gibiydi!</p>
+                    <div class="testimonial-author">
+                        <span class="author-name">Zeynep Bastık</span>
+                        <span class="author-title">Sanatçı</span>
+                    </div>
+                </div>
+                <div class="testimonial-card reveal delay-1">
+                    <div class="quote-icon"><i class="fas fa-quote-left"></i></div>
+                    <p class="testimonial-text">Etkinlik videomuz sosyal medyada binlerce görüntülenme aldı. Çekim kalitesi gerçekten üst düzey.</p>
+                    <div class="testimonial-author">
+                        <span class="author-name">Emre Fel</span>
+                        <span class="author-title">Şarkıcı</span>
+                    </div>
+                </div>
+                <div class="testimonial-card reveal delay-2">
+                    <div class="quote-icon"><i class="fas fa-quote-left"></i></div>
+                    <p class="testimonial-text">Klip çekiminde bize eşlik etti. Işık ve kamera açılarıyla muhteşem bir atmosfer yarattı.</p>
+                    <div class="testimonial-author">
+                        <span class="author-name">Dedub Lüman</span>
+                        <span class="author-title">Müzik Grubu</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="iletisim" class="contact-section">
+        <div class="container">
+            <div class="section-header reveal">
+                <span class="section-tag">İLETİŞİM</span>
+                <h2 class="section-title">PROJEMİZ VAR!</h2>
+                <p class="section-desc">Bir konser, klip veya etkinlik çekimi mi planlıyorsunuz? Birlikte çalışalım.</p>
+            </div>
+            <div class="contact-grid">
+                <div class="contact-info reveal-left">
+                    <div class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <div>
+                            <h4>E-posta</h4>
+                            <p>songul@ornek.com</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-phone"></i>
+                        <div>
+                            <h4>Telefon</h4>
+                            <p>+90 555 123 45 67</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <div>
+                            <h4>Konum</h4>
+                            <p>İstanbul, Türkiye</p>
+                        </div>
+                    </div>
+                    <div class="social-links">
+                        <a href="https://www.instagram.com/violaceae.01/" target="_blank" rel="noopener noreferrer" class="social-link"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+                <form class="contact-form reveal-right" id="contactForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <input type="text" placeholder="Adınız Soyadınız" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="email" placeholder="E-posta Adresiniz" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <select>
+                            <option value="">Proje Türü Seçin</option>
+                            <option value="konser">Konser Çekimi</option>
+                            <option value="klip">Müzik Klibi</option>
+                            <option value="etkinlik">Etkinlik Çekimi</option>
+                            <option value="diger">Diğer</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <textarea rows="5" placeholder="Projenizden Bahsedin..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full">
+                        Mesaj Gönder <i class="fas fa-paper-plane"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">SONGÜL BAYRAMCI</div>
+                <p>Konser & Etkinlik Görüntüleme</p>
+                <div class="footer-divider"></div>
+                <p class="copyright">&copy; 2026 Tüm Hakları Saklıdır.</p>
+                <div style="margin-top: 15px;">
+                    <a href="admin.html" class="admin-link" style="font-size: 0.8rem; color: var(--text-secondary); opacity: 0.6; text-decoration: none; transition: opacity 0.3s;"><i class="fas fa-cog"></i> Yönetici Paneli</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Lightbox Modal -->
+    <div class="lightbox" id="lightbox">
+        <button class="lightbox-close" id="lightboxClose">&times;</button>
+        <img src="" alt="" class="lightbox-image" id="lightboxImage">
+        <div class="lightbox-info">
+            <h3 id="lightboxTitle"></h3>
+            <p id="lightboxDesc"></p>
+        </div>
+    </div>
+
+    <script src="data/data.js"></script>
+    <script src="js/script.js"></script>
+</body>
+</html>

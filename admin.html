@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yönetim Paneli | Songül Bayramcı</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <i class="fas fa-camera-retro"></i>
+                <span>SB <span>ADMIN</span></span>
+            </div>
+        </div>
+
+        <ul class="sidebar-menu">
+            <li class="sidebar-item">
+                <a href="#portfolio" class="sidebar-link active" data-tab="tab-portfolio">
+                    <i class="fas fa-images"></i>
+                    <span>Portföy & Görseller</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="#hero" class="sidebar-link" data-tab="tab-hero">
+                    <i class="fas fa-heading"></i>
+                    <span>Hero & Başlıklar</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="#stats" class="sidebar-link" data-tab="tab-stats">
+                    <i class="fas fa-chart-line"></i>
+                    <span>İstatistikler</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="#about" class="sidebar-link" data-tab="tab-about">
+                    <i class="fas fa-user"></i>
+                    <span>Hakkımda</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="#testimonials" class="sidebar-link" data-tab="tab-testimonials">
+                    <i class="fas fa-comments"></i>
+                    <span>Referanslar</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="#contact" class="sidebar-link" data-tab="tab-contact">
+                    <i class="fas fa-address-book"></i>
+                    <span>İletişim & Sosyal</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="#backup" class="sidebar-link" data-tab="tab-backup">
+                    <i class="fas fa-database"></i>
+                    <span>Yedek & Dışa Aktar</span>
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <a href="index.html" target="_blank" class="view-site-btn">
+                <i class="fas fa-external-link-alt"></i>
+                <span>Siteyi Görüntüle</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="admin-main">
+        <!-- Top Header -->
+        <header class="admin-header">
+            <div class="header-title">
+                <h1 id="pageTitle">Portföy & Görsel Yönetimi</h1>
+                <p id="pageDesc">Çalışmalarım bölümünde sergilenen fotoğrafları düzenleyin, silin veya yeni görsel ekleyin.</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-secondary" id="btnResetData">
+                    <i class="fas fa-undo"></i> Varsayılana Sıfırla
+                </button>
+                <button class="btn btn-primary" id="btnSaveAll">
+                    <i class="fas fa-save"></i> Tümünü Kaydet
+                </button>
+            </div>
+        </header>
+
+        <!-- 1. TAB: PORTFOLIO -->
+        <section id="tab-portfolio" class="tab-panel active">
+            <div class="admin-card">
+                <div class="card-header">
+                    <h2>Mevcut Portföy Görselleri (<span id="portfolioCount">0</span>)</h2>
+                    <button class="btn btn-primary btn-sm" id="btnOpenAddModal">
+                        <i class="fas fa-plus"></i> Yeni Görsel Ekle
+                    </button>
+                </div>
+                <div class="portfolio-admin-grid" id="portfolioList">
+                    <!-- Loaded dynamically via JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. TAB: HERO -->
+        <section id="tab-hero" class="tab-panel">
+            <div class="admin-card">
+                <div class="card-header">
+                    <h2>Hero / Giriş Bölümü Ayarları</h2>
+                </div>
+                <form id="heroForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Üst Etiket (Tag)</label>
+                            <input type="text" id="heroTag" class="form-control" placeholder="Örn: KONSER & ETKİNLİK ÇEKİMİ">
+                        </div>
+                        <div class="form-group">
+                            <label>Alt Başlık / Açıklama</label>
+                            <input type="text" id="heroSubtitle" class="form-control" placeholder="Açıklama metni">
+                        </div>
+                        <div class="form-group">
+                            <label>Ana Başlık - 1. Satır</label>
+                            <input type="text" id="heroTitleLine1" class="form-control" placeholder="Örn: HER ANI">
+                        </div>
+                        <div class="form-group">
+                            <label>Ana Başlık - 2. Satır (Vurgulu Kırmızı)</label>
+                            <input type="text" id="heroTitleLine2" class="form-control" placeholder="Örn: YAKALA">
+                        </div>
+                        <div class="form-group form-full">
+                            <label>Arka Plan Görseli Yolu / URL</label>
+                            <input type="text" id="heroBgImage" class="form-control" placeholder="Örn: Görsel/Zeynep bastık 4.PNG">
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- 3. TAB: STATS -->
+        <section id="tab-stats" class="tab-panel">
+            <div class="admin-card">
+                <div class="card-header">
+                    <h2>4'lü İstatistik Sayacı</h2>
+                </div>
+                <form id="statsForm">
+                    <div class="form-grid" id="statsInputsContainer">
+                        <!-- Loaded dynamically -->
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- 4. TAB: ABOUT -->
+        <section id="tab-about" class="tab-panel">
+            <div class="admin-card">
+                <div class="card-header">
+                    <h2>Hakkımda Bölümü İçerikleri</h2>
+                </div>
+                <form id="aboutForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>İsim / Başlık</label>
+                            <input type="text" id="aboutName" class="form-control" placeholder="Songül Bayramcı">
+                        </div>
+                        <div class="form-group">
+                            <label>Profil / Sahne Görseli Yolu</label>
+                            <input type="text" id="aboutImage" class="form-control" placeholder="Görsel/Zeynep bastık 4.PNG">
+                        </div>
+                        <div class="form-group form-full">
+                            <label>Giriş Vurgulu Metin (Lead)</label>
+                            <textarea id="aboutLead" class="form-control" rows="2"></textarea>
+                        </div>
+                        <div class="form-group form-full">
+                            <label>1. Paragraf</label>
+                            <textarea id="aboutP1" class="form-control" rows="3"></textarea>
+                        </div>
+                        <div class="form-group form-full">
+                            <label>2. Paragraf</label>
+                            <textarea id="aboutP2" class="form-control" rows="3"></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- 5. TAB: TESTIMONIALS -->
+        <section id="tab-testimonials" class="tab-panel">
+            <div class="admin-card">
+                <div class="card-header">
+                    <h2>Müşteri & Sanatçı Referansları</h2>
+                </div>
+                <div id="testimonialsContainer">
+                    <!-- Loaded dynamically -->
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. TAB: CONTACT & SOCIAL -->
+        <section id="tab-contact" class="tab-panel">
+            <div class="admin-card">
+                <div class="card-header">
+                    <h2>İletişim ve Sosyal Medya Bağlantıları</h2>
+                </div>
+                <form id="contactForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>E-posta Adresi</label>
+                            <input type="email" id="contactEmail" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>Telefon Numarası</label>
+                            <input type="text" id="contactPhone" class="form-control">
+                        </div>
+                        <div class="form-group form-full">
+                            <label>Konum / Şehir</label>
+                            <input type="text" id="contactLocation" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fab fa-instagram" style="color:#e63946;"></i> Instagram Profili URL</label>
+                            <input type="url" id="contactInstagram" class="form-control" placeholder="https://www.instagram.com/violaceae.01/">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fab fa-youtube"></i> YouTube Kanalı URL</label>
+                            <input type="url" id="contactYoutube" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fab fa-twitter"></i> X (Twitter) Profili URL</label>
+                            <input type="url" id="contactTwitter" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fab fa-linkedin"></i> LinkedIn Profili URL</label>
+                            <input type="url" id="contactLinkedin" class="form-control">
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- 7. TAB: BACKUP & EXPORT -->
+        <section id="tab-backup" class="tab-panel">
+            <div class="admin-card">
+                <div class="card-header">
+                    <h2>Veri Yedekleme ve Dışa Aktarma</h2>
+                </div>
+                <p style="color: var(--text-secondary); margin-bottom: 20px;">
+                    Panel üzerinden yaptığınız tüm güncellemeler tarayıcınızın belleğinde (localStorage) tutulur. Kalıcı dosya yedeği almak veya başka cihazlara aktarmak için aşağıdaki seçenekleri kullanabilirsiniz.
+                </p>
+                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                    <button class="btn btn-primary" id="btnDownloadDataJs">
+                        <i class="fas fa-download"></i> data.js Dosyası Olarak İndir
+                    </button>
+                    <button class="btn btn-secondary" id="btnCopyJson">
+                        <i class="fas fa-copy"></i> JSON Olarak Kopyala
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Portfolio Add/Edit Modal -->
+    <div class="modal" id="portfolioModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Yeni Görsel Ekle</h2>
+                <button class="modal-close" id="btnCloseModal">&times;</button>
+            </div>
+            <form id="portfolioForm">
+                <input type="hidden" id="editItemId">
+
+                <!-- Image Upload & Path -->
+                <div class="form-group">
+                    <label>Görsel Kaynağı (Dosya Seçin veya Yol/Link Girin)</label>
+                    <div class="upload-box" id="dropZone">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Bilgisayarınızdan Resim Seçin veya Sürükleyin</p>
+                        <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                    </div>
+                    <input type="text" id="itemSrc" class="form-control" placeholder="Örn: Görsel/Zeynep bastık 4.PNG veya https://...">
+                    <img id="modalImgPreview" class="image-preview" alt="Önizleme">
+                </div>
+
+                <div class="form-group">
+                    <label>Sanatçı / Başlık</label>
+                    <input type="text" id="itemTitle" class="form-control" placeholder="Örn: Zeynep Bastık" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Kategori</label>
+                    <select id="itemCategory" class="form-control" required>
+                        <option value="konser">Konser</option>
+                        <option value="klip">Müzik Klibi</option>
+                        <option value="etkinlik">Etkinlik</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Açıklama / Alt Başlık</label>
+                    <input type="text" id="itemDesc" class="form-control" placeholder="Örn: Canlı Performans" required>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 25px;">
+                    <button type="button" class="btn btn-secondary" id="btnCancelModal">İptal</button>
+                    <button type="submit" class="btn btn-primary" id="btnSaveModal">Görseli Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notifications Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="data/data.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>
