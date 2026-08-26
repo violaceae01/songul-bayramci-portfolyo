@@ -280,7 +280,7 @@ body {
 
 .item-thumb {
     width: 100%;
-    aspect-ratio: 16/10;
+    aspect-ratio: 1080 / 1350;
     object-fit: cover;
     background: #000;
 }

@@ -528,13 +528,13 @@ footer {
 
 .portfolio-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-    gap: 25px;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 30px;
 }
 
 .portfolio-item {
     position: relative;
-    aspect-ratio: 16/10;
+    aspect-ratio: 1080 / 1350;
     overflow: hidden;
     border-radius: 12px;
     cursor: pointer;
