@@ -280,12 +280,13 @@ document.addEventListener('DOMContentLoaded', () => {
     hydrateStaticContent(currentSiteData);
 
     // ============================================
-    // CUSTOM CURSOR
+    // CUSTOM CURSOR (DESKTOP ONLY)
     // ============================================
     const cursorDot = document.querySelector('.cursor-dot');
     const cursorOutline = document.querySelector('.cursor-outline');
+    const isFinePointer = window.matchMedia('(pointer: fine)').matches;
 
-    if (cursorDot && cursorOutline) {
+    if (cursorDot && cursorOutline && isFinePointer) {
         document.addEventListener('mousemove', (e) => {
             cursorDot.style.left = `${e.clientX}px`;
             cursorDot.style.top = `${e.clientY}px`;
@@ -325,16 +326,17 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ============================================
-    // NAVIGATION
+    // NAVIGATION & MOBILE DRAWER
     // ============================================
     const nav = document.getElementById('mainNav');
     const navToggle = document.getElementById('navToggle');
+    const navLinksContainer = document.querySelector('.nav-links');
     const navLinks = document.querySelectorAll('.nav-link');
     const sections = document.querySelectorAll('section[id]');
 
     // Scroll effect
     window.addEventListener('scroll', () => {
-        if (window.scrollY > 100) {
+        if (window.scrollY > 50) {
             nav?.classList.add('scrolled');
         } else {
             nav?.classList.remove('scrolled');
@@ -357,10 +359,20 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Mobile menu
-    if (navToggle) {
+    // Mobile menu toggle
+    if (navToggle && navLinksContainer) {
         navToggle.addEventListener('click', () => {
-            navToggle.classList.toggle('active');
+            const isActive = navToggle.classList.toggle('active');
+            navLinksContainer.classList.toggle('active');
+            document.body.style.overflow = isActive ? 'hidden' : '';
+        });
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                navToggle.classList.remove('active');
+                navLinksContainer.classList.remove('active');
+                document.body.style.overflow = '';
+            });
         });
     }
 
