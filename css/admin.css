@@ -255,74 +255,113 @@ body {
     font-weight: 600;
 }
 
-/* Portfolio Grid */
-.portfolio-admin-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+/* Artist Admin List & Cards */
+.artists-admin-list {
+    display: flex;
+    flex-direction: column;
     gap: 25px;
 }
 
-.portfolio-admin-item {
+.artist-admin-card {
     background: var(--bg-darker);
     border: 1px solid var(--border-color);
-    border-radius: 10px;
-    overflow: hidden;
+    border-radius: 12px;
+    padding: 24px;
     transition: all var(--transition);
+}
+
+.artist-admin-card:hover {
+    border-color: rgba(230, 57, 70, 0.4);
+}
+
+.artist-card-header {
     display: flex;
-    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 20px;
+    margin-bottom: 20px;
 }
 
-.portfolio-admin-item:hover {
-    border-color: var(--accent);
-    transform: translateY(-4px);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
-}
-
-.item-thumb {
-    width: 100%;
-    aspect-ratio: 1080 / 1350;
-    object-fit: cover;
+.artist-cover-wrap {
+    width: 90px;
+    height: 115px;
+    flex-shrink: 0;
+    border-radius: 8px;
+    overflow: hidden;
     background: #000;
+    border: 1px solid var(--border-color);
 }
 
-.item-details {
-    padding: 18px;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
+.artist-cover-thumb {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
-.item-badge {
-    align-self: flex-start;
-    font-size: 0.7rem;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    background: rgba(230, 57, 70, 0.15);
-    color: var(--accent-light);
-    padding: 4px 10px;
-    border-radius: 20px;
-    margin-bottom: 10px;
-    font-weight: 600;
-}
-
-.item-title {
-    font-size: 1.1rem;
-    font-weight: 600;
-    margin-bottom: 5px;
-}
-
-.item-desc {
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-    margin-bottom: 15px;
+.artist-info-wrap {
     flex: 1;
 }
 
-.item-actions {
+.artist-actions-wrap {
     display: flex;
     gap: 10px;
-    border-top: 1px solid var(--border-color);
-    padding-top: 12px;
+    align-self: flex-start;
+}
+
+.artist-photos-section {
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: 8px;
+    padding: 16px;
+}
+
+.artist-subphotos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 12px;
+}
+
+.artist-subphoto-item {
+    position: relative;
+    aspect-ratio: 1080 / 1350;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #111;
+    border: 1px solid var(--border-color);
+}
+
+.artist-subphoto-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.btn-delete-subphoto {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 22px;
+    height: 22px;
+    background: rgba(230, 57, 70, 0.85);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.artist-subphoto-item:hover .btn-delete-subphoto {
+    opacity: 1;
+}
+
+.btn-delete-subphoto:hover {
+    background: var(--accent);
+    transform: scale(1.15);
 }
 
 /* Forms */

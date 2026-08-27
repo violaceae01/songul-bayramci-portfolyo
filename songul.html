@@ -93,16 +93,16 @@
             </div>
         </header>
 
-        <!-- 1. TAB: PORTFOLIO -->
+        <!-- 1. TAB: ARTISTS & PORTFOLIO -->
         <section id="tab-portfolio" class="tab-panel active">
             <div class="admin-card">
                 <div class="card-header">
-                    <h2>Mevcut Portföy Görselleri (<span id="portfolioCount">0</span>)</h2>
-                    <button class="btn btn-primary btn-sm" id="btnOpenAddModal">
-                        <i class="fas fa-plus"></i> Yeni Görsel Ekle
+                    <h2>Sanatçı Portföyleri (<span id="artistsCount">0</span>)</h2>
+                    <button class="btn btn-primary btn-sm" id="btnOpenAddArtistModal">
+                        <i class="fas fa-plus"></i> Yeni Sanatçı Ekle
                     </button>
                 </div>
-                <div class="portfolio-admin-grid" id="portfolioList">
+                <div class="artists-admin-list" id="artistsList">
                     <!-- Loaded dynamically via JS -->
                 </div>
             </div>
@@ -262,50 +262,93 @@
         </section>
     </main>
 
-    <!-- Portfolio Add/Edit Modal -->
-    <div class="modal" id="portfolioModal">
+    <!-- Artist Add/Edit Modal -->
+    <div class="modal" id="artistModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 id="modalTitle">Yeni Görsel Ekle</h2>
-                <button class="modal-close" id="btnCloseModal">&times;</button>
+                <h2 id="artistModalTitle">Yeni Sanatçı Ekle</h2>
+                <button class="modal-close" id="btnCloseArtistModal">&times;</button>
             </div>
-            <form id="portfolioForm">
-                <input type="hidden" id="editItemId">
+            <form id="artistForm">
+                <input type="hidden" id="editArtistId">
 
-                <!-- Image Upload & Path -->
                 <div class="form-group">
-                    <label>Görsel Kaynağı (Dosya Seçin veya Yol/Link Girin)</label>
-                    <div class="upload-box" id="dropZone">
+                    <label>Sanatçı Adı</label>
+                    <input type="text" id="artistName" class="form-control" placeholder="Örn: Mert Demir" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Konser / Etkinlik Adı</label>
+                    <input type="text" id="artistConcertName" class="form-control" placeholder="Örn: Harbiye Açıkhava Konseri">
+                </div>
+
+
+
+                <!-- Artist Cover Image -->
+                <div class="form-group">
+                    <label>Kapak Görseli (Dosya Seçin veya Yol/URL Girin)</label>
+                    <div class="upload-box" id="artistDropZone">
                         <i class="fas fa-cloud-upload-alt"></i>
-                        <p>Bilgisayarınızdan Resim Seçin veya Sürükleyin</p>
-                        <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                        <p>Kapak Resmi Seçin veya Sürükleyin</p>
+                        <input type="file" id="artistFileInput" accept="image/*" style="display: none;">
                     </div>
-                    <input type="text" id="itemSrc" class="form-control" placeholder="Örn: Görsel/Zeynep bastık 4.PNG veya https://...">
-                    <img id="modalImgPreview" class="image-preview" alt="Önizleme">
+                    <input type="text" id="artistCover" class="form-control" placeholder="Örn: Görsel/Mert Demir.PNG">
+                    <img id="artistCoverPreview" class="image-preview" alt="Kapak Önizleme">
                 </div>
 
                 <div class="form-group">
-                    <label>Sanatçı / Başlık</label>
-                    <input type="text" id="itemTitle" class="form-control" placeholder="Örn: Zeynep Bastık" required>
+                    <label>Yönlendirme Buton Başlığı</label>
+                    <input type="text" id="artistActionText" class="form-control" placeholder="Örn: Konser Çekimine Git" required>
                 </div>
 
                 <div class="form-group">
-                    <label>Kategori</label>
-                    <select id="itemCategory" class="form-control" required>
-                        <option value="konser">Konser</option>
-                        <option value="klip">Müzik Klibi</option>
-                        <option value="etkinlik">Etkinlik</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>Açıklama / Alt Başlık</label>
-                    <input type="text" id="itemDesc" class="form-control" placeholder="Örn: Canlı Performans" required>
+                    <label>Yönlendirme Linki (Instagram / Video URL)</label>
+                    <input type="text" id="artistActionUrl" class="form-control" placeholder="Örn: https://www.instagram.com/mertdemir/" required>
                 </div>
 
                 <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 25px;">
-                    <button type="button" class="btn btn-secondary" id="btnCancelModal">İptal</button>
-                    <button type="submit" class="btn btn-primary" id="btnSaveModal">Görseli Kaydet</button>
+                    <button type="button" class="btn btn-secondary" id="btnCancelArtistModal">İptal</button>
+                    <button type="submit" class="btn btn-primary" id="btnSaveArtistModal">Sanatçıyı Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Photo Add Modal -->
+    <div class="modal" id="photoModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Sanatçıya Yeni Fotoğraf Ekle</h2>
+                <button class="modal-close" id="btnClosePhotoModal">&times;</button>
+            </div>
+            <form id="photoForm">
+                <input type="hidden" id="targetArtistId">
+
+                <!-- Photo Upload & Path -->
+                <div class="form-group">
+                    <label>Fotoğraf (Dosya Seçin veya Yol/Link Girin)</label>
+                    <div class="upload-box" id="photoDropZone">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Fotoğraf Seçin veya Sürükleyin</p>
+                        <input type="file" id="photoFileInput" accept="image/*" style="display: none;">
+                    </div>
+                    <input type="text" id="photoSrc" class="form-control" placeholder="Örn: Görsel/Mert Demir1.PNG" required>
+                    <img id="photoPreview" class="image-preview" alt="Önizleme">
+                </div>
+
+                <div class="form-group">
+                    <label>Fotoğraf Başlığı</label>
+                    <input type="text" id="photoTitle" class="form-control" placeholder="Örn: Mert Demir - Sahne">
+                </div>
+
+                <div class="form-group">
+                    <label>Açıklama / Not</label>
+                    <input type="text" id="photoDesc" class="form-control" placeholder="Örn: Canlı Performans Çekimi">
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 25px;">
+                    <button type="button" class="btn btn-secondary" id="btnCancelPhotoModal">İptal</button>
+                    <button type="submit" class="btn btn-primary" id="btnSavePhotoModal">Fotoğrafı Ekle</button>
                 </div>
             </form>
         </div>

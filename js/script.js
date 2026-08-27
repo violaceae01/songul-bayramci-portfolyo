@@ -191,12 +191,25 @@ document.addEventListener('DOMContentLoaded', () => {
             const saved = localStorage.getItem('sb_site_data');
             if (saved) {
                 const parsed = JSON.parse(saved);
-                if (typeof siteData !== 'undefined' && siteData.portfolio && parsed.portfolio) {
-                    const existingSrcs = new Set(parsed.portfolio.map(p => p.src));
-                    const newItems = siteData.portfolio.filter(p => !existingSrcs.has(p.src));
-                    if (newItems.length > 0) {
-                        parsed.portfolio = [...newItems, ...parsed.portfolio];
+                if (typeof siteData !== 'undefined') {
+                    if (!parsed.artists && siteData.artists) {
+                        parsed.artists = siteData.artists;
                         localStorage.setItem('sb_site_data', JSON.stringify(parsed));
+                    } else if (parsed.artists && siteData.artists) {
+                        // Merge concertName if missing
+                        let updated = false;
+                        parsed.artists.forEach(a => {
+                            if (!a.concertName) {
+                                const matched = siteData.artists.find(sa => sa.id === a.id);
+                                if (matched && matched.concertName) {
+                                    a.concertName = matched.concertName;
+                                    updated = true;
+                                }
+                            }
+                        });
+                        if (updated) {
+                            localStorage.setItem('sb_site_data', JSON.stringify(parsed));
+                        }
                     }
                 }
                 return parsed;
@@ -208,7 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const currentSiteData = getSiteData();
-    let portfolioItems = currentSiteData.portfolio || [];
+    let artistsList = currentSiteData.artists || (typeof siteData !== 'undefined' ? siteData.artists : []);
 
     // Hydrate Hero & About & Contact
     function hydrateStaticContent(data) {
@@ -252,6 +265,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const aboutLead = document.querySelector('.about-content .lead');
             if (aboutLead && data.about.lead) aboutLead.textContent = data.about.lead;
+
+            const pElements = document.querySelectorAll('.about-content p:not(.lead)');
+            if (pElements[0] && data.about.p1) pElements[0].textContent = data.about.p1;
+            if (pElements[1] && data.about.p2) pElements[1].textContent = data.about.p2;
+        }
+
+        // Testimonials
+        if (data.testimonials && data.testimonials.length) {
+            const testimonialCards = document.querySelectorAll('.testimonial-card');
+            data.testimonials.forEach((tm, idx) => {
+                if (testimonialCards[idx]) {
+                    const txt = testimonialCards[idx].querySelector('.testimonial-text');
+                    const auth = testimonialCards[idx].querySelector('.author-info h4');
+                    const role = testimonialCards[idx].querySelector('.author-info span');
+                    if (txt) txt.textContent = `"${tm.text}"`;
+                    if (auth) auth.textContent = tm.name;
+                    if (role) role.textContent = tm.title;
+                }
+            });
         }
 
         // Contact & Social Links
@@ -403,46 +435,127 @@ document.addEventListener('DOMContentLoaded', () => {
     reveals.forEach(el => revealObserver.observe(el));
 
     // ============================================
-    // LOAD PORTFOLIO
+    // LOAD ARTIST PORTFOLIO & GALLERY MODAL
     // ============================================
     const portfolioGrid = document.getElementById('portfolioGrid');
+    const directLinkGrid = document.getElementById('directLinkGrid');
+    const artistGalleryModal = document.getElementById('artistGalleryModal');
+    const artistGalleryClose = document.getElementById('artistGalleryClose');
+    const modalArtistCategory = document.getElementById('modalArtistCategory');
+    const modalArtistName = document.getElementById('modalArtistName');
+    const modalArtistCount = document.getElementById('modalArtistCount');
+    const modalArtistGrid = document.getElementById('modalArtistGrid');
 
-    function loadPortfolio(filter = 'all') {
+    let currentOpenArtist = null;
+
+    function loadPortfolio() {
         if (!portfolioGrid) return;
-
         portfolioGrid.innerHTML = '';
 
-        const filtered = filter === 'all'
-            ? portfolioItems
-            : portfolioItems.filter(item => item.category === filter);
-
-        filtered.forEach((item, index) => {
+        artistsList.forEach((artist, index) => {
             const div = document.createElement('div');
             div.className = 'portfolio-item reveal';
             div.style.animationDelay = `${index * 0.1}s`;
-            div.innerHTML = '<img src="' + item.src + '" alt="' + item.title + '" loading="lazy"><span class="category">' + item.desc + '</span><div class="portfolio-overlay"><h3>' + item.title + '</h3><p>' + item.desc + '</p></div>';
-            div.addEventListener('click', () => openLightbox(item));
+            const count = artist.images ? artist.images.length : 1;
+            div.innerHTML = `
+                <img src="${artist.cover}" alt="${artist.name}" loading="lazy">
+                <div class="portfolio-overlay">
+                    <span style="font-size:0.75rem; color:var(--accent); font-weight:600; letter-spacing:1px; margin-bottom:4px;">
+                        <i class="fas fa-images"></i> ${count} FOTOĞRAF
+                    </span>
+                    <h3 style="display:flex; justify-content:space-between; align-items:baseline;">
+                        <span>${artist.name}</span> 
+                        <span style="font-size: 0.8rem; font-weight:400; color:#ccc;">${artist.concertName || ''}</span>
+                    </h3>
+                    <p><i class="fas fa-arrow-right" style="color:var(--accent);"></i> Galeriyi İncele</p>
+                </div>
+            `;
+            div.addEventListener('click', () => openArtistGallery(artist));
             portfolioGrid.appendChild(div);
         });
 
         // Re-observe new elements
-        document.querySelectorAll('.portfolio-item.reveal').forEach(el => revealObserver.observe(el));
+        document.querySelectorAll('#portfolioGrid .portfolio-item.reveal').forEach(el => revealObserver.observe(el));
+    }
+
+    function loadDirectLinks() {
+        if (!directLinkGrid) return;
+        directLinkGrid.innerHTML = '';
+
+        artistsList.forEach((artist, index) => {
+            const div = document.createElement('div');
+            div.className = 'portfolio-item reveal';
+            div.style.animationDelay = `${index * 0.1}s`;
+            div.innerHTML = `
+                <img src="${artist.cover}" alt="${artist.name}" loading="lazy">
+                <div class="portfolio-overlay">
+                    <h3 style="display:flex; justify-content:space-between; align-items:baseline;">
+                        <span>${artist.name}</span> 
+                        <span style="font-size: 0.8rem; font-weight:400; color:#ccc;">${artist.concertName || ''}</span>
+                    </h3>
+                    <p><i class="fas fa-link" style="color:var(--accent);"></i> ${artist.actionText || 'Konser Çekimine Git'}</p>
+                </div>
+            `;
+            div.addEventListener('click', () => {
+                if(artist.actionUrl) {
+                    window.open(artist.actionUrl, '_blank');
+                }
+            });
+            directLinkGrid.appendChild(div);
+        });
+
+        // Re-observe new elements
+        document.querySelectorAll('#directLinkGrid .portfolio-item.reveal').forEach(el => revealObserver.observe(el));
+    }
+
+    function openArtistGallery(artist) {
+        if (!artistGalleryModal) return;
+        currentOpenArtist = artist;
+
+        if (modalArtistCategory) modalArtistCategory.textContent = (artist.category || 'Konser').toUpperCase();
+        if (modalArtistName) modalArtistName.textContent = artist.name || 'Sanatçı';
+        const imgCount = artist.images ? artist.images.length : 0;
+        if (modalArtistCount) modalArtistCount.textContent = `${imgCount} Fotoğraf Çekimi`;
+
+        if (modalArtistGrid) {
+            modalArtistGrid.innerHTML = '';
+            (artist.images || []).forEach(img => {
+                const card = document.createElement('div');
+                card.className = 'artist-photo-card';
+                card.innerHTML = `
+                    <img src="${img.src}" alt="${img.title || artist.name}" loading="lazy">
+                    <div class="artist-photo-overlay">
+                        <span style="font-weight:600; font-size:0.95rem; color:#fff; margin-bottom:3px;">${img.title || artist.name}</span>
+                        <span><i class="fas fa-search-plus"></i> Büyütmek İçin Tıkla</span>
+                    </div>
+                `;
+                card.addEventListener('click', () => openLightbox(img, artist));
+                modalArtistGrid.appendChild(card);
+            });
+        }
+
+        artistGalleryModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeArtistGallery() {
+        if (!artistGalleryModal) return;
+        artistGalleryModal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    if (artistGalleryClose) {
+        artistGalleryClose.addEventListener('click', closeArtistGallery);
+    }
+
+    if (artistGalleryModal) {
+        artistGalleryModal.addEventListener('click', (e) => {
+            if (e.target === artistGalleryModal) closeArtistGallery();
+        });
     }
 
     loadPortfolio();
-
-    // ============================================
-    // PORTFOLIO FILTER
-    // ============================================
-    const filterBtns = document.querySelectorAll('.filter-btn');
-
-    filterBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            filterBtns.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            loadPortfolio(btn.dataset.filter);
-        });
-    });
+    loadDirectLinks();
 
     // ============================================
     // LIGHTBOX
@@ -453,13 +566,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const lightboxDesc = document.getElementById('lightboxDesc');
     const lightboxClose = document.getElementById('lightboxClose');
 
-    function openLightbox(item) {
+    function openLightbox(item, artist = currentOpenArtist) {
         if (!lightbox || !lightboxImage) return;
 
         lightboxImage.src = item.src;
-        lightboxImage.alt = item.title;
-        if (lightboxTitle) lightboxTitle.textContent = item.title;
-        if (lightboxDesc) lightboxDesc.textContent = item.desc;
+        lightboxImage.alt = item.title || '';
+        if (lightboxTitle) lightboxTitle.textContent = item.title || '';
+        if (lightboxDesc) lightboxDesc.textContent = item.desc || '';
+
         lightbox.classList.add('active');
         document.body.style.overflow = 'hidden';
     }
@@ -467,7 +581,12 @@ document.addEventListener('DOMContentLoaded', () => {
     function closeLightbox() {
         if (!lightbox) return;
         lightbox.classList.remove('active');
-        document.body.style.overflow = '';
+        // If artist gallery modal is still open, keep overflow hidden
+        if (artistGalleryModal && artistGalleryModal.classList.contains('active')) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
     }
 
     if (lightboxClose) {
@@ -480,8 +599,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Escape key listener for both modals
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') closeLightbox();
+        if (e.key === 'Escape') {
+            if (lightbox && lightbox.classList.contains('active')) {
+                closeLightbox();
+            } else if (artistGalleryModal && artistGalleryModal.classList.contains('active')) {
+                closeArtistGallery();
+            }
+        }
     });
 
     // ============================================

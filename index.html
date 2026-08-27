@@ -88,21 +88,29 @@
         </div>
     </section>
 
+    <!-- Direct Links Section -->
+    <section id="direct-links" class="portfolio-section">
+        <div class="container">
+            <div class="section-header reveal">
+                <span class="section-tag">HIZLI ERİŞİM</span>
+                <h2 class="section-title">SANATÇILAR & KONSERLER</h2>
+                <p class="section-desc">Sanatçıların konser çekimlerine doğrudan ulaşın</p>
+            </div>
+
+            <!-- Direct Link Grid -->
+            <div class="portfolio-grid" id="directLinkGrid">
+                <!-- Images will be loaded dynamically -->
+            </div>
+        </div>
+    </section>
+
     <!-- Portfolio Section -->
-    <section id="portfolio" class="portfolio-section">
+    <section id="portfolio" class="portfolio-section" style="padding-top: 20px;">
         <div class="container">
             <div class="section-header reveal">
                 <span class="section-tag">PORTFÖYÜM</span>
-                <h2 class="section-title">ÇALIŞMALARIM</h2>
+                <h2 class="section-title">Galeri</h2>
                 <p class="section-desc">Konser, klip ve etkinlik çekimlerimden kareler</p>
-            </div>
-
-            <!-- Filter Buttons -->
-            <div class="portfolio-filter reveal delay-1">
-                <button class="filter-btn active" data-filter="all">Tümü</button>
-                <button class="filter-btn" data-filter="konser">Konser</button>
-                <button class="filter-btn" data-filter="klip">Müzik Klibi</button>
-                <button class="filter-btn" data-filter="etkinlik">Etkinlik</button>
             </div>
 
             <!-- Portfolio Grid -->
@@ -308,6 +316,22 @@
             </div>
         </div>
     </footer>
+
+    <!-- Artist Gallery Modal -->
+    <div class="artist-gallery-modal" id="artistGalleryModal">
+        <div class="artist-gallery-container">
+            <button class="artist-gallery-close" id="artistGalleryClose" title="Kapat">&times;</button>
+            <div class="artist-gallery-header">
+                <span class="artist-gallery-badge" id="modalArtistCategory">KONSER</span>
+                <h2 class="artist-gallery-title" id="modalArtistName">Mert Demir</h2>
+                <p class="artist-gallery-subtitle" id="modalArtistCount">3 Fotoğraf Çekimi</p>
+            </div>
+            
+            <div class="artist-gallery-grid" id="modalArtistGrid">
+                <!-- Rendered dynamically with grayscale -> color hover -->
+            </div>
+        </div>
+    </div>
 
     <!-- Lightbox Modal -->
     <div class="lightbox" id="lightbox">

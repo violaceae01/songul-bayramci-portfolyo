@@ -10,12 +10,24 @@ document.addEventListener('DOMContentLoaded', () => {
             const saved = localStorage.getItem(STORAGE_KEY);
             if (saved) {
                 const parsed = JSON.parse(saved);
-                if (typeof siteData !== 'undefined' && siteData.portfolio && parsed.portfolio) {
-                    const existingSrcs = new Set(parsed.portfolio.map(p => p.src));
-                    const newItems = siteData.portfolio.filter(p => !existingSrcs.has(p.src));
-                    if (newItems.length > 0) {
-                        parsed.portfolio = [...newItems, ...parsed.portfolio];
+                if (typeof siteData !== 'undefined') {
+                    if (!parsed.artists && siteData.artists) {
+                        parsed.artists = siteData.artists;
                         localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+                    } else if (parsed.artists && siteData.artists) {
+                        let updated = false;
+                        parsed.artists.forEach(a => {
+                            if (!a.concertName) {
+                                const matched = siteData.artists.find(sa => sa.id === a.id);
+                                if (matched && matched.concertName) {
+                                    a.concertName = matched.concertName;
+                                    updated = true;
+                                }
+                            }
+                        });
+                        if (updated) {
+                            localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+                        }
                     }
                 }
                 return parsed;
@@ -27,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return typeof siteData !== 'undefined' ? JSON.parse(JSON.stringify(siteData)) : {
             hero: {},
             stats: [],
-            portfolio: [],
+            artists: [],
             about: {},
             testimonials: [],
             contact: {}
@@ -105,187 +117,275 @@ document.addEventListener('DOMContentLoaded', () => {
     // ============================================
     // 1. PORTFOLIO MANAGEMENT
     // ============================================
-    const portfolioList = document.getElementById('portfolioList');
-    const portfolioCount = document.getElementById('portfolioCount');
-    const portfolioModal = document.getElementById('portfolioModal');
-    const portfolioForm = document.getElementById('portfolioForm');
-    const btnOpenAddModal = document.getElementById('btnOpenAddModal');
-    const btnCloseModal = document.getElementById('btnCloseModal');
-    const btnCancelModal = document.getElementById('btnCancelModal');
-    const modalTitle = document.getElementById('modalTitle');
-    const editItemId = document.getElementById('editItemId');
+    const artistsListEl = document.getElementById('artistsList');
+    const artistsCount = document.getElementById('artistsCount');
+    const btnOpenAddArtistModal = document.getElementById('btnOpenAddArtistModal');
+    
+    // Artist Modal
+    const artistModal = document.getElementById('artistModal');
+    const artistForm = document.getElementById('artistForm');
+    const editArtistId = document.getElementById('editArtistId');
+    const artistName = document.getElementById('artistName');
+    const artistConcertName = document.getElementById('artistConcertName');
+    const artistCover = document.getElementById('artistCover');
+    const artistCoverPreview = document.getElementById('artistCoverPreview');
+    const artistActionText = document.getElementById('artistActionText');
+    const artistActionUrl = document.getElementById('artistActionUrl');
+    
+    // Photo Modal
+    const photoModal = document.getElementById('photoModal');
+    const photoForm = document.getElementById('photoForm');
+    const targetArtistId = document.getElementById('targetArtistId');
+    const photoSrc = document.getElementById('photoSrc');
+    const photoTitle = document.getElementById('photoTitle');
+    const photoDesc = document.getElementById('photoDesc');
+    const photoPreview = document.getElementById('photoPreview');
+    
+    function renderArtistsList() {
+        if (!artistsListEl) return;
+        artistsListEl.innerHTML = '';
+        const artists = appData.artists || [];
+        if (artistsCount) artistsCount.textContent = artists.length;
 
-    const itemSrc = document.getElementById('itemSrc');
-    const itemTitle = document.getElementById('itemTitle');
-    const itemCategory = document.getElementById('itemCategory');
-    const itemDesc = document.getElementById('itemDesc');
-    const modalImgPreview = document.getElementById('modalImgPreview');
-    const dropZone = document.getElementById('dropZone');
-    const fileInput = document.getElementById('fileInput');
-
-    function renderPortfolioList() {
-        if (!portfolioList) return;
-        portfolioList.innerHTML = '';
-        const items = appData.portfolio || [];
-        if (portfolioCount) portfolioCount.textContent = items.length;
-
-        if (items.length === 0) {
-            portfolioList.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-secondary); padding: 40px;">Henüz hiç görsel eklenmemiş.</p>';
+        if (artists.length === 0) {
+            artistsListEl.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 40px;">Henüz hiç sanatçı eklenmemiş.</p>';
             return;
         }
 
-        items.forEach((item, index) => {
+        artists.forEach(artist => {
             const card = document.createElement('div');
-            card.className = 'portfolio-admin-item';
+            card.className = 'artist-admin-card';
+            
+            let photosHtml = '';
+            (artist.images || []).forEach(img => {
+                photosHtml += `
+                    <div class="artist-subphoto-item">
+                        <img src="${img.src}" alt="${img.title || ''}" onerror="this.src='https://via.placeholder.com/150?text=Görsel'">
+                        <button class="btn-delete-subphoto" data-artist="${artist.id}" data-photo="${img.id}" title="Fotoğrafı Sil"><i class="fas fa-times"></i></button>
+                    </div>
+                `;
+            });
+
             card.innerHTML = `
-                <img src="${item.src}" alt="${item.title}" class="item-thumb" onerror="this.src='https://via.placeholder.com/400x250?text=Görsel+Bulunamadı'">
-                <div class="item-details">
-                    <span class="item-badge">${item.category || 'genel'}</span>
-                    <h3 class="item-title">${item.title || 'Başlıksız'}</h3>
-                    <p class="item-desc">${item.desc || ''}</p>
-                    <div class="item-actions">
-                        <button class="btn btn-secondary btn-sm edit-btn" data-id="${item.id}" style="flex:1;">
+                <div class="artist-card-header">
+                    <div class="artist-cover-wrap">
+                        <img src="${artist.cover}" alt="${artist.name}" class="artist-cover-thumb" onerror="this.src='https://via.placeholder.com/150?text=Görsel'">
+                    </div>
+                    <div class="artist-info-wrap">
+                        <h3 style="margin-bottom: 5px; font-size: 1.2rem;">${artist.name} <span style="font-size:0.85rem; color:#888; font-weight:normal;">- ${artist.concertName || ''}</span></h3>
+                        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 5px;">
+                            <i class="fas fa-link"></i> ${artist.actionText || 'Konser Çekimine Git'} -> <a href="${artist.actionUrl}" target="_blank" style="color: var(--accent);">${artist.actionUrl}</a>
+                        </p>
+                    </div>
+                    <div class="artist-actions-wrap">
+                        <button class="btn btn-secondary btn-sm btn-edit-artist" data-id="${artist.id}">
                             <i class="fas fa-edit"></i> Düzenle
                         </button>
-                        <button class="btn btn-danger btn-sm delete-btn" data-id="${item.id}">
+                        <button class="btn btn-danger btn-sm btn-delete-artist" data-id="${artist.id}">
                             <i class="fas fa-trash-alt"></i>
                         </button>
                     </div>
                 </div>
+                <div class="artist-photos-section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <h4 style="font-size: 0.95rem;">Bağlı Fotoğraflar (${(artist.images || []).length})</h4>
+                        <button class="btn btn-primary btn-sm btn-add-subphoto" data-id="${artist.id}">
+                            <i class="fas fa-plus"></i> Yeni Fotoğraf Ekle
+                        </button>
+                    </div>
+                    <div class="artist-subphotos-grid">
+                        ${photosHtml}
+                    </div>
+                </div>
             `;
+            
+            artistsListEl.appendChild(card);
+        });
 
-            // Edit button
-            card.querySelector('.edit-btn').addEventListener('click', () => openEditModal(item));
+        // Events
+        document.querySelectorAll('.btn-edit-artist').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = parseInt(e.currentTarget.dataset.id);
+                openArtistModal(appData.artists.find(a => a.id === id));
+            });
+        });
 
-            // Delete button
-            card.querySelector('.delete-btn').addEventListener('click', () => deletePortfolioItem(item.id));
+        document.querySelectorAll('.btn-delete-artist').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = parseInt(e.currentTarget.dataset.id);
+                if (confirm('Bu sanatçıyı ve tüm fotoğraflarını silmek istediğinize emin misiniz?')) {
+                    appData.artists = appData.artists.filter(a => a.id !== id);
+                    saveData(false);
+                    renderArtistsList();
+                    showToast('Sanatçı silindi!', 'success');
+                }
+            });
+        });
 
-            portfolioList.appendChild(card);
+        document.querySelectorAll('.btn-add-subphoto').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = parseInt(e.currentTarget.dataset.id);
+                openPhotoModal(id);
+            });
+        });
+
+        document.querySelectorAll('.btn-delete-subphoto').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const artistId = parseInt(e.currentTarget.dataset.artist);
+                const photoId = parseInt(e.currentTarget.dataset.photo);
+                if (confirm('Bu fotoğrafı silmek istediğinize emin misiniz?')) {
+                    const artist = appData.artists.find(a => a.id === artistId);
+                    if (artist) {
+                        artist.images = artist.images.filter(img => img.id !== photoId);
+                        saveData(false);
+                        renderArtistsList();
+                        showToast('Fotoğraf silindi!', 'success');
+                    }
+                }
+            });
         });
     }
 
-    function openAddModal() {
-        modalTitle.textContent = 'Yeni Görsel Ekle';
-        portfolioForm.reset();
-        editItemId.value = '';
-        modalImgPreview.style.display = 'none';
-        portfolioModal.classList.add('active');
-    }
-
-    function openEditModal(item) {
-        modalTitle.textContent = 'Görseli Düzenle';
-        editItemId.value = item.id;
-        itemSrc.value = item.src;
-        itemTitle.value = item.title;
-        itemCategory.value = item.category;
-        itemDesc.value = item.desc;
-
-        if (item.src) {
-            modalImgPreview.src = item.src;
-            modalImgPreview.style.display = 'block';
-        } else {
-            modalImgPreview.style.display = 'none';
-        }
-
-        portfolioModal.classList.add('active');
-    }
-
-    function closeModal() {
-        portfolioModal.classList.remove('active');
-    }
-
-    function deletePortfolioItem(id) {
-        if (confirm('Bu görseli portföyden silmek istediğinize emin misiniz?')) {
-            appData.portfolio = (appData.portfolio || []).filter(item => item.id !== id);
-            saveData(false);
-            renderPortfolioList();
-            showToast('Görsel silindi!', 'success');
-        }
-    }
-
-    // Dropzone & File Input
-    if (dropZone && fileInput) {
-        dropZone.addEventListener('click', () => fileInput.click());
-
-        fileInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    itemSrc.value = event.target.result;
-                    modalImgPreview.src = event.target.result;
-                    modalImgPreview.style.display = 'block';
-                };
-                reader.readAsDataURL(file);
+    // Artist Modal Functions
+    function openArtistModal(artist = null) {
+        artistForm.reset();
+        artistCoverPreview.style.display = 'none';
+        
+        if (artist) {
+            document.getElementById('artistModalTitle').textContent = 'Sanatçıyı Düzenle';
+            editArtistId.value = artist.id;
+            artistName.value = artist.name;
+            artistConcertName.value = artist.concertName || '';
+            artistCover.value = artist.cover;
+            artistActionText.value = artist.actionText || '';
+            artistActionUrl.value = artist.actionUrl || '';
+            
+            if (artist.cover) {
+                artistCoverPreview.src = artist.cover;
+                artistCoverPreview.style.display = 'block';
             }
-        });
-
-        dropZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            dropZone.style.borderColor = 'var(--accent)';
-        });
-
-        dropZone.addEventListener('dragleave', () => {
-            dropZone.style.borderColor = '';
-        });
-
-        dropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropZone.style.borderColor = '';
-            const file = e.dataTransfer.files[0];
-            if (file && file.type.startsWith('image/')) {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    itemSrc.value = event.target.result;
-                    modalImgPreview.src = event.target.result;
-                    modalImgPreview.style.display = 'block';
-                };
-                reader.readAsDataURL(file);
-            }
-        });
+        } else {
+            document.getElementById('artistModalTitle').textContent = 'Yeni Sanatçı Ekle';
+            editArtistId.value = '';
+        }
+        
+        artistModal.classList.add('active');
+    }
+    
+    function closeArtistModal() {
+        artistModal.classList.remove('active');
     }
 
-    itemSrc?.addEventListener('input', () => {
-        if (itemSrc.value.trim()) {
-            modalImgPreview.src = itemSrc.value.trim();
-            modalImgPreview.style.display = 'block';
-        } else {
-            modalImgPreview.style.display = 'none';
-        }
-    });
+    if (btnOpenAddArtistModal) btnOpenAddArtistModal.addEventListener('click', () => openArtistModal());
+    document.getElementById('btnCloseArtistModal')?.addEventListener('click', closeArtistModal);
+    document.getElementById('btnCancelArtistModal')?.addEventListener('click', closeArtistModal);
 
-    if (btnOpenAddModal) btnOpenAddModal.addEventListener('click', openAddModal);
-    if (btnCloseModal) btnCloseModal.addEventListener('click', closeModal);
-    if (btnCancelModal) btnCancelModal.addEventListener('click', closeModal);
-
-    portfolioForm?.addEventListener('submit', (e) => {
+    artistForm?.addEventListener('submit', (e) => {
         e.preventDefault();
-        const id = editItemId.value ? parseInt(editItemId.value, 10) : Date.now();
-        const src = itemSrc.value.trim();
-        const title = itemTitle.value.trim();
-        const category = itemCategory.value;
-        const desc = itemDesc.value.trim();
+        const id = editArtistId.value ? parseInt(editArtistId.value) : Date.now();
+        const name = artistName.value.trim();
+        const concertName = artistConcertName.value.trim();
+        const cover = artistCover.value.trim();
+        const actionText = artistActionText.value.trim();
+        const actionUrl = artistActionUrl.value.trim();
 
-        if (!src) {
-            showToast('Lütfen bir görsel seçin veya dosya yolu girin!', 'error');
-            return;
-        }
+        if (!appData.artists) appData.artists = [];
 
-        if (!appData.portfolio) appData.portfolio = [];
-
-        const existingIndex = appData.portfolio.findIndex(item => item.id === id);
-        if (existingIndex > -1) {
-            appData.portfolio[existingIndex] = { id, src, title, category, desc };
-            showToast('Görsel güncellendi!', 'success');
+        const existing = appData.artists.find(a => a.id === id);
+        if (existing) {
+            existing.name = name;
+            existing.concertName = concertName;
+            existing.cover = cover;
+            existing.actionText = actionText;
+            existing.actionUrl = actionUrl;
+            showToast('Sanatçı güncellendi!', 'success');
         } else {
-            appData.portfolio.unshift({ id, src, title, category, desc });
-            showToast('Yeni görsel eklendi!', 'success');
+            appData.artists.unshift({ id, name, concertName, cover, actionText, actionUrl, images: [] });
+            showToast('Yeni sanatçı eklendi!', 'success');
         }
 
         saveData(false);
-        renderPortfolioList();
-        closeModal();
+        renderArtistsList();
+        closeArtistModal();
     });
+
+    // Photo Modal Functions
+    function openPhotoModal(artistId) {
+        photoForm.reset();
+        targetArtistId.value = artistId;
+        photoPreview.style.display = 'none';
+        photoModal.classList.add('active');
+    }
+    
+    function closePhotoModal() {
+        photoModal.classList.remove('active');
+    }
+
+    document.getElementById('btnClosePhotoModal')?.addEventListener('click', closePhotoModal);
+    document.getElementById('btnCancelPhotoModal')?.addEventListener('click', closePhotoModal);
+
+    photoForm?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const artistId = parseInt(targetArtistId.value);
+        const src = photoSrc.value.trim();
+        const title = photoTitle.value.trim();
+        const desc = photoDesc.value.trim();
+        
+        const artist = appData.artists.find(a => a.id === artistId);
+        if (artist) {
+            if (!artist.images) artist.images = [];
+            artist.images.push({ id: Date.now(), src, title, desc });
+            saveData(false);
+            renderArtistsList();
+            showToast('Fotoğraf eklendi!', 'success');
+            closePhotoModal();
+        }
+    });
+
+    // Setup Dropzones
+    function setupDropzone(zoneId, inputId, previewId, pathInputId) {
+        const zone = document.getElementById(zoneId);
+        const fileInput = document.getElementById(inputId);
+        const pathInput = document.getElementById(pathInputId);
+        const preview = document.getElementById(previewId);
+        
+        if (!zone || !fileInput) return;
+        
+        zone.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
+        zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.style.borderColor = 'var(--accent)'; });
+        zone.addEventListener('dragleave', () => zone.style.borderColor = '');
+        zone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            zone.style.borderColor = '';
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) handleFile(file);
+        });
+
+        function handleFile(file) {
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    pathInput.value = event.target.result;
+                    preview.src = event.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        pathInput?.addEventListener('input', () => {
+            if (pathInput.value.trim()) {
+                preview.src = pathInput.value.trim();
+                preview.style.display = 'block';
+            } else {
+                preview.style.display = 'none';
+            }
+        });
+    }
+
+    setupDropzone('artistDropZone', 'artistFileInput', 'artistCoverPreview', 'artistCover');
+    setupDropzone('photoDropZone', 'photoFileInput', 'photoPreview', 'photoSrc');
 
     // ============================================
     // 2. HERO FORM
@@ -529,7 +629,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // INITIALIZATION
     // ============================================
     function initAll() {
-        renderPortfolioList();
+        renderArtistsList();
         populateHeroForm();
         renderStatsForm();
         populateAboutForm();
