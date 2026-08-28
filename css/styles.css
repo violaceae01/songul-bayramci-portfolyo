@@ -509,6 +509,10 @@ footer {
 
 .works-gallery-section {
     padding-top: 20px;
+}
+
+.home-rotating-gallery-section {
+    padding: 90px 0 110px;
     overflow: hidden;
 }
 

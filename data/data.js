@@ -12,8 +12,6 @@ const siteData = {
     { "id": 3, "number": "25+", "label": "Mutlu Müşteri" },
     { "id": 4, "number": "5+", "label": "Yıllık Deneyim" }
   ],
-  // Dönen galeri, aşağıdaki sanatçıların "images" listelerindeki tüm görselleri kullanır.
-  // Her listeye istediğiniz kadar 1080 x 1350 görsel ekleyebilirsiniz.
   "artists": [
     {
       "id": 1,
@@ -89,6 +87,19 @@ const siteData = {
         { "id": 601, "src": "Görsel/Dedub lüman.PNG", "title": "Dedub Lüman", "desc": "Klip Sahnesi ve Çekimleri" }
       ]
     }
+  ],
+  // ANASAYFA KARIŞIK GALERİSİ
+  // Görselleri Görsel klasörüne yükleyip aşağıdaki listeye istediğiniz kadar ekleyebilirsiniz.
+  // En iyi sonuç için dosyaları 1080 x 1350 piksel hazırlayın.
+  "homeGallery": [
+    { "id": 1, "src": "Görsel/Mert Demir.PNG", "title": "Mert Demir", "desc": "Canlı Konser Performansı" },
+    { "id": 2, "src": "Görsel/Tuğba Yurt1.PNG", "title": "Tuğba Yurt", "desc": "Sahne Performansı" },
+    { "id": 3, "src": "Görsel/Zeynep bastık3.PNG", "title": "Zeynep Bastık", "desc": "Konser Çekimi" },
+    { "id": 4, "src": "Görsel/Emre Fel2.PNG", "title": "Emre Fel", "desc": "Klip Çekimi" },
+    { "id": 5, "src": "Görsel/tUĞBA ÖZERK.PNG", "title": "Tuğba Özerk", "desc": "Özel Etkinlik" },
+    { "id": 6, "src": "Görsel/Dedub lüman.PNG", "title": "Dedub Lüman", "desc": "Canlı Sahne" },
+    { "id": 7, "src": "Görsel/Mert Demir2.PNG", "title": "Mert Demir", "desc": "Sahne Işıkları" },
+    { "id": 8, "src": "Görsel/Zeynep bastık2.PNG", "title": "Zeynep Bastık", "desc": "Konser Detayı" }
   ],
   "about": {
     "tag": "HAKKIMDA",

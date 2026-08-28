@@ -192,12 +192,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (saved) {
                 const parsed = JSON.parse(saved);
                 if (typeof siteData !== 'undefined') {
+                    let updated = false;
                     if (!parsed.artists && siteData.artists) {
                         parsed.artists = siteData.artists;
-                        localStorage.setItem('sb_site_data', JSON.stringify(parsed));
+                        updated = true;
                     } else if (parsed.artists && siteData.artists) {
                         // Merge concertName if missing
-                        let updated = false;
                         parsed.artists.forEach(a => {
                             if (!a.concertName) {
                                 const matched = siteData.artists.find(sa => sa.id === a.id);
@@ -207,10 +207,14 @@ document.addEventListener('DOMContentLoaded', () => {
                                 }
                             }
                         });
-                        if (updated) {
-                            localStorage.setItem('sb_site_data', JSON.stringify(parsed));
-                        }
                     }
+
+                    if (!parsed.homeGallery && siteData.homeGallery) {
+                        parsed.homeGallery = siteData.homeGallery;
+                        updated = true;
+                    }
+
+                    if (updated) localStorage.setItem('sb_site_data', JSON.stringify(parsed));
                 }
                 return parsed;
             }
@@ -438,7 +442,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // ============================================
     // LOAD ARTIST PORTFOLIO & GALLERY MODAL
     // ============================================
-    const rotatingGalleryTrack = document.getElementById('rotatingGalleryTrack');
+    const portfolioGrid = document.getElementById('portfolioGrid');
+    const homeRotatingGalleryTrack = document.getElementById('homeRotatingGalleryTrack');
     const directLinkGrid = document.getElementById('directLinkGrid');
     const artistGalleryModal = document.getElementById('artistGalleryModal');
     const artistGalleryClose = document.getElementById('artistGalleryClose');
@@ -449,26 +454,50 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let currentOpenArtist = null;
 
-    function loadRotatingGallery() {
-        if (!rotatingGalleryTrack) return;
-        rotatingGalleryTrack.innerHTML = '';
+    function loadPortfolio() {
+        if (!portfolioGrid) return;
+        portfolioGrid.innerHTML = '';
 
-        const galleryItems = artistsList.flatMap(artist => {
-            const images = artist.images && artist.images.length
-                ? artist.images
-                : [{ src: artist.cover, title: artist.name, desc: artist.concertName || '' }];
+        artistsList.forEach((artist, index) => {
+            const div = document.createElement('div');
+            div.className = 'portfolio-item reveal';
+            div.style.animationDelay = `${index * 0.1}s`;
+            const count = artist.images ? artist.images.length : 1;
+            div.innerHTML = `
+                <img src="${artist.cover}" alt="${artist.name}" loading="lazy">
+                <div class="portfolio-overlay">
+                    <span style="font-size:0.75rem; color:var(--accent); font-weight:600; letter-spacing:1px; margin-bottom:4px;">
+                        <i class="fas fa-images"></i> ${count} FOTOĞRAF
+                    </span>
+                    <h3 style="display:flex; justify-content:space-between; align-items:baseline;">
+                        <span>${artist.name}</span>
+                        <span style="font-size: 0.8rem; font-weight:400; color:#ccc;">${artist.concertName || ''}</span>
+                    </h3>
+                    <p><i class="fas fa-arrow-right" style="color:var(--accent);"></i> Galeriyi İncele</p>
+                </div>
+            `;
+            div.addEventListener('click', () => openArtistGallery(artist));
+            portfolioGrid.appendChild(div);
+        });
 
-            return images.map(image => ({ ...image, artist }));
-        }).filter(item => item.src);
+        document.querySelectorAll('#portfolioGrid .portfolio-item.reveal').forEach(el => revealObserver.observe(el));
+    }
+
+    function loadHomeRotatingGallery() {
+        if (!homeRotatingGalleryTrack) return;
+        homeRotatingGalleryTrack.innerHTML = '';
+
+        const galleryItems = ((typeof siteData !== 'undefined' ? siteData.homeGallery : null) || currentSiteData.homeGallery || [])
+            .filter(item => item && item.src);
 
         if (!galleryItems.length) {
-            rotatingGalleryTrack.innerHTML = '<p class="rotating-gallery-empty">Galeriye henüz görsel eklenmedi.</p>';
-            rotatingGalleryTrack.classList.add('is-empty');
+            homeRotatingGalleryTrack.innerHTML = '<p class="rotating-gallery-empty">Galeriye henüz görsel eklenmedi.</p>';
+            homeRotatingGalleryTrack.classList.add('is-empty');
             return;
         }
 
-        rotatingGalleryTrack.classList.remove('is-empty');
-        rotatingGalleryTrack.style.setProperty('--gallery-duration', `${Math.max(32, galleryItems.length * 4.5)}s`);
+        homeRotatingGalleryTrack.classList.remove('is-empty');
+        homeRotatingGalleryTrack.style.setProperty('--gallery-duration', `${Math.max(32, galleryItems.length * 4.5)}s`);
 
         const createGroup = (isDuplicate = false) => {
             const group = document.createElement('div');
@@ -480,24 +509,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 card.className = 'rotating-gallery-card';
                 card.type = 'button';
                 card.tabIndex = isDuplicate ? -1 : 0;
-                card.setAttribute('aria-label', `${item.title || item.artist.name} görselini büyüt`);
+                card.setAttribute('aria-label', `${item.title || 'Galeri'} görselini büyüt`);
                 card.innerHTML = `
-                    <img src="${item.src}" alt="${isDuplicate ? '' : (item.title || item.artist.name)}" loading="lazy">
+                    <img src="${item.src}" alt="${isDuplicate ? '' : (item.title || 'Galeri görseli')}" loading="lazy">
                     <span class="rotating-gallery-number">${String(index + 1).padStart(2, '0')}</span>
                     <span class="rotating-gallery-overlay">
-                        <strong>${item.title || item.artist.name}</strong>
-                        <small>${item.desc || item.artist.concertName || ''}</small>
+                        <strong>${item.title || 'Songül Bayramcı'}</strong>
+                        <small>${item.desc || ''}</small>
                         <i class="fas fa-expand-alt" aria-hidden="true"></i>
                     </span>
                 `;
-                card.addEventListener('click', () => openLightbox(item, item.artist));
+                card.addEventListener('click', () => openLightbox(item));
                 group.appendChild(card);
             });
 
             return group;
         };
 
-        rotatingGalleryTrack.append(createGroup(), createGroup(true));
+        homeRotatingGalleryTrack.append(createGroup(), createGroup(true));
     }
 
     function loadDirectLinks() {
@@ -576,7 +605,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    loadRotatingGallery();
+    loadPortfolio();
+    loadHomeRotatingGallery();
     loadDirectLinks();
 
     // ============================================
