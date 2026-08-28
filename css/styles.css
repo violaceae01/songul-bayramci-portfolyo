@@ -650,28 +650,6 @@ footer {
     font-size: 1rem;
 }
 
-.rotating-gallery-hint {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    margin-top: 10px;
-    color: var(--text-secondary);
-    font-size: 0.75rem;
-    letter-spacing: 1px;
-}
-
-.rotating-gallery-hint i {
-    color: var(--accent);
-}
-
-.rotating-gallery-hint span {
-    width: 3px;
-    height: 3px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.3);
-}
-
 .rotating-gallery-empty {
     width: 100vw;
     color: var(--text-secondary);
@@ -1837,12 +1815,6 @@ footer {
 
     .rotating-gallery-overlay {
         padding: 22px 18px 18px;
-    }
-
-    .rotating-gallery-hint {
-        flex-wrap: wrap;
-        padding: 0 24px;
-        text-align: center;
     }
 
     .portfolio-overlay {
