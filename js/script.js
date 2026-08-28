@@ -364,6 +364,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const navToggle = document.getElementById('navToggle');
     const navLinksContainer = document.querySelector('.nav-links');
     const navLinks = document.querySelectorAll('.nav-link');
+    const samePageNavLinks = document.querySelectorAll('.nav-link[href^="#"]');
     const sections = document.querySelectorAll('section[id]');
 
     // Scroll effect
@@ -383,7 +384,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        navLinks.forEach(link => {
+        samePageNavLinks.forEach(link => {
             link.classList.remove('active');
             if (link.getAttribute('href') === '#' + current) {
                 link.classList.add('active');

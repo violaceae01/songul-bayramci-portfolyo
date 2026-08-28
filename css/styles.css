@@ -498,6 +498,18 @@ footer {
     background: transparent;
 }
 
+.works-main {
+    min-height: 100vh;
+}
+
+.works-section-first {
+    padding-top: 180px;
+}
+
+.works-gallery-section {
+    padding-top: 20px;
+}
+
 .portfolio-filter {
     display: flex;
     justify-content: center;
