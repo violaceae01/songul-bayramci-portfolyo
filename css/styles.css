@@ -670,6 +670,11 @@ footer {
     background: transparent;
 }
 
+.about-page .about-section {
+    min-height: 100vh;
+    padding-top: 180px;
+}
+
 .about-grid {
     display: grid;
     grid-template-columns: 1fr 1.2fr;
@@ -713,6 +718,7 @@ footer {
     text-align: left;
 }
 
+.about-content h1,
 .about-content h2 {
     font-family: var(--font-display);
     font-size: 2.5rem;
@@ -1547,11 +1553,16 @@ footer {
         padding: 70px 0;
     }
 
+    .about-page .about-section {
+        padding: 130px 0 70px;
+    }
+
     .about-image img {
         height: 320px;
         border-radius: 14px;
     }
 
+    .about-content h1,
     .about-content h2 {
         font-size: 2rem;
         margin-bottom: 15px;

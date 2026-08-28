@@ -260,7 +260,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const aboutImg = document.querySelector('.about-image img');
             if (aboutImg && data.about.image) aboutImg.src = data.about.image;
 
-            const aboutName = document.querySelector('.about-content h2');
+            const aboutName = document.querySelector('.about-content h1, .about-content h2');
             if (aboutName && data.about.name) aboutName.textContent = data.about.name;
 
             const aboutLead = document.querySelector('.about-content .lead');

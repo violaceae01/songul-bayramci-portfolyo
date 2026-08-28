@@ -10,6 +10,7 @@ const staticDirectories = ["assets", "css", "data", "Görsel", "js"];
 const staticFiles = [
   "Code_Generated_Image.png",
   "calismalarim.html",
+  "hakkimda.html",
   "iletisim.html",
   "index.html",
   "songul.html",
