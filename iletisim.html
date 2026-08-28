@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Konser, klip ve etkinlik çekimleri için Songül Bayramcı ile iletişime geçin.">
+    <title>İletişim | Songül Bayramcı</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="contact-page">
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
+    <div class="scroll-progress" id="scrollProgress"></div>
+
+    <nav class="main-nav scrolled" id="mainNav">
+        <div class="nav-container">
+            <a href="index.html#home" class="nav-logo" aria-label="Ana sayfaya dön">SB</a>
+            <div class="nav-links">
+                <a href="index.html#home" class="nav-link">ANA SAYFA</a>
+                <a href="calismalarim.html" class="nav-link">ÇALIŞMALARIM</a>
+                <a href="index.html#hakkimda" class="nav-link">HAKKIMDA</a>
+                <a href="iletisim.html" class="nav-link active" aria-current="page">İLETİŞİM</a>
+            </div>
+            <button class="nav-toggle" id="navToggle" type="button" aria-label="Menüyü aç veya kapat">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <main>
+        <section id="iletisim" class="contact-section">
+            <div class="container">
+                <div class="section-header reveal">
+                    <span class="section-tag">İLETİŞİM</span>
+                    <h1 class="section-title">PROJEMİZ VAR!</h1>
+                    <p class="section-desc">Bir konser, klip veya etkinlik çekimi mi planlıyorsunuz? Birlikte çalışalım.</p>
+                </div>
+                <div class="contact-grid">
+                    <div class="contact-info reveal-left">
+                        <div class="contact-item">
+                            <i class="fas fa-envelope"></i>
+                            <div>
+                                <h4>E-posta</h4>
+                                <p>songul@ornek.com</p>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-phone"></i>
+                            <div>
+                                <h4>Telefon</h4>
+                                <p>+90 555 123 45 67</p>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <div>
+                                <h4>Konum</h4>
+                                <p>İstanbul, Türkiye</p>
+                            </div>
+                        </div>
+                        <div class="social-links">
+                            <a href="https://www.instagram.com/violaceae.01/" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                            <a href="#" class="social-link" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                            <a href="#" class="social-link" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                            <a href="#" class="social-link" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                        </div>
+                    </div>
+                    <form class="contact-form reveal-right" id="contactForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="sr-only" for="contactName">Adınız Soyadınız</label>
+                                <input id="contactName" name="name" type="text" placeholder="Adınız Soyadınız" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="sr-only" for="contactEmail">E-posta Adresiniz</label>
+                                <input id="contactEmail" name="email" type="email" placeholder="E-posta Adresiniz" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="sr-only" for="projectType">Proje Türü</label>
+                            <select id="projectType" name="projectType">
+                                <option value="">Proje Türü Seçin</option>
+                                <option value="konser">Konser Çekimi</option>
+                                <option value="klip">Müzik Klibi</option>
+                                <option value="etkinlik">Etkinlik Çekimi</option>
+                                <option value="diger">Diğer</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="sr-only" for="projectMessage">Projenizden Bahsedin</label>
+                            <textarea id="projectMessage" name="message" rows="5" placeholder="Projenizden Bahsedin..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-full">
+                            Mesaj Gönder <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">SONGÜL BAYRAMCI</div>
+                <p>Konser &amp; Etkinlik Görüntüleme</p>
+                <div class="footer-divider"></div>
+                <p class="copyright">&copy; 2026 Tüm Hakları Saklıdır.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="data/data.js"></script>
+    <script src="js/script.js"></script>
+</body>
+</html>
