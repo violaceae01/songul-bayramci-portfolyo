@@ -12,6 +12,8 @@ const siteData = {
     { "id": 3, "number": "25+", "label": "Mutlu Müşteri" },
     { "id": 4, "number": "5+", "label": "Yıllık Deneyim" }
   ],
+  // Dönen galeri, aşağıdaki sanatçıların "images" listelerindeki tüm görselleri kullanır.
+  // Her listeye istediğiniz kadar 1080 x 1350 görsel ekleyebilirsiniz.
   "artists": [
     {
       "id": 1,
