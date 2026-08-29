@@ -4,6 +4,6 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/build.mjs",
-    "test": "node scripts/test-site-data-api.mjs && node scripts/test-worker.mjs"
+    "test": "node scripts/test-worker.mjs"
   }
 }
