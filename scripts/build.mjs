@@ -13,6 +13,7 @@ const staticFiles = [
   "hakkimda.html",
   "iletisim.html",
   "index.html",
+  "sanatci.html",
   "songul.html",
 ];
 

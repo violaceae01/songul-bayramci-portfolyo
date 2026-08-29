@@ -15,76 +15,124 @@ const siteData = {
   "artists": [
     {
       "id": 1,
+      "slug": "mert-demir",
       "name": "Mert Demir",
-      "concertName": "Harbiye Açıkhava Konseri",
       "cover": "Görsel/Mert Demir.PNG",
-      "actionText": "Konser Çekimine Git",
-      "actionUrl": "https://www.instagram.com/mertdemir/",
-      "images": [
-        { "id": 101, "src": "Görsel/Mert Demir.PNG", "title": "Mert Demir", "desc": "Canlı Konser Performansı" },
-        { "id": 102, "src": "Görsel/Mert Demir1.PNG", "title": "Mert Demir", "desc": "Müzik Klibi Sahnesi" },
-        { "id": 103, "src": "Görsel/Mert Demir2.PNG", "title": "Mert Demir", "desc": "Sahne Işık ve Atmosfer" }
+      "concerts": [
+        {
+          "id": 101,
+          "name": "Harbiye Açıkhava Konseri",
+          "date": "",
+          "venue": "Harbiye Açıkhava",
+          "videoLabel": "Konser Çekimine Git",
+          "videoUrl": "https://www.instagram.com/mertdemir/",
+          "images": [
+            { "id": 1011, "src": "Görsel/Mert Demir.PNG", "title": "Mert Demir", "desc": "Canlı Konser Performansı" },
+            { "id": 1012, "src": "Görsel/Mert Demir1.PNG", "title": "Mert Demir", "desc": "Müzik Klibi Sahnesi" },
+            { "id": 1013, "src": "Görsel/Mert Demir2.PNG", "title": "Mert Demir", "desc": "Sahne Işık ve Atmosfer" }
+          ]
+        }
       ]
     },
     {
       "id": 2,
+      "slug": "tugba-yurt",
       "name": "Tuğba Yurt",
-      "concertName": "Jolly Joker Konseri",
       "cover": "Görsel/Tuğba Yurt.PNG",
-      "actionText": "Konser Çekimine Git",
-      "actionUrl": "https://www.instagram.com/tugbayurt/",
-      "images": [
-        { "id": 201, "src": "Görsel/Tuğba Yurt.PNG", "title": "Tuğba Yurt", "desc": "Canlı Konser Çekimi" },
-        { "id": 202, "src": "Görsel/Tuğba Yurt1.PNG", "title": "Tuğba Yurt", "desc": "Klip ve Performans" }
+      "concerts": [
+        {
+          "id": 201,
+          "name": "Jolly Joker Konseri",
+          "date": "",
+          "venue": "Jolly Joker",
+          "videoLabel": "Konser Çekimine Git",
+          "videoUrl": "https://www.instagram.com/tugbayurt/",
+          "images": [
+            { "id": 2011, "src": "Görsel/Tuğba Yurt.PNG", "title": "Tuğba Yurt", "desc": "Canlı Konser Çekimi" },
+            { "id": 2012, "src": "Görsel/Tuğba Yurt1.PNG", "title": "Tuğba Yurt", "desc": "Klip ve Performans" }
+          ]
+        }
       ]
     },
     {
       "id": 3,
+      "slug": "zeynep-bastik",
       "name": "Zeynep Bastık",
-      "concertName": "Bostancı Gösteri Merkezi",
       "cover": "Görsel/Zeynep bastık 4.PNG",
-      "actionText": "Konser Çekimine Git",
-      "actionUrl": "https://www.instagram.com/zeynepbastik/",
-      "images": [
-        { "id": 301, "src": "Görsel/Zeynep bastık 4.PNG", "title": "Zeynep Bastık", "desc": "Canlı Konser Çekimi" },
-        { "id": 302, "src": "Görsel/Zeynep bastık3.PNG", "title": "Zeynep Bastık", "desc": "Sahne Performansı" },
-        { "id": 303, "src": "Görsel/Zeynep bastık2.PNG", "title": "Zeynep Bastık", "desc": "Konser Detay Çekimi" },
-        { "id": 304, "src": "Görsel/zeynep bastık1.PNG", "title": "Zeynep Bastık", "desc": "Müzik Klibi Sahnesi" }
+      "concerts": [
+        {
+          "id": 301,
+          "name": "Bostancı Gösteri Merkezi",
+          "date": "",
+          "venue": "Bostancı Gösteri Merkezi",
+          "videoLabel": "Konser Çekimine Git",
+          "videoUrl": "https://www.instagram.com/zeynepbastik/",
+          "images": [
+            { "id": 3011, "src": "Görsel/Zeynep bastık 4.PNG", "title": "Zeynep Bastık", "desc": "Canlı Konser Çekimi" },
+            { "id": 3012, "src": "Görsel/Zeynep bastık3.PNG", "title": "Zeynep Bastık", "desc": "Sahne Performansı" },
+            { "id": 3013, "src": "Görsel/Zeynep bastık2.PNG", "title": "Zeynep Bastık", "desc": "Konser Detay Çekimi" },
+            { "id": 3014, "src": "Görsel/zeynep bastık1.PNG", "title": "Zeynep Bastık", "desc": "Müzik Klibi Sahnesi" }
+          ]
+        }
       ]
     },
     {
       "id": 4,
+      "slug": "emre-fel",
       "name": "Emre Fel",
-      "concertName": "Dorock XL Kadıköy",
       "cover": "Görsel/Emre fel.PNG",
-      "actionText": "Konser Çekimine Git",
-      "actionUrl": "https://www.instagram.com/emrefel/",
-      "images": [
-        { "id": 401, "src": "Görsel/Emre fel.PNG", "title": "Emre Fel", "desc": "Konser Sahne Çekimi" },
-        { "id": 402, "src": "Görsel/Emre Fel2.PNG", "title": "Emre Fel", "desc": "Klip Çekimi ve Detaylar" }
+      "concerts": [
+        {
+          "id": 401,
+          "name": "Dorock XL Kadıköy",
+          "date": "",
+          "venue": "Dorock XL Kadıköy",
+          "videoLabel": "Konser Çekimine Git",
+          "videoUrl": "https://www.instagram.com/emrefel/",
+          "images": [
+            { "id": 4011, "src": "Görsel/Emre fel.PNG", "title": "Emre Fel", "desc": "Konser Sahne Çekimi" },
+            { "id": 4012, "src": "Görsel/Emre Fel2.PNG", "title": "Emre Fel", "desc": "Klip Çekimi ve Detaylar" }
+          ]
+        }
       ]
     },
     {
       "id": 5,
+      "slug": "tugba-ozerk",
       "name": "Tuğba Özerk",
-      "concertName": "Özel Etkinlik Çekimi",
       "cover": "Görsel/tUĞBA ÖZERK.PNG",
-      "actionText": "Etkinlik Çekimine Git",
-      "actionUrl": "https://www.instagram.com/tugbaozerk/",
-      "images": [
-        { "id": 501, "src": "Görsel/tUĞBA ÖZERK.PNG", "title": "Tuğba Özerk", "desc": "Etkinlik Çekimi" },
-        { "id": 502, "src": "Görsel/Tuğba özerl2.PNG", "title": "Tuğba Özerk", "desc": "Canlı Sahne Performansı" }
+      "concerts": [
+        {
+          "id": 501,
+          "name": "Özel Etkinlik Çekimi",
+          "date": "",
+          "venue": "İstanbul",
+          "videoLabel": "Etkinlik Çekimine Git",
+          "videoUrl": "https://www.instagram.com/tugbaozerk/",
+          "images": [
+            { "id": 5011, "src": "Görsel/tUĞBA ÖZERK.PNG", "title": "Tuğba Özerk", "desc": "Etkinlik Çekimi" },
+            { "id": 5012, "src": "Görsel/Tuğba özerl2.PNG", "title": "Tuğba Özerk", "desc": "Canlı Sahne Performansı" }
+          ]
+        }
       ]
     },
     {
       "id": 6,
+      "slug": "dedub-luman",
       "name": "Dedub Lüman",
-      "concertName": "Vadi İstanbul Açıkhava",
       "cover": "Görsel/Dedub lüman.PNG",
-      "actionText": "Klip Çekimine Git",
-      "actionUrl": "https://www.instagram.com/dedubluman/",
-      "images": [
-        { "id": 601, "src": "Görsel/Dedub lüman.PNG", "title": "Dedub Lüman", "desc": "Klip Sahnesi ve Çekimleri" }
+      "concerts": [
+        {
+          "id": 601,
+          "name": "Vadi İstanbul Açıkhava",
+          "date": "",
+          "venue": "Vadi İstanbul Açıkhava",
+          "videoLabel": "Klip Çekimine Git",
+          "videoUrl": "https://www.instagram.com/dedubluman/",
+          "images": [
+            { "id": 6011, "src": "Görsel/Dedub lüman.PNG", "title": "Dedub Lüman", "desc": "Klip Sahnesi ve Çekimleri" }
+          ]
+        }
       ]
     }
   ],

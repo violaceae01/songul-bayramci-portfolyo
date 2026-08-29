@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Songül Bayramcı'nın konser ve etkinlik çekimlerinden seçkiler.">
-    <title>Çalışmalarım | Songül Bayramcı</title>
+    <meta name="description" content="Songül Bayramcı konser çekimleri, fotoğraf galerileri ve video bağlantıları.">
+    <title>Sanatçı Konserleri | Songül Bayramcı</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/styles.css">
 </head>
-<body class="works-page">
+<body class="artist-page">
     <div class="cursor-dot"></div>
     <div class="cursor-outline"></div>
     <div class="scroll-progress" id="scrollProgress"></div>
@@ -22,7 +22,7 @@
             <a href="index.html#home" class="nav-logo" aria-label="Ana sayfaya dön">SB</a>
             <div class="nav-links">
                 <a href="index.html#home" class="nav-link">ANA SAYFA</a>
-                <a href="calismalarim.html" class="nav-link active" aria-current="page">ÇALIŞMALARIM</a>
+                <a href="calismalarim.html" class="nav-link active">ÇALIŞMALARIM</a>
                 <a href="hakkimda.html" class="nav-link">HAKKIMDA</a>
                 <a href="iletisim.html" class="nav-link">İLETİŞİM</a>
             </div>
@@ -34,21 +34,30 @@
         </div>
     </nav>
 
-    <main class="works-main">
-        <section class="artist-directory-section works-section-first">
+    <main class="artist-detail-main" id="artistDetailRoot">
+        <section class="artist-detail-hero">
             <div class="container">
-                <div class="section-header reveal">
-                    <span class="section-tag">A — Z</span>
-                    <h1 class="section-title">SANATÇILAR</h1>
-                    <p class="section-desc">Sanatçıyı seçin; konserlerini, fotoğraf galerilerini ve video bağlantılarını inceleyin.</p>
+                <a href="calismalarim.html" class="artist-back-link"><i class="fas fa-arrow-left"></i> Tüm sanatçılar</a>
+                <div class="artist-detail-hero-grid">
+                    <div class="artist-detail-cover-wrap reveal">
+                        <img id="artistDetailCover" class="artist-detail-cover" src="" alt="">
+                    </div>
+                    <div class="artist-detail-heading reveal">
+                        <span class="section-tag" id="artistDetailTag">KONSER ARŞİVİ</span>
+                        <h1 id="artistDetailName">Sanatçı</h1>
+                        <p id="artistDetailSummary">Konser çekimleri yükleniyor.</p>
+                    </div>
                 </div>
+            </div>
+        </section>
 
-                <div class="artist-directory-meta reveal">
-                    <span id="artistDirectoryCount">0 sanatçı</span>
-                    <span>Alfabetik sıralama</span>
-                </div>
-                <div class="artist-directory" id="artistDirectory">
-                    <!-- Artists will be grouped alphabetically -->
+        <section class="artist-concerts-section">
+            <div class="container">
+                <div class="artist-concerts-list" id="artistConcertsList"></div>
+                <div class="artist-detail-empty" id="artistDetailEmpty" hidden>
+                    <span class="section-tag">ARŞİV</span>
+                    <h2>Henüz konser eklenmedi</h2>
+                    <p>Bu sanatçının yeni konser çekimleri eklendiğinde burada ayrı bölümler halinde görünecek.</p>
                 </div>
             </div>
         </section>
@@ -65,6 +74,15 @@
             </div>
         </div>
     </footer>
+
+    <div class="lightbox" id="lightbox">
+        <button class="lightbox-close" id="lightboxClose" type="button" aria-label="Fotoğrafı kapat">&times;</button>
+        <img src="" alt="" class="lightbox-image" id="lightboxImage">
+        <div class="lightbox-info">
+            <h3 id="lightboxTitle"></h3>
+            <p id="lightboxDesc"></p>
+        </div>
+    </div>
 
     <script src="data/data.js"></script>
     <script src="js/data-utils.js"></script>

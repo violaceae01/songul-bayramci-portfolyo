@@ -225,7 +225,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const currentSiteData = getSiteData();
-    let artistsList = currentSiteData.artists || (typeof siteData !== 'undefined' ? siteData.artists : []);
+    const dataUtils = window.SiteDataUtils;
+    let artistsList = dataUtils
+        ? dataUtils.normalizeArtists(currentSiteData.artists || (typeof siteData !== 'undefined' ? siteData.artists : []))
+        : (currentSiteData.artists || (typeof siteData !== 'undefined' ? siteData.artists : []));
 
     // Hydrate Hero & About & Contact
     function hydrateStaticContent(data) {
@@ -440,47 +443,156 @@ document.addEventListener('DOMContentLoaded', () => {
     reveals.forEach(el => revealObserver.observe(el));
 
     // ============================================
-    // LOAD ARTIST PORTFOLIO & GALLERY MODAL
+    // ARTIST DIRECTORY, DETAIL PAGE & HOME GALLERY
     // ============================================
-    const portfolioGrid = document.getElementById('portfolioGrid');
+    const artistDirectory = document.getElementById('artistDirectory');
+    const artistDirectoryCount = document.getElementById('artistDirectoryCount');
+    const artistDetailRoot = document.getElementById('artistDetailRoot');
+    const artistDetailCover = document.getElementById('artistDetailCover');
+    const artistDetailName = document.getElementById('artistDetailName');
+    const artistDetailTag = document.getElementById('artistDetailTag');
+    const artistDetailSummary = document.getElementById('artistDetailSummary');
+    const artistConcertsList = document.getElementById('artistConcertsList');
+    const artistDetailEmpty = document.getElementById('artistDetailEmpty');
     const homeRotatingGalleryTrack = document.getElementById('homeRotatingGalleryTrack');
-    const directLinkGrid = document.getElementById('directLinkGrid');
-    const artistGalleryModal = document.getElementById('artistGalleryModal');
-    const artistGalleryClose = document.getElementById('artistGalleryClose');
-    const modalArtistCategory = document.getElementById('modalArtistCategory');
-    const modalArtistName = document.getElementById('modalArtistName');
-    const modalArtistCount = document.getElementById('modalArtistCount');
-    const modalArtistGrid = document.getElementById('modalArtistGrid');
 
-    let currentOpenArtist = null;
+    const escapeHtml = value => dataUtils ? dataUtils.escapeHtml(value) : String(value || '');
 
-    function loadPortfolio() {
-        if (!portfolioGrid) return;
-        portfolioGrid.innerHTML = '';
+    function loadArtistDirectory() {
+        if (!artistDirectory) return;
+        artistDirectory.innerHTML = '';
 
-        artistsList.forEach((artist, index) => {
-            const div = document.createElement('div');
-            div.className = 'portfolio-item reveal';
-            div.style.animationDelay = `${index * 0.1}s`;
-            const count = artist.images ? artist.images.length : 1;
-            div.innerHTML = `
-                <img src="${artist.cover}" alt="${artist.name}" loading="lazy">
-                <div class="portfolio-overlay">
-                    <span style="font-size:0.75rem; color:var(--accent); font-weight:600; letter-spacing:1px; margin-bottom:4px;">
-                        <i class="fas fa-images"></i> ${count} FOTOĞRAF
+        const sortedArtists = dataUtils ? dataUtils.sortArtists(artistsList) : [...artistsList];
+        if (artistDirectoryCount) artistDirectoryCount.textContent = `${sortedArtists.length} sanatçı`;
+
+        if (!sortedArtists.length) {
+            artistDirectory.innerHTML = '<div class="artist-directory-empty"><h2>Henüz sanatçı eklenmedi</h2><p>Yeni sanatçılar yönetim panelinden eklendiğinde burada alfabetik olarak sıralanacak.</p></div>';
+            return;
+        }
+
+        const grouped = sortedArtists.reduce((groups, artist) => {
+            const letter = (artist.name || '#').trim().charAt(0).toLocaleUpperCase('tr') || '#';
+            if (!groups[letter]) groups[letter] = [];
+            groups[letter].push(artist);
+            return groups;
+        }, {});
+
+        Object.entries(grouped).forEach(([letter, artists]) => {
+            const group = document.createElement('section');
+            group.className = 'artist-letter-group reveal';
+            group.innerHTML = `<h2 class="artist-letter">${escapeHtml(letter)}</h2><div class="artist-directory-grid"></div>`;
+            const grid = group.querySelector('.artist-directory-grid');
+
+            artists.forEach(artist => {
+                const photoCount = artist.concerts.reduce((total, concert) => total + (concert.images?.length || 0), 0);
+                const link = document.createElement('a');
+                link.className = 'artist-directory-card';
+                link.href = `sanatci.html?artist=${encodeURIComponent(artist.slug)}`;
+                link.innerHTML = `
+                    <img src="${escapeHtml(artist.cover)}" alt="${escapeHtml(artist.name)}" loading="lazy">
+                    <span class="artist-directory-overlay">
+                        <small>${artist.concerts.length} KONSER · ${photoCount} KARE</small>
+                        <strong>${escapeHtml(artist.name)}</strong>
+                        <span>Arşivi Aç <i class="fas fa-arrow-right"></i></span>
                     </span>
-                    <h3 style="display:flex; justify-content:space-between; align-items:baseline;">
-                        <span>${artist.name}</span>
-                        <span style="font-size: 0.8rem; font-weight:400; color:#ccc;">${artist.concertName || ''}</span>
-                    </h3>
-                    <p><i class="fas fa-arrow-right" style="color:var(--accent);"></i> Galeriyi İncele</p>
-                </div>
-            `;
-            div.addEventListener('click', () => openArtistGallery(artist));
-            portfolioGrid.appendChild(div);
-        });
+                `;
+                grid.appendChild(link);
+            });
 
-        document.querySelectorAll('#portfolioGrid .portfolio-item.reveal').forEach(el => revealObserver.observe(el));
+            artistDirectory.appendChild(group);
+            revealObserver.observe(group);
+        });
+    }
+
+    function formatConcertDate(value) {
+        if (!value) return '';
+        const date = new Date(`${value}T00:00:00`);
+        if (Number.isNaN(date.getTime())) return value;
+        return new Intl.DateTimeFormat('tr-TR', { day: '2-digit', month: 'long', year: 'numeric' }).format(date);
+    }
+
+    function loadArtistDetail() {
+        if (!artistDetailRoot || !artistConcertsList) return;
+
+        const artistParam = new URLSearchParams(window.location.search).get('artist');
+        const artist = artistsList.find(item => item.slug === artistParam || String(item.id) === String(artistParam));
+
+        if (!artist) {
+            document.title = 'Sanatçı Bulunamadı | Songül Bayramcı';
+            artistDetailRoot.innerHTML = `
+                <section class="artist-not-found"><div class="container">
+                    <span class="section-tag">404</span><h1>Sanatçı bulunamadı</h1>
+                    <p>Aradığınız sanatçı kaldırılmış veya bağlantı değişmiş olabilir.</p>
+                    <a href="calismalarim.html" class="btn btn-primary">Tüm Sanatçılar</a>
+                </div></section>`;
+            return;
+        }
+
+        document.title = `${artist.name} Konserleri | Songül Bayramcı`;
+        if (artistDetailCover) {
+            artistDetailCover.src = artist.cover;
+            artistDetailCover.alt = artist.name;
+        }
+        if (artistDetailName) artistDetailName.textContent = artist.name;
+        if (artistDetailTag) artistDetailTag.textContent = `${artist.concerts.length} KONSER ARŞİVİ`;
+        if (artistDetailSummary) artistDetailSummary.textContent = `${artist.name} konser çekimleri, fotoğraf galerileri ve video bağlantıları.`;
+
+        const concerts = [...artist.concerts].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+        artistConcertsList.innerHTML = '';
+
+        if (!concerts.length) {
+            if (artistDetailEmpty) artistDetailEmpty.hidden = false;
+            return;
+        }
+
+        if (artistDetailEmpty) artistDetailEmpty.hidden = true;
+        concerts.forEach((concert, concertIndex) => {
+            const article = document.createElement('article');
+            article.className = 'artist-concert-block reveal';
+            const dateText = formatConcertDate(concert.date);
+            const meta = [dateText, concert.venue].filter(Boolean);
+            const gallery = concert.images || [];
+
+            article.innerHTML = `
+                <header class="artist-concert-header">
+                    <div>
+                        <span class="concert-index">${String(concertIndex + 1).padStart(2, '0')}</span>
+                        ${meta.length ? `<p class="concert-meta">${meta.map(escapeHtml).join(' · ')}</p>` : ''}
+                        <h2>${escapeHtml(concert.name)}</h2>
+                        <p>${gallery.length} fotoğraf çekimi</p>
+                    </div>
+                    ${concert.videoUrl ? `
+                        <div class="concert-video-panel">
+                            <span><i class="fas fa-play"></i> VİDEO BAĞLANTISI</span>
+                            <a href="${escapeHtml(concert.videoUrl)}" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+                                ${escapeHtml(concert.videoLabel || 'Konser Çekimine Git')} <i class="fas fa-arrow-up-right-from-square"></i>
+                            </a>
+                        </div>` : ''}
+                </header>
+                <div class="concert-photo-grid"></div>
+            `;
+
+            const photoGrid = article.querySelector('.concert-photo-grid');
+            if (!gallery.length) {
+                photoGrid.innerHTML = '<p class="concert-gallery-empty">Bu konsere henüz fotoğraf eklenmedi.</p>';
+            } else {
+                gallery.forEach(image => {
+                    const button = document.createElement('button');
+                    button.type = 'button';
+                    button.className = 'concert-photo-card';
+                    button.setAttribute('aria-label', `${image.title || artist.name} görselini büyüt`);
+                    button.innerHTML = `
+                        <img src="${escapeHtml(image.src)}" alt="${escapeHtml(image.title || artist.name)}" loading="lazy">
+                        <span><strong>${escapeHtml(image.title || artist.name)}</strong><small>${escapeHtml(image.desc || concert.name)}</small></span>
+                    `;
+                    button.addEventListener('click', () => openLightbox(image));
+                    photoGrid.appendChild(button);
+                });
+            }
+
+            artistConcertsList.appendChild(article);
+            revealObserver.observe(article);
+        });
     }
 
     function loadHomeRotatingGallery() {
@@ -529,85 +641,9 @@ document.addEventListener('DOMContentLoaded', () => {
         homeRotatingGalleryTrack.append(createGroup(), createGroup(true));
     }
 
-    function loadDirectLinks() {
-        if (!directLinkGrid) return;
-        directLinkGrid.innerHTML = '';
-
-        artistsList.forEach((artist, index) => {
-            const div = document.createElement('div');
-            div.className = 'portfolio-item reveal';
-            div.style.animationDelay = `${index * 0.1}s`;
-            div.innerHTML = `
-                <img src="${artist.cover}" alt="${artist.name}" loading="lazy">
-                <div class="portfolio-overlay">
-                    <h3 style="display:flex; justify-content:space-between; align-items:baseline;">
-                        <span>${artist.name}</span> 
-                        <span style="font-size: 0.8rem; font-weight:400; color:#ccc;">${artist.concertName || ''}</span>
-                    </h3>
-                    <p><i class="fas fa-link" style="color:var(--accent);"></i> ${artist.actionText || 'Konser Çekimine Git'}</p>
-                </div>
-            `;
-            div.addEventListener('click', () => {
-                if(artist.actionUrl) {
-                    window.open(artist.actionUrl, '_blank');
-                }
-            });
-            directLinkGrid.appendChild(div);
-        });
-
-        // Re-observe new elements
-        document.querySelectorAll('#directLinkGrid .portfolio-item.reveal').forEach(el => revealObserver.observe(el));
-    }
-
-    function openArtistGallery(artist) {
-        if (!artistGalleryModal) return;
-        currentOpenArtist = artist;
-
-        if (modalArtistCategory) modalArtistCategory.textContent = (artist.category || 'Konser').toUpperCase();
-        if (modalArtistName) modalArtistName.textContent = artist.name || 'Sanatçı';
-        const imgCount = artist.images ? artist.images.length : 0;
-        if (modalArtistCount) modalArtistCount.textContent = `${imgCount} Fotoğraf Çekimi`;
-
-        if (modalArtistGrid) {
-            modalArtistGrid.innerHTML = '';
-            (artist.images || []).forEach(img => {
-                const card = document.createElement('div');
-                card.className = 'artist-photo-card';
-                card.innerHTML = `
-                    <img src="${img.src}" alt="${img.title || artist.name}" loading="lazy">
-                    <div class="artist-photo-overlay">
-                        <span style="font-weight:600; font-size:0.95rem; color:#fff; margin-bottom:3px;">${img.title || artist.name}</span>
-                        <span><i class="fas fa-search-plus"></i> Büyütmek İçin Tıkla</span>
-                    </div>
-                `;
-                card.addEventListener('click', () => openLightbox(img, artist));
-                modalArtistGrid.appendChild(card);
-            });
-        }
-
-        artistGalleryModal.classList.add('active');
-        document.body.style.overflow = 'hidden';
-    }
-
-    function closeArtistGallery() {
-        if (!artistGalleryModal) return;
-        artistGalleryModal.classList.remove('active');
-        document.body.style.overflow = '';
-    }
-
-    if (artistGalleryClose) {
-        artistGalleryClose.addEventListener('click', closeArtistGallery);
-    }
-
-    if (artistGalleryModal) {
-        artistGalleryModal.addEventListener('click', (e) => {
-            if (e.target === artistGalleryModal) closeArtistGallery();
-        });
-    }
-
-    loadPortfolio();
+    loadArtistDirectory();
+    loadArtistDetail();
     loadHomeRotatingGallery();
-    loadDirectLinks();
 
     // ============================================
     // LIGHTBOX
@@ -618,7 +654,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const lightboxDesc = document.getElementById('lightboxDesc');
     const lightboxClose = document.getElementById('lightboxClose');
 
-    function openLightbox(item, artist = currentOpenArtist) {
+    function openLightbox(item) {
         if (!lightbox || !lightboxImage) return;
 
         lightboxImage.src = item.src;
@@ -633,12 +669,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function closeLightbox() {
         if (!lightbox) return;
         lightbox.classList.remove('active');
-        // If artist gallery modal is still open, keep overflow hidden
-        if (artistGalleryModal && artistGalleryModal.classList.contains('active')) {
-            document.body.style.overflow = 'hidden';
-        } else {
-            document.body.style.overflow = '';
-        }
+        document.body.style.overflow = '';
     }
 
     if (lightboxClose) {
@@ -651,13 +682,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Escape key listener for both modals
+    // Escape key listener
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
             if (lightbox && lightbox.classList.contains('active')) {
                 closeLightbox();
-            } else if (artistGalleryModal && artistGalleryModal.classList.contains('active')) {
-                closeArtistGallery();
             }
         }
     });

@@ -26,7 +26,7 @@
             <li class="sidebar-item">
                 <a href="#portfolio" class="sidebar-link active" data-tab="tab-portfolio">
                     <i class="fas fa-images"></i>
-                    <span>Portföy & Görseller</span>
+                    <span>Sanatçılar & Konserler</span>
                 </a>
             </li>
             <li class="sidebar-item">
@@ -80,8 +80,8 @@
         <!-- Top Header -->
         <header class="admin-header">
             <div class="header-title">
-                <h1 id="pageTitle">Portföy & Görsel Yönetimi</h1>
-                <p id="pageDesc">Çalışmalarım bölümünde sergilenen fotoğrafları düzenleyin, silin veya yeni görsel ekleyin.</p>
+                <h1 id="pageTitle">Sanatçı & Konser Yönetimi</h1>
+                <p id="pageDesc">Sanatçıları, sanatçılara bağlı konserleri, galerileri ve video bağlantılarını yönetin.</p>
             </div>
             <div class="header-actions">
                 <button class="btn btn-secondary" id="btnResetData">
@@ -97,7 +97,7 @@
         <section id="tab-portfolio" class="tab-panel active">
             <div class="admin-card">
                 <div class="card-header">
-                    <h2>Sanatçı Portföyleri (<span id="artistsCount">0</span>)</h2>
+                    <h2>Sanatçılar (<span id="artistsCount">0</span>)</h2>
                     <button class="btn btn-primary btn-sm" id="btnOpenAddArtistModal">
                         <i class="fas fa-plus"></i> Yeni Sanatçı Ekle
                     </button>
@@ -277,13 +277,6 @@
                     <input type="text" id="artistName" class="form-control" placeholder="Örn: Mert Demir" required>
                 </div>
 
-                <div class="form-group">
-                    <label>Konser / Etkinlik Adı</label>
-                    <input type="text" id="artistConcertName" class="form-control" placeholder="Örn: Harbiye Açıkhava Konseri">
-                </div>
-
-
-
                 <!-- Artist Cover Image -->
                 <div class="form-group">
                     <label>Kapak Görseli (Dosya Seçin veya Yol/URL Girin)</label>
@@ -296,19 +289,54 @@
                     <img id="artistCoverPreview" class="image-preview" alt="Kapak Önizleme">
                 </div>
 
-                <div class="form-group">
-                    <label>Yönlendirme Buton Başlığı</label>
-                    <input type="text" id="artistActionText" class="form-control" placeholder="Örn: Konser Çekimine Git" required>
-                </div>
-
-                <div class="form-group">
-                    <label>Yönlendirme Linki (Instagram / Video URL)</label>
-                    <input type="text" id="artistActionUrl" class="form-control" placeholder="Örn: https://www.instagram.com/mertdemir/" required>
-                </div>
-
                 <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 25px;">
                     <button type="button" class="btn btn-secondary" id="btnCancelArtistModal">İptal</button>
                     <button type="submit" class="btn btn-primary" id="btnSaveArtistModal">Sanatçıyı Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Concert Add/Edit Modal -->
+    <div class="modal" id="concertModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="concertModalTitle">Yeni Konser Ekle</h2>
+                <button class="modal-close" id="btnCloseConcertModal" type="button">&times;</button>
+            </div>
+            <form id="concertForm">
+                <input type="hidden" id="targetConcertArtistId">
+                <input type="hidden" id="editConcertId">
+
+                <div class="form-group">
+                    <label>Konser / Etkinlik Adı</label>
+                    <input type="text" id="concertName" class="form-control" placeholder="Örn: Harbiye Açıkhava Konseri" required>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Konser Tarihi</label>
+                        <input type="date" id="concertDate" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Mekân</label>
+                        <input type="text" id="concertVenue" class="form-control" placeholder="Örn: Harbiye Açıkhava">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Video Butonu Yazısı</label>
+                    <input type="text" id="concertVideoLabel" class="form-control" placeholder="Örn: Konser Çekimine Git">
+                </div>
+
+                <div class="form-group">
+                    <label>Video / Çekim Bağlantısı</label>
+                    <input type="url" id="concertVideoUrl" class="form-control" placeholder="https://youtube.com/... veya https://instagram.com/...">
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 25px;">
+                    <button type="button" class="btn btn-secondary" id="btnCancelConcertModal">İptal</button>
+                    <button type="submit" class="btn btn-primary">Konseri Kaydet</button>
                 </div>
             </form>
         </div>
@@ -318,11 +346,12 @@
     <div class="modal" id="photoModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Sanatçıya Yeni Fotoğraf Ekle</h2>
+                <h2>Konsere Yeni Fotoğraf Ekle</h2>
                 <button class="modal-close" id="btnClosePhotoModal">&times;</button>
             </div>
             <form id="photoForm">
                 <input type="hidden" id="targetArtistId">
+                <input type="hidden" id="targetConcertId">
 
                 <!-- Photo Upload & Path -->
                 <div class="form-group">
@@ -358,6 +387,7 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <script src="data/data.js"></script>
+    <script src="js/data-utils.js"></script>
     <script src="js/admin.js"></script>
 </body>
 </html>
