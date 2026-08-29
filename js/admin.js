@@ -51,6 +51,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function updateStorageStatus() {
         const status = document.getElementById('storageStatus');
         if (!status || !api) return;
+        if (api.isLocalPreview) {
+            status.className = 'storage-status storage-status-local';
+            status.innerHTML = '<i class="fas fa-laptop"></i><span>Yerel önizleme açık. Sanatçı, konser ve görsel ekleyebilirsiniz; değişiklikler bu cihazda saklanır.</span>';
+            return;
+        }
         const mode = api.getStorageMode();
         if (mode === 'local') {
             status.className = 'storage-status storage-status-local';
