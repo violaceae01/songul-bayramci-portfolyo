@@ -79,9 +79,6 @@
     }
 
     async function load(defaults) {
-        if (isLocalPreview) {
-            return await loadLocal(defaults);
-        }
         try {
             const response = await fetch('/api/site-data', {
                 method: 'GET',
@@ -95,12 +92,15 @@
                 lastError = null;
                 return mergeData(defaults, payload.data);
             }
-            throw new Error(`Site verisi alınamadı (${response.status}).`);
+            if (!isLocalPreview) throw new Error(`Site verisi alınamadı (${response.status}).`);
         } catch (error) {
             lastError = error;
-            storageMode = 'unavailable';
-            return clone(defaults);
+            if (!isLocalPreview) {
+                storageMode = 'unavailable';
+                return clone(defaults);
+            }
         }
+        return await loadLocal(defaults);
     }
 
     async function readError(response) {
@@ -113,16 +113,6 @@
     }
 
     async function save(data) {
-        if (isLocalPreview) {
-            try {
-                await writeIndexedData(data);
-            } catch {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-            }
-            storageMode = 'local';
-            return { ok: true, local: true };
-        }
-
         if (storageMode === 'cloud') {
             const response = await fetch('/api/site-data', {
                 method: 'PUT',
@@ -135,6 +125,15 @@
                 throw error;
             }
             return response.json();
+        }
+
+        if (isLocalPreview && storageMode !== 'unavailable') {
+            try {
+                await writeIndexedData(data);
+            } catch {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            }
+            return { ok: true, local: true };
         }
 
         throw lastError || new Error('Kalıcı depolama şu anda kullanılamıyor.');
@@ -174,11 +173,6 @@
     }
 
     async function uploadImage(file) {
-        if (isLocalPreview) {
-            storageMode = 'local';
-            return fileToOptimizedDataUrl(file);
-        }
-
         if (storageMode === 'cloud') {
             const form = new FormData();
             form.append('file', file, file.name);
@@ -190,6 +184,10 @@
             }
             const payload = await response.json();
             return payload.url;
+        }
+
+        if (isLocalPreview && storageMode !== 'unavailable') {
+            return fileToOptimizedDataUrl(file);
         }
 
         throw lastError || new Error('Görsel yükleme şu anda kullanılamıyor.');
