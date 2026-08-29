@@ -1,21 +1,20 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const STORAGE_KEY = 'sb_site_data';
+document.addEventListener('DOMContentLoaded', async () => {
+    const api = window.SiteDataApi;
     const utils = window.SiteDataUtils;
     const clone = value => JSON.parse(JSON.stringify(value));
     const escapeHtml = value => utils ? utils.escapeHtml(value) : String(value || '');
     const findById = (list, id) => (list || []).find(item => String(item.id) === String(id));
+    const defaults = typeof siteData !== 'undefined' ? clone(siteData) : {
+        hero: {}, stats: [], artists: [], homeGallery: [], about: {}, testimonials: [], contact: {}
+    };
 
-    let appData = loadData();
+    let appData = await loadData();
 
-    function loadData() {
-        const defaults = typeof siteData !== 'undefined' ? clone(siteData) : {
-            hero: {}, stats: [], artists: [], homeGallery: [], about: {}, testimonials: [], contact: {}
-        };
+    async function loadData() {
         try {
-            const saved = localStorage.getItem(STORAGE_KEY);
-            const parsed = saved ? JSON.parse(saved) : {};
-            const merged = { ...defaults, ...parsed };
-            merged.artists = utils ? utils.normalizeArtists(parsed.artists || defaults.artists) : (parsed.artists || defaults.artists);
+            const loaded = api ? await api.load(defaults) : clone(defaults);
+            const merged = { ...defaults, ...loaded };
+            merged.artists = utils ? utils.normalizeArtists(loaded.artists || defaults.artists) : (loaded.artists || defaults.artists);
             if (utils) {
                 const defaultArtists = utils.normalizeArtists(defaults.artists);
                 merged.artists.forEach(artist => {
@@ -23,7 +22,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (!artist.bio && defaultArtist?.bio) artist.bio = defaultArtist.bio;
                 });
             }
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
             return merged;
         } catch (error) {
             console.error('Veri yükleme hatası:', error);
@@ -32,14 +30,54 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function saveData(notify = true) {
+    async function saveData(notify = true) {
         try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
-            if (notify) showToast('Tüm değişiklikler başarıyla kaydedildi!', 'success');
+            if (!api) throw new Error('Depolama bağlantısı kurulamadı.');
+            const result = await api.save(appData);
+            if (notify) {
+                showToast(result.local ? 'Değişiklikler yerel önizlemeye kaydedildi.' : 'Değişiklikler siteye kalıcı olarak kaydedildi.', 'success');
+            }
+            return true;
         } catch (error) {
             console.error('Kaydetme hatası:', error);
-            showToast('Veri boyutu tarayıcı sınırını aştı. Büyük görselleri dosya yolu olarak ekleyin.', 'error');
+            const message = error.status === 401
+                ? 'Kaydetmek için ChatGPT hesabınızla giriş yapın.'
+                : error.message || 'Değişiklikler kaydedilemedi.';
+            showToast(message, 'error');
+            return false;
         }
+    }
+
+    async function updateStorageStatus() {
+        const status = document.getElementById('storageStatus');
+        if (!status || !api) return;
+        const mode = api.getStorageMode();
+        if (mode === 'local') {
+            status.className = 'storage-status storage-status-local';
+            status.innerHTML = '<i class="fas fa-laptop"></i><span>Yerel önizleme: görseller 1080 × 1350 sınırında küçültülür. Yayınlanan sitede kalıcı dosya deposu kullanılacaktır.</span>';
+            return;
+        }
+        if (mode === 'cloud') {
+            try {
+                const session = await api.getAdminSession();
+                if (session.authorized) {
+                    status.className = 'storage-status storage-status-cloud';
+                    status.innerHTML = '<i class="fas fa-cloud"></i><span>Kalıcı site depolaması bağlı. İçerikler ve görseller tüm cihazlarda güncellenecek.</span>';
+                } else if (!session.configured) {
+                    status.className = 'storage-status storage-status-error';
+                    status.innerHTML = '<i class="fas fa-user-lock"></i><span>Yönetici hesabı henüz tanımlanmadı. Yayınlama sırasında yönetici e-postası ayarlanmalıdır.</span>';
+                } else {
+                    status.className = 'storage-status storage-status-error';
+                    status.innerHTML = '<i class="fas fa-user-lock"></i><span>Kaydetmek için <a href="/signin-with-chatgpt?return_to=/songul.html" target="_top">ChatGPT ile giriş yapın</a>.</span>';
+                }
+            } catch (error) {
+                status.className = 'storage-status storage-status-error';
+                status.innerHTML = `<i class="fas fa-triangle-exclamation"></i><span>${escapeHtml(error.message || 'Depolama durumu alınamadı.')}</span>`;
+            }
+            return;
+        }
+        status.className = 'storage-status storage-status-error';
+        status.innerHTML = '<i class="fas fa-triangle-exclamation"></i><span>Kalıcı site depolamasına şu anda ulaşılamıyor.</span>';
     }
 
     function showToast(message, type = 'success') {
@@ -170,7 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </section>`;
     }
 
-    artistsListEl?.addEventListener('click', event => {
+    artistsListEl?.addEventListener('click', async event => {
         const button = event.target.closest('[data-action]');
         if (!button) return;
         const action = button.dataset.action;
@@ -183,16 +221,25 @@ document.addEventListener('DOMContentLoaded', () => {
         if (action === 'edit-concert' && concert) openConcertModal(artist.id, concert);
         if (action === 'add-photo' && concert) openPhotoModal(artist.id, concert.id);
         if (action === 'delete-artist' && confirm(`${artist.name} ve tüm konserleri silinsin mi?`)) {
+            const previous = clone(appData);
             appData.artists = appData.artists.filter(item => String(item.id) !== String(artist.id));
-            saveData(false); renderArtistsList(); showToast('Sanatçı silindi.');
+            if (await saveData(false)) showToast('Sanatçı silindi.');
+            else appData = previous;
+            renderArtistsList();
         }
         if (action === 'delete-concert' && concert && confirm(`${concert.name} konseri ve tüm fotoğrafları silinsin mi?`)) {
+            const previous = clone(appData);
             artist.concerts = artist.concerts.filter(item => String(item.id) !== String(concert.id));
-            saveData(false); renderArtistsList(); showToast('Konser silindi.');
+            if (await saveData(false)) showToast('Konser silindi.');
+            else appData = previous;
+            renderArtistsList();
         }
         if (action === 'delete-photo' && concert && confirm('Bu fotoğraf silinsin mi?')) {
+            const previous = clone(appData);
             concert.images = concert.images.filter(item => String(item.id) !== String(button.dataset.photoId));
-            saveData(false); renderArtistsList(); showToast('Fotoğraf silindi.');
+            if (await saveData(false)) showToast('Fotoğraf silindi.');
+            else appData = previous;
+            renderArtistsList();
         }
     });
 
@@ -212,20 +259,26 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btnCloseArtistModal')?.addEventListener('click', closeArtistModal);
     document.getElementById('btnCancelArtistModal')?.addEventListener('click', closeArtistModal);
 
-    artistForm?.addEventListener('submit', event => {
+    artistForm?.addEventListener('submit', async event => {
         event.preventDefault();
+        const previous = clone(appData);
         const existing = findById(appData.artists, editArtistId.value);
         const name = artistName.value.trim();
         const bio = artistBio.value.trim();
         const cover = artistCover.value.trim();
         if (existing) {
-            existing.name = name; existing.bio = bio; existing.cover = cover; showToast('Sanatçı güncellendi.');
+            existing.name = name; existing.bio = bio; existing.cover = cover;
         } else {
             const id = Date.now();
             appData.artists.push({ id, slug: utils ? utils.slugify(name) : String(id), name, bio, cover, concerts: [] });
-            showToast('Yeni sanatçı eklendi.');
         }
-        saveData(false); renderArtistsList(); closeArtistModal();
+        if (await saveData(false)) {
+            showToast(existing ? 'Sanatçı güncellendi.' : 'Yeni sanatçı eklendi.');
+            renderArtistsList();
+            closeArtistModal();
+        } else {
+            appData = previous;
+        }
     });
 
     function openConcertModal(artistId, concert = null) {
@@ -242,15 +295,22 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btnCloseConcertModal')?.addEventListener('click', closeConcertModal);
     document.getElementById('btnCancelConcertModal')?.addEventListener('click', closeConcertModal);
 
-    concertForm?.addEventListener('submit', event => {
+    concertForm?.addEventListener('submit', async event => {
         event.preventDefault();
+        const previous = clone(appData);
         const artist = findById(appData.artists, targetConcertArtistId.value);
         if (!artist) return;
         const existing = findById(artist.concerts, editConcertId.value);
         const values = { name: concertName.value.trim(), date: concertDate.value, venue: concertVenue.value.trim(), videoLabel: concertVideoLabel.value.trim(), videoUrl: concertVideoUrl.value.trim() };
-        if (existing) { Object.assign(existing, values); showToast('Konser güncellendi.'); }
-        else { artist.concerts.push({ id: Date.now(), ...values, cover: '', images: [] }); showToast('Yeni konser eklendi.'); }
-        saveData(false); renderArtistsList(); closeConcertModal();
+        if (existing) Object.assign(existing, values);
+        else artist.concerts.push({ id: Date.now(), ...values, cover: '', images: [] });
+        if (await saveData(false)) {
+            showToast(existing ? 'Konser güncellendi.' : 'Yeni konser eklendi.');
+            renderArtistsList();
+            closeConcertModal();
+        } else {
+            appData = previous;
+        }
     });
 
     function openPhotoModal(artistId, concertId) {
@@ -261,25 +321,47 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btnClosePhotoModal')?.addEventListener('click', closePhotoModal);
     document.getElementById('btnCancelPhotoModal')?.addEventListener('click', closePhotoModal);
 
-    photoForm?.addEventListener('submit', event => {
+    photoForm?.addEventListener('submit', async event => {
         event.preventDefault();
+        const previous = clone(appData);
         const artist = findById(appData.artists, targetArtistId.value);
         const concert = findById(artist?.concerts, targetConcertId.value);
         if (!artist || !concert) return;
         concert.images.push({ id: Date.now(), src: photoSrc.value.trim(), title: photoTitle.value.trim() || artist.name, desc: photoDesc.value.trim() });
         if (!concert.cover) concert.cover = photoSrc.value.trim();
-        saveData(false); renderArtistsList(); closePhotoModal(); showToast('Fotoğraf konsere eklendi.');
+        if (await saveData(false)) {
+            renderArtistsList();
+            closePhotoModal();
+            showToast('Fotoğraf konsere eklendi.');
+        } else {
+            appData = previous;
+        }
     });
 
     function setupDropzone(zoneId, inputId, previewId, pathInputId) {
         const zone = document.getElementById(zoneId); const fileInput = document.getElementById(inputId);
         const pathInput = document.getElementById(pathInputId); const preview = document.getElementById(previewId);
         if (!zone || !fileInput || !pathInput || !preview) return;
-        const handleFile = file => {
+        const handleFile = async file => {
             if (!file) return;
-            const reader = new FileReader();
-            reader.onload = event => { pathInput.value = event.target.result; preview.src = event.target.result; preview.style.display = 'block'; };
-            reader.readAsDataURL(file);
+            zone.classList.add('is-uploading');
+            const label = zone.querySelector('p');
+            const originalLabel = label?.textContent || '';
+            if (label) label.textContent = 'Görsel yükleniyor…';
+            try {
+                if (!api) throw new Error('Görsel yükleme bağlantısı kurulamadı.');
+                const src = await api.uploadImage(file);
+                pathInput.value = src;
+                preview.src = src;
+                preview.style.display = 'block';
+                showToast(api.getStorageMode() === 'cloud' ? 'Görsel siteye yüklendi.' : 'Görsel yerel önizleme için küçültüldü.');
+            } catch (error) {
+                showToast(error.status === 401 ? 'Görsel yüklemek için ChatGPT hesabınızla giriş yapın.' : error.message, 'error');
+            } finally {
+                zone.classList.remove('is-uploading');
+                if (label) label.textContent = originalLabel;
+                fileInput.value = '';
+            }
         };
         zone.addEventListener('click', () => fileInput.click());
         fileInput.addEventListener('change', event => handleFile(event.target.files[0]));
@@ -329,8 +411,19 @@ document.addEventListener('DOMContentLoaded', () => {
     function readContactForm() { appData.contact = Object.fromEntries(Object.entries(contactFields).map(([key, input]) => [key, input.value.trim()])); }
 
     function readAllForms() { readHeroForm(); readStatsForm(); readAboutForm(); readTestimonialsForm(); readContactForm(); }
-    document.getElementById('btnSaveAll')?.addEventListener('click', () => { readAllForms(); saveData(true); });
-    document.getElementById('btnResetData')?.addEventListener('click', () => { if (!confirm('Tüm veriler varsayılana sıfırlansın mı?')) return; localStorage.removeItem(STORAGE_KEY); appData = loadData(); initAll(); showToast('Varsayılan veriler geri yüklendi.'); });
+    document.getElementById('btnSaveAll')?.addEventListener('click', async () => { readAllForms(); await saveData(true); });
+    document.getElementById('btnResetData')?.addEventListener('click', async () => {
+        if (!confirm('Tüm veriler varsayılana sıfırlansın mı?')) return;
+        const previous = clone(appData);
+        appData = clone(defaults);
+        appData.artists = utils ? utils.normalizeArtists(appData.artists) : appData.artists;
+        if (await saveData(false)) {
+            initAll();
+            showToast('Varsayılan veriler geri yüklendi.');
+        } else {
+            appData = previous;
+        }
+    });
     document.getElementById('btnDownloadDataJs')?.addEventListener('click', () => {
         readAllForms(); const blob = new Blob([`const siteData = ${JSON.stringify(appData, null, 2)};\n`], { type: 'application/javascript;charset=utf-8' });
         const link = document.createElement('a'); const url = URL.createObjectURL(blob); link.href = url; link.download = 'data.js'; document.body.appendChild(link); link.click(); link.remove(); URL.revokeObjectURL(url); showToast('data.js dosyası indirildi.');
@@ -339,4 +432,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function initAll() { renderArtistsList(); populateHeroForm(); renderStatsForm(); populateAboutForm(); renderTestimonialsForm(); populateContactForm(); }
     initAll();
+    await updateStorageStatus();
 });
