@@ -93,11 +93,6 @@
             </div>
         </header>
 
-        <div class="storage-status storage-status-loading" id="storageStatus" role="status">
-            <i class="fas fa-circle-notch fa-spin"></i>
-            <span>Depolama bağlantısı kontrol ediliyor…</span>
-        </div>
-
         <!-- 1. TAB: ARTISTS & PORTFOLIO -->
         <section id="tab-portfolio" class="tab-panel active">
             <div class="admin-card">
@@ -253,7 +248,7 @@
                     <h2>Veri Yedekleme ve Dışa Aktarma</h2>
                 </div>
                 <p style="color: var(--text-secondary); margin-bottom: 20px;">
-                    Yayınlanan sitede içerikler kalıcı veritabanına, yüklediğiniz fotoğraflar dosya deposuna kaydedilir. Aşağıdaki seçenekleri ayrıca yedek almak için kullanabilirsiniz.
+                    Panel üzerinden yaptığınız tüm güncellemeler tarayıcınızın belleğinde (localStorage) tutulur. Kalıcı dosya yedeği almak veya başka cihazlara aktarmak için aşağıdaki seçenekleri kullanabilirsiniz.
                 </p>
                 <div style="display: flex; gap: 15px; flex-wrap: wrap;">
                     <button class="btn btn-primary" id="btnDownloadDataJs">
@@ -398,7 +393,6 @@
 
     <script src="data/data.js"></script>
     <script src="js/data-utils.js"></script>
-    <script src="js/site-data-api.js"></script>
     <script src="js/admin.js"></script>
 </body>
 </html>

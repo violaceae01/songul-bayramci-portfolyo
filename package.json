@@ -3,7 +3,6 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "node scripts/build.mjs",
-    "test": "node scripts/test-worker.mjs"
+    "build": "node scripts/build.mjs"
   }
 }

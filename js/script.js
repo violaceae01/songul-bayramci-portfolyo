@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', () => {
 
     // ============================================
     // IMAGE PARTICLE SYSTEM - ON ALL SECTIONS
@@ -184,20 +184,47 @@ document.addEventListener('DOMContentLoaded', async () => {
     new ImageParticleSystem();
 
     // ============================================
-    // DYNAMIC SITE DATA (FROM CLOUD STORAGE OR LOCAL PREVIEW)
+    // DYNAMIC SITE DATA (FROM LOCALSTORAGE OR DATA.JS)
     // ============================================
-    async function getSiteData() {
-        const defaults = typeof siteData !== 'undefined' ? siteData : {};
-        if (!window.SiteDataApi) return defaults;
+    function getSiteData() {
         try {
-            return await window.SiteDataApi.load(defaults);
-        } catch (error) {
-            console.error('Site data read error:', error);
-            return defaults;
+            const saved = localStorage.getItem('sb_site_data');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                if (typeof siteData !== 'undefined') {
+                    let updated = false;
+                    if (!parsed.artists && siteData.artists) {
+                        parsed.artists = siteData.artists;
+                        updated = true;
+                    } else if (parsed.artists && siteData.artists) {
+                        // Merge concertName if missing
+                        parsed.artists.forEach(a => {
+                            if (!a.concertName) {
+                                const matched = siteData.artists.find(sa => sa.id === a.id);
+                                if (matched && matched.concertName) {
+                                    a.concertName = matched.concertName;
+                                    updated = true;
+                                }
+                            }
+                        });
+                    }
+
+                    if (!parsed.homeGallery && siteData.homeGallery) {
+                        parsed.homeGallery = siteData.homeGallery;
+                        updated = true;
+                    }
+
+                    if (updated) localStorage.setItem('sb_site_data', JSON.stringify(parsed));
+                }
+                return parsed;
+            }
+        } catch (e) {
+            console.error('LocalStorage read error:', e);
         }
+        return typeof siteData !== 'undefined' ? siteData : {};
     }
 
-    const currentSiteData = await getSiteData();
+    const currentSiteData = getSiteData();
     const dataUtils = window.SiteDataUtils;
     let artistsList = dataUtils
         ? dataUtils.normalizeArtists(currentSiteData.artists || (typeof siteData !== 'undefined' ? siteData.artists : []))

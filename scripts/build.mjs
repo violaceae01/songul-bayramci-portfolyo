@@ -31,10 +31,21 @@ for (const file of staticFiles) {
   await cp(join(projectRoot, file), join(clientRoot, file));
 }
 
-await cp(
-  join(projectRoot, "server", "index.js"),
-  join(outputRoot, "server", "index.js"),
-);
+const workerSource = `export default {
+  async fetch(request, env) {
+    const url = new URL(request.url);
+
+    if (url.pathname === "/") {
+      url.pathname = "/index.html";
+      request = new Request(url, request);
+    }
+
+    return env.ASSETS.fetch(request);
+  },
+};
+`;
+
+await writeFile(join(outputRoot, "server", "index.js"), workerSource);
 
 const hosting = await readFile(
   join(projectRoot, ".openai", "hosting.json"),
@@ -42,8 +53,3 @@ const hosting = await readFile(
 );
 await mkdir(join(outputRoot, ".openai"), { recursive: true });
 await writeFile(join(outputRoot, ".openai", "hosting.json"), hosting);
-await cp(
-  join(projectRoot, ".openai", "drizzle"),
-  join(outputRoot, ".openai", "drizzle"),
-  { recursive: true },
-);
