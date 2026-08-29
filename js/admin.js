@@ -16,6 +16,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const parsed = saved ? JSON.parse(saved) : {};
             const merged = { ...defaults, ...parsed };
             merged.artists = utils ? utils.normalizeArtists(parsed.artists || defaults.artists) : (parsed.artists || defaults.artists);
+            if (utils) {
+                const defaultArtists = utils.normalizeArtists(defaults.artists);
+                merged.artists.forEach(artist => {
+                    const defaultArtist = defaultArtists.find(item => String(item.id) === String(artist.id));
+                    if (!artist.bio && defaultArtist?.bio) artist.bio = defaultArtist.bio;
+                });
+            }
             localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
             return merged;
         } catch (error) {
@@ -81,6 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const artistForm = document.getElementById('artistForm');
     const editArtistId = document.getElementById('editArtistId');
     const artistName = document.getElementById('artistName');
+    const artistBio = document.getElementById('artistBio');
     const artistCover = document.getElementById('artistCover');
     const artistCoverPreview = document.getElementById('artistCoverPreview');
 
@@ -127,6 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="artist-info-wrap">
                         <h3>${escapeHtml(artist.name)}</h3>
                         <p>${artist.concerts.length} konser · <a href="sanatci.html?artist=${encodeURIComponent(artist.slug)}" target="_blank">sanatçı sayfasını aç</a></p>
+                        ${artist.bio ? `<p class="artist-bio-preview">${escapeHtml(artist.bio)}</p>` : ''}
                     </div>
                     <div class="artist-actions-wrap">
                         <button class="btn btn-primary btn-sm" data-action="add-concert" data-artist-id="${artist.id}"><i class="fas fa-plus"></i> Yeni Konser</button>
@@ -193,6 +202,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('artistModalTitle').textContent = artist ? 'Sanatçıyı Düzenle' : 'Yeni Sanatçı Ekle';
         editArtistId.value = artist?.id || '';
         artistName.value = artist?.name || '';
+        artistBio.value = artist?.bio || '';
         artistCover.value = artist?.cover || '';
         if (artist?.cover) { artistCoverPreview.src = artist.cover; artistCoverPreview.style.display = 'block'; }
         artistModal.classList.add('active');
@@ -206,12 +216,13 @@ document.addEventListener('DOMContentLoaded', () => {
         event.preventDefault();
         const existing = findById(appData.artists, editArtistId.value);
         const name = artistName.value.trim();
+        const bio = artistBio.value.trim();
         const cover = artistCover.value.trim();
         if (existing) {
-            existing.name = name; existing.cover = cover; showToast('Sanatçı güncellendi.');
+            existing.name = name; existing.bio = bio; existing.cover = cover; showToast('Sanatçı güncellendi.');
         } else {
             const id = Date.now();
-            appData.artists.push({ id, slug: utils ? utils.slugify(name) : String(id), name, cover, concerts: [] });
+            appData.artists.push({ id, slug: utils ? utils.slugify(name) : String(id), name, bio, cover, concerts: [] });
             showToast('Yeni sanatçı eklendi.');
         }
         saveData(false); renderArtistsList(); closeArtistModal();

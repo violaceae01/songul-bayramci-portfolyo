@@ -318,6 +318,17 @@ body {
     text-decoration: none;
 }
 
+.artist-bio-preview {
+    display: -webkit-box;
+    max-width: 720px;
+    margin-top: 9px;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    line-height: 1.55;
+}
+
 .artist-actions-wrap {
     display: flex;
     gap: 10px;

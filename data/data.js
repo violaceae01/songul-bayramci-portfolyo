@@ -17,6 +17,7 @@ const siteData = {
       "id": 1,
       "slug": "mert-demir",
       "name": "Mert Demir",
+      "bio": "Mert Demir konserlerinden sahne enerjisini, ışığı ve performans anlarını öne çıkaran çekimler.",
       "cover": "Görsel/Mert Demir.PNG",
       "concerts": [
         {
@@ -38,6 +39,7 @@ const siteData = {
       "id": 2,
       "slug": "tugba-yurt",
       "name": "Tuğba Yurt",
+      "bio": "Tuğba Yurt'un canlı performanslarından konser atmosferini ve sahne detaylarını yansıtan kareler.",
       "cover": "Görsel/Tuğba Yurt.PNG",
       "concerts": [
         {
@@ -58,6 +60,7 @@ const siteData = {
       "id": 3,
       "slug": "zeynep-bastik",
       "name": "Zeynep Bastık",
+      "bio": "Zeynep Bastık konserlerinden performans, seyirci ve sahne ışıklarını bir araya getiren çekimler.",
       "cover": "Görsel/Zeynep bastık 4.PNG",
       "concerts": [
         {
@@ -80,6 +83,7 @@ const siteData = {
       "id": 4,
       "slug": "emre-fel",
       "name": "Emre Fel",
+      "bio": "Emre Fel'in sahne performanslarından sinematik açıları ve konserin ruhunu öne çıkaran çalışmalar.",
       "cover": "Görsel/Emre fel.PNG",
       "concerts": [
         {
@@ -100,6 +104,7 @@ const siteData = {
       "id": 5,
       "slug": "tugba-ozerk",
       "name": "Tuğba Özerk",
+      "bio": "Tuğba Özerk'in özel etkinlik ve sahne performanslarından seçilmiş fotoğraf ve video çalışmaları.",
       "cover": "Görsel/tUĞBA ÖZERK.PNG",
       "concerts": [
         {
@@ -120,6 +125,7 @@ const siteData = {
       "id": 6,
       "slug": "dedub-luman",
       "name": "Dedub Lüman",
+      "bio": "Dedub Lüman performanslarından grubun sahne atmosferini ve güçlü ışık dünyasını yansıtan çekimler.",
       "cover": "Görsel/Dedub lüman.PNG",
       "concerts": [
         {

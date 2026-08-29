@@ -230,6 +230,14 @@ document.addEventListener('DOMContentLoaded', () => {
         ? dataUtils.normalizeArtists(currentSiteData.artists || (typeof siteData !== 'undefined' ? siteData.artists : []))
         : (currentSiteData.artists || (typeof siteData !== 'undefined' ? siteData.artists : []));
 
+    if (dataUtils && typeof siteData !== 'undefined' && siteData.artists) {
+        const defaultArtists = dataUtils.normalizeArtists(siteData.artists);
+        artistsList.forEach(artist => {
+            const defaultArtist = defaultArtists.find(item => String(item.id) === String(artist.id));
+            if (!artist.bio && defaultArtist?.bio) artist.bio = defaultArtist.bio;
+        });
+    }
+
     // Hydrate Hero & About & Contact
     function hydrateStaticContent(data) {
         if (!data) return;
@@ -451,7 +459,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const artistDetailCover = document.getElementById('artistDetailCover');
     const artistDetailName = document.getElementById('artistDetailName');
     const artistDetailTag = document.getElementById('artistDetailTag');
-    const artistDetailSummary = document.getElementById('artistDetailSummary');
+    const artistDetailBio = document.getElementById('artistDetailBio');
     const artistConcertsList = document.getElementById('artistConcertsList');
     const artistDetailEmpty = document.getElementById('artistDetailEmpty');
     const homeRotatingGalleryTrack = document.getElementById('homeRotatingGalleryTrack');
@@ -470,38 +478,27 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const grouped = sortedArtists.reduce((groups, artist) => {
-            const letter = (artist.name || '#').trim().charAt(0).toLocaleUpperCase('tr') || '#';
-            if (!groups[letter]) groups[letter] = [];
-            groups[letter].push(artist);
-            return groups;
-        }, {});
+        const grid = document.createElement('div');
+        grid.className = 'artist-directory-grid';
 
-        Object.entries(grouped).forEach(([letter, artists]) => {
-            const group = document.createElement('section');
-            group.className = 'artist-letter-group reveal';
-            group.innerHTML = `<h2 class="artist-letter">${escapeHtml(letter)}</h2><div class="artist-directory-grid"></div>`;
-            const grid = group.querySelector('.artist-directory-grid');
-
-            artists.forEach(artist => {
-                const photoCount = artist.concerts.reduce((total, concert) => total + (concert.images?.length || 0), 0);
-                const link = document.createElement('a');
-                link.className = 'artist-directory-card';
-                link.href = `sanatci.html?artist=${encodeURIComponent(artist.slug)}`;
-                link.innerHTML = `
-                    <img src="${escapeHtml(artist.cover)}" alt="${escapeHtml(artist.name)}" loading="lazy">
-                    <span class="artist-directory-overlay">
-                        <small>${artist.concerts.length} KONSER · ${photoCount} KARE</small>
-                        <strong>${escapeHtml(artist.name)}</strong>
-                        <span>Arşivi Aç <i class="fas fa-arrow-right"></i></span>
-                    </span>
-                `;
-                grid.appendChild(link);
-            });
-
-            artistDirectory.appendChild(group);
-            revealObserver.observe(group);
+        sortedArtists.forEach(artist => {
+            const photoCount = artist.concerts.reduce((total, concert) => total + (concert.images?.length || 0), 0);
+            const link = document.createElement('a');
+            link.className = 'artist-directory-card reveal';
+            link.href = `sanatci.html?artist=${encodeURIComponent(artist.slug)}`;
+            link.innerHTML = `
+                <img src="${escapeHtml(artist.cover)}" alt="${escapeHtml(artist.name)}" loading="lazy">
+                <span class="artist-directory-overlay">
+                    <small>${artist.concerts.length} KONSER · ${photoCount} KARE</small>
+                    <strong>${escapeHtml(artist.name)}</strong>
+                    <span>Arşivi Aç <i class="fas fa-arrow-right"></i></span>
+                </span>
+            `;
+            grid.appendChild(link);
+            revealObserver.observe(link);
         });
+
+        artistDirectory.appendChild(grid);
     }
 
     function formatConcertDate(value) {
@@ -535,7 +532,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (artistDetailName) artistDetailName.textContent = artist.name;
         if (artistDetailTag) artistDetailTag.textContent = `${artist.concerts.length} KONSER ARŞİVİ`;
-        if (artistDetailSummary) artistDetailSummary.textContent = `${artist.name} konser çekimleri, fotoğraf galerileri ve video bağlantıları.`;
+        if (artistDetailBio) artistDetailBio.textContent = artist.bio || `${artist.name} konser çekimleri ve sahne çalışmalarından oluşan arşiv.`;
 
         const concerts = [...artist.concerts].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
         artistConcertsList.innerHTML = '';

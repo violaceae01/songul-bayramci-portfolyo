@@ -41,6 +41,7 @@
             id: artist?.id ?? `artist-${Date.now()}-${index}`,
             slug: artist?.slug || slugify(artist?.name || `sanatci-${index + 1}`),
             name: artist?.name || `Sanatçı ${index + 1}`,
+            bio: artist?.bio || '',
             cover: artist?.cover || '',
             concerts: []
         };
