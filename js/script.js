@@ -458,15 +458,27 @@ document.addEventListener('DOMContentLoaded', () => {
     // ============================================
     const reveals = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
 
-    const revealObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('active');
-            }
-        });
-    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+    const revealObserver = 'IntersectionObserver' in window
+        ? new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    revealObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.08, rootMargin: '0px 0px -24px 0px' })
+        : null;
 
-    reveals.forEach(el => revealObserver.observe(el));
+    const observeReveal = element => {
+        if (!element) return;
+        if (revealObserver) {
+            revealObserver.observe(element);
+        } else {
+            element.classList.add('active');
+        }
+    };
+
+    reveals.forEach(observeReveal);
 
     // ============================================
     // ARTIST DIRECTORY, DETAIL PAGE & HOME GALLERY
@@ -499,13 +511,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const grid = document.createElement('div');
         grid.className = 'artist-directory-grid';
 
-        sortedArtists.forEach(artist => {
+        sortedArtists.forEach((artist, artistIndex) => {
             const photoCount = artist.concerts.reduce((total, concert) => total + (concert.images?.length || 0), 0);
             const link = document.createElement('a');
-            link.className = 'artist-directory-card reveal';
+            link.className = 'artist-directory-card reveal active';
             link.href = `sanatci.html?artist=${encodeURIComponent(artist.slug)}`;
             link.innerHTML = `
-                <img src="${escapeHtml(artist.cover)}" alt="${escapeHtml(artist.name)}" loading="lazy">
+                <img src="${escapeHtml(artist.cover)}" alt="${escapeHtml(artist.name)}" loading="${artistIndex < 4 ? 'eager' : 'lazy'}" decoding="async">
                 <span class="artist-directory-overlay">
                     <small>${artist.concerts.length} KONSER · ${photoCount} KARE</small>
                     <strong>${escapeHtml(artist.name)}</strong>
@@ -513,7 +525,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 </span>
             `;
             grid.appendChild(link);
-            revealObserver.observe(link);
         });
 
         artistDirectory.appendChild(grid);
@@ -606,7 +617,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             artistConcertsList.appendChild(article);
-            revealObserver.observe(article);
+            observeReveal(article);
         });
     }
 
@@ -638,7 +649,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 card.tabIndex = isDuplicate ? -1 : 0;
                 card.setAttribute('aria-label', `${item.title || 'Galeri'} görselini büyüt`);
                 card.innerHTML = `
-                    <img src="${item.src}" alt="${isDuplicate ? '' : (item.title || 'Galeri görseli')}" loading="lazy">
+                    <img src="${item.src}" alt="${isDuplicate ? '' : (item.title || 'Galeri görseli')}" loading="${isDuplicate ? 'lazy' : 'eager'}" decoding="async">
                     <span class="rotating-gallery-number">${String(index + 1).padStart(2, '0')}</span>
                     <span class="rotating-gallery-overlay">
                         <strong>${item.title || 'Songül Bayramcı'}</strong>
@@ -654,6 +665,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         homeRotatingGalleryTrack.append(createGroup(), createGroup(true));
+        homeRotatingGalleryTrack.closest('.rotating-gallery')?.classList.add('active');
     }
 
     loadArtistDirectory();
