@@ -11,7 +11,8 @@ document.addEventListener('DOMContentLoaded', () => {
             document.body.appendChild(this.canvas);
             this.ctx = this.canvas.getContext('2d');
             this.particles = [];
-            this.particleCount = 100;
+            const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            this.particleCount = reducedMotion ? 18 : window.innerWidth <= 600 ? 35 : window.innerWidth <= 1024 ? 60 : 100;
             this.mouse = { x: null, y: null };
             this.imageLoaded = false;
 
@@ -409,18 +410,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Mobile menu toggle
     if (navToggle && navLinksContainer) {
+        const setMobileMenuState = (isOpen) => {
+            navToggle.classList.toggle('active', isOpen);
+            navLinksContainer.classList.toggle('active', isOpen);
+            navToggle.setAttribute('aria-expanded', String(isOpen));
+            navToggle.setAttribute('aria-label', isOpen ? 'Menüyü kapat' : 'Menüyü aç');
+            document.body.classList.toggle('menu-open', isOpen);
+        };
+
         navToggle.addEventListener('click', () => {
-            const isActive = navToggle.classList.toggle('active');
-            navLinksContainer.classList.toggle('active');
-            document.body.style.overflow = isActive ? 'hidden' : '';
+            setMobileMenuState(!navLinksContainer.classList.contains('active'));
         });
 
         navLinks.forEach(link => {
             link.addEventListener('click', () => {
-                navToggle.classList.remove('active');
-                navLinksContainer.classList.remove('active');
-                document.body.style.overflow = '';
+                setMobileMenuState(false);
             });
+        });
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && navLinksContainer.classList.contains('active')) {
+                setMobileMenuState(false);
+                navToggle.focus();
+            }
+        });
+
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 900 && navLinksContainer.classList.contains('active')) {
+                setMobileMenuState(false);
+            }
         });
     }
 

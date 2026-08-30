@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Yönetim Paneli | Songül Bayramcı</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -250,7 +250,7 @@
                 <p style="color: var(--text-secondary); margin-bottom: 20px;">
                     Panel üzerinden yaptığınız tüm güncellemeler tarayıcınızın belleğinde (localStorage) tutulur. Kalıcı dosya yedeği almak veya başka cihazlara aktarmak için aşağıdaki seçenekleri kullanabilirsiniz.
                 </p>
-                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                <div class="backup-actions">
                     <button class="btn btn-primary" id="btnDownloadDataJs">
                         <i class="fas fa-download"></i> data.js Dosyası Olarak İndir
                     </button>
@@ -267,7 +267,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2 id="artistModalTitle">Yeni Sanatçı Ekle</h2>
-                <button class="modal-close" id="btnCloseArtistModal">&times;</button>
+                <button class="modal-close" id="btnCloseArtistModal" type="button" aria-label="Sanatçı penceresini kapat">&times;</button>
             </div>
             <form id="artistForm">
                 <input type="hidden" id="editArtistId">
@@ -294,7 +294,7 @@
                     <img id="artistCoverPreview" class="image-preview" alt="Kapak Önizleme">
                 </div>
 
-                <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 25px;">
+                <div class="modal-actions">
                     <button type="button" class="btn btn-secondary" id="btnCancelArtistModal">İptal</button>
                     <button type="submit" class="btn btn-primary" id="btnSaveArtistModal">Sanatçıyı Kaydet</button>
                 </div>
@@ -307,7 +307,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2 id="concertModalTitle">Yeni Konser Ekle</h2>
-                <button class="modal-close" id="btnCloseConcertModal" type="button">&times;</button>
+                <button class="modal-close" id="btnCloseConcertModal" type="button" aria-label="Konser penceresini kapat">&times;</button>
             </div>
             <form id="concertForm">
                 <input type="hidden" id="targetConcertArtistId">
@@ -339,7 +339,7 @@
                     <input type="url" id="concertVideoUrl" class="form-control" placeholder="https://youtube.com/... veya https://instagram.com/...">
                 </div>
 
-                <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 25px;">
+                <div class="modal-actions">
                     <button type="button" class="btn btn-secondary" id="btnCancelConcertModal">İptal</button>
                     <button type="submit" class="btn btn-primary">Konseri Kaydet</button>
                 </div>
@@ -352,7 +352,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2>Konsere Yeni Fotoğraf Ekle</h2>
-                <button class="modal-close" id="btnClosePhotoModal">&times;</button>
+                <button class="modal-close" id="btnClosePhotoModal" type="button" aria-label="Fotoğraf penceresini kapat">&times;</button>
             </div>
             <form id="photoForm">
                 <input type="hidden" id="targetArtistId">
@@ -380,7 +380,7 @@
                     <input type="text" id="photoDesc" class="form-control" placeholder="Örn: Canlı Performans Çekimi">
                 </div>
 
-                <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 25px;">
+                <div class="modal-actions">
                     <button type="button" class="btn btn-secondary" id="btnCancelPhotoModal">İptal</button>
                     <button type="submit" class="btn btn-primary" id="btnSavePhotoModal">Fotoğrafı Ekle</button>
                 </div>
