@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/admin.css?v=20260831-hero-video-admin">
 </head>
 <body>
 
@@ -133,8 +133,10 @@
                             <input type="text" id="heroTitleLine2" class="form-control" placeholder="Örn: YAKALA">
                         </div>
                         <div class="form-group form-full">
-                            <label>Arka Plan Görseli Yolu / URL</label>
-                            <input type="text" id="heroBgImage" class="form-control" placeholder="Örn: Görsel/Zeynep bastık 4.PNG">
+                            <label for="heroBgVideo">Arka Plan Videosu Yolu / Doğrudan URL</label>
+                            <input type="text" id="heroBgVideo" class="form-control" placeholder="Örn: assets/hero_bg.mp4 veya https://.../video.mp4">
+                            <p class="form-help">Doğrudan MP4 veya WebM video bağlantısı kullanın. YouTube sayfa bağlantıları bu alanda çalışmaz.</p>
+                            <video id="heroVideoPreview" class="video-preview" controls muted playsinline preload="metadata"></video>
                         </div>
                     </div>
                 </form>
@@ -391,8 +393,8 @@
     <!-- Toast Notifications Container -->
     <div class="toast-container" id="toastContainer"></div>
 
-    <script src="data/data.js"></script>
+    <script src="data/data.js?v=20260831-hero-video-admin"></script>
     <script src="js/data-utils.js"></script>
-    <script src="js/admin.js"></script>
+    <script src="js/admin.js?v=20260831-hero-video-admin"></script>
 </body>
 </html>

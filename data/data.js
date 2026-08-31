@@ -4,7 +4,7 @@ const siteData = {
     "titleLine1": "HER ANI",
     "titleLine2": "YAKALA",
     "subtitle": "Profesyonel konser, klip ve etkinlik görüntüleme çekimi",
-    "bgImage": "Görsel/Zeynep bastık 4.PNG"
+    "bgVideo": "assets/hero_bg.mp4"
   },
   "stats": [
     { "id": 1, "number": "50+", "label": "Etkinlik Çekimi" },

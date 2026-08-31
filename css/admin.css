@@ -551,6 +551,24 @@ textarea.form-control {
     resize: vertical;
 }
 
+.form-help {
+    margin-top: 8px;
+    color: var(--text-secondary);
+    font-size: 0.82rem;
+    line-height: 1.55;
+}
+
+.video-preview {
+    display: none;
+    width: min(100%, 720px);
+    max-height: 360px;
+    margin-top: 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    background: #000;
+    object-fit: contain;
+}
+
 /* Image Upload Preview */
 .upload-box {
     border: 2px dashed var(--border-color);

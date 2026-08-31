@@ -194,6 +194,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 const parsed = JSON.parse(saved);
                 if (typeof siteData !== 'undefined') {
                     let updated = false;
+                    const savedHero = parsed.hero || {};
+                    const hadHeroVideo = Boolean(savedHero.bgVideo);
+                    parsed.hero = { ...(siteData.hero || {}), ...(parsed.hero || {}) };
+                    if (!hadHeroVideo && siteData.hero?.bgVideo) {
+                        parsed.hero.bgVideo = siteData.hero.bgVideo;
+                        updated = true;
+                    }
+                    if (Object.prototype.hasOwnProperty.call(parsed.hero, 'bgImage')) {
+                        delete parsed.hero.bgImage;
+                        updated = true;
+                    }
                     if (!parsed.artists && siteData.artists) {
                         parsed.artists = siteData.artists;
                         updated = true;
@@ -256,6 +267,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const heroSub = document.querySelector('.hero-subtitle');
             if (heroSub && data.hero.subtitle) heroSub.textContent = data.hero.subtitle;
+
+            const heroVideo = document.querySelector('.hero-video');
+            const heroVideoSource = heroVideo?.querySelector('source');
+            const heroVideoUrl = data.hero.bgVideo || (typeof siteData !== 'undefined' ? siteData.hero?.bgVideo : '');
+            if (heroVideo && heroVideoSource && heroVideoUrl && heroVideoSource.getAttribute('src') !== heroVideoUrl) {
+                const normalizedVideoUrl = heroVideoUrl.split('?')[0].toLowerCase();
+                heroVideoSource.src = heroVideoUrl;
+                heroVideoSource.type = normalizedVideoUrl.endsWith('.webm') ? 'video/webm' : 'video/mp4';
+                heroVideo.load();
+                const playRequest = heroVideo.play();
+                if (playRequest?.catch) playRequest.catch(() => {});
+            }
         }
 
         // Stats

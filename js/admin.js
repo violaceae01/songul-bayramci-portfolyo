@@ -15,6 +15,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const saved = localStorage.getItem(STORAGE_KEY);
             const parsed = saved ? JSON.parse(saved) : {};
             const merged = { ...defaults, ...parsed };
+            merged.hero = { ...(defaults.hero || {}), ...(parsed.hero || {}) };
+            if (!merged.hero.bgVideo && defaults.hero?.bgVideo) merged.hero.bgVideo = defaults.hero.bgVideo;
+            delete merged.hero.bgImage;
             merged.artists = utils ? utils.normalizeArtists(parsed.artists || defaults.artists) : (parsed.artists || defaults.artists);
             if (utils) {
                 const defaultArtists = utils.normalizeArtists(defaults.artists);
@@ -59,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const tabDescriptions = {
         'tab-portfolio': { title: 'Sanatçı & Konser Yönetimi', desc: 'Sanatçıları, konserlerini, galerilerini ve video bağlantılarını yönetin.' },
-        'tab-hero': { title: 'Hero & Başlıklar', desc: 'Ana sayfa giriş alanındaki başlıkları, alt başlığı ve arka plan görselini güncelleyin.' },
+        'tab-hero': { title: 'Hero & Başlıklar', desc: 'Ana sayfa giriş alanındaki başlıkları, alt başlığı ve arka plan videosunu güncelleyin.' },
         'tab-stats': { title: 'İstatistik Sayaçları', desc: 'Sitede yer alan deneyim ve istatistik sayılarını düzenleyin.' },
         'tab-about': { title: 'Hakkımda Bölümü', desc: 'Biyografi metinlerini ve profil fotoğrafını yönetin.' },
         'tab-testimonials': { title: 'Referanslar & Yorumlar', desc: 'Sanatçı ve müşteri referanslarını düzenleyin.' },
@@ -293,9 +296,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const heroTag = document.getElementById('heroTag'); const heroSubtitle = document.getElementById('heroSubtitle');
     const heroTitleLine1 = document.getElementById('heroTitleLine1'); const heroTitleLine2 = document.getElementById('heroTitleLine2');
-    const heroBgImage = document.getElementById('heroBgImage');
-    function populateHeroForm() { if (!appData.hero) return; heroTag.value = appData.hero.tag || ''; heroSubtitle.value = appData.hero.subtitle || ''; heroTitleLine1.value = appData.hero.titleLine1 || ''; heroTitleLine2.value = appData.hero.titleLine2 || ''; heroBgImage.value = appData.hero.bgImage || ''; }
-    function readHeroForm() { appData.hero = { tag: heroTag.value.trim(), subtitle: heroSubtitle.value.trim(), titleLine1: heroTitleLine1.value.trim(), titleLine2: heroTitleLine2.value.trim(), bgImage: heroBgImage.value.trim() }; }
+    const heroBgVideo = document.getElementById('heroBgVideo'); const heroVideoPreview = document.getElementById('heroVideoPreview');
+    function updateHeroVideoPreview() {
+        if (!heroVideoPreview) return;
+        const videoUrl = heroBgVideo?.value.trim() || '';
+        if (!videoUrl) {
+            heroVideoPreview.removeAttribute('src');
+            heroVideoPreview.style.display = 'none';
+            heroVideoPreview.load();
+            return;
+        }
+        if (heroVideoPreview.getAttribute('src') !== videoUrl) {
+            heroVideoPreview.src = videoUrl;
+            heroVideoPreview.load();
+        }
+        heroVideoPreview.style.display = 'block';
+    }
+    function populateHeroForm() {
+        if (!appData.hero) return;
+        heroTag.value = appData.hero.tag || '';
+        heroSubtitle.value = appData.hero.subtitle || '';
+        heroTitleLine1.value = appData.hero.titleLine1 || '';
+        heroTitleLine2.value = appData.hero.titleLine2 || '';
+        heroBgVideo.value = appData.hero.bgVideo || 'assets/hero_bg.mp4';
+        updateHeroVideoPreview();
+    }
+    function readHeroForm() {
+        appData.hero = {
+            tag: heroTag.value.trim(),
+            subtitle: heroSubtitle.value.trim(),
+            titleLine1: heroTitleLine1.value.trim(),
+            titleLine2: heroTitleLine2.value.trim(),
+            bgVideo: heroBgVideo.value.trim()
+        };
+    }
+    heroBgVideo?.addEventListener('input', updateHeroVideoPreview);
 
     const statsContainer = document.getElementById('statsInputsContainer');
     function renderStatsForm() {
