@@ -364,14 +364,34 @@ document.addEventListener('DOMContentLoaded', () => {
     // SCROLL PROGRESS
     // ============================================
     const scrollProgress = document.getElementById('scrollProgress');
-    window.addEventListener('scroll', () => {
+    const scrollToTopButton = document.getElementById('scrollToTop');
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    const updateScrollControls = () => {
         const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
         const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-        const scrolled = (winScroll / height) * 100;
+        const scrolled = height > 0 ? (winScroll / height) * 100 : 0;
         if (scrollProgress) {
             scrollProgress.style.width = `${scrolled}%`;
         }
-    });
+
+        if (scrollToTopButton) {
+            const revealPoint = Math.max(420, window.innerHeight * 0.65);
+            scrollToTopButton.classList.toggle('is-visible', winScroll > revealPoint);
+        }
+    };
+
+    window.addEventListener('scroll', updateScrollControls, { passive: true });
+    updateScrollControls();
+
+    if (scrollToTopButton) {
+        scrollToTopButton.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: prefersReducedMotion.matches ? 'auto' : 'smooth'
+            });
+        });
+    }
 
     // ============================================
     // NAVIGATION & MOBILE DRAWER
