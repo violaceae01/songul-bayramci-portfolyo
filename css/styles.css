@@ -1219,7 +1219,7 @@ footer {
     display: flex;
     width: max-content;
     will-change: transform;
-    animation: brandMarquee 32s linear infinite;
+    animation: brandMarquee var(--partner-duration, 32s) linear infinite;
 }
 
 .brand-marquee:hover .brand-marquee-track {
@@ -1267,6 +1267,271 @@ footer {
 @keyframes brandMarquee {
     from { transform: translateX(0); }
     to { transform: translateX(-50%); }
+}
+
+.partner-logo-group {
+    gap: clamp(1.1rem, 2.4vw, 2.2rem);
+    padding-right: clamp(1.1rem, 2.4vw, 2.2rem);
+}
+
+.partner-logo-card {
+    width: clamp(210px, 20vw, 310px);
+    height: clamp(120px, 11vw, 160px);
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    padding: 24px 30px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.025);
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: border-color var(--transition), background var(--transition);
+}
+
+.partner-logo-card:hover,
+.partner-logo-card:focus-visible {
+    border-color: rgba(230, 57, 70, 0.7);
+    background: rgba(230, 57, 70, 0.07);
+}
+
+.partner-logo-card:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -5px;
+}
+
+.partner-logo-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: grayscale(1) brightness(1.25);
+    transition: filter var(--transition), transform var(--transition);
+}
+
+.partner-logo-card:hover img {
+    filter: grayscale(0) brightness(1.08);
+    transform: scale(1.04);
+}
+
+.partner-logo-card strong {
+    display: none;
+    max-width: 210px;
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    line-height: 1.2;
+    text-align: center;
+}
+
+.partner-logo-card:not(:has(img)) strong {
+    display: block;
+}
+
+.brand-marquee-track.is-empty {
+    width: 100%;
+    animation: none;
+}
+
+.partner-logo-empty {
+    width: 100%;
+    color: var(--text-secondary);
+    text-align: center;
+}
+
+/* YouTube Projects */
+.youtube-projects-section {
+    min-height: 100vh;
+    padding: 180px 0 130px;
+    overflow: hidden;
+    background: linear-gradient(180deg, rgba(230, 57, 70, 0.035), transparent 38%);
+}
+
+.youtube-projects-section::before {
+    content: '';
+    position: absolute;
+    top: -90px;
+    left: 50%;
+    width: min(1500px, 130vw);
+    height: 520px;
+    background: url('../assets/images/songul-signature-transparent.png') center / contain no-repeat;
+    opacity: 0.13;
+    transform: translateX(-50%) rotate(-4deg);
+    pointer-events: none;
+}
+
+.youtube-projects-header {
+    position: relative;
+    z-index: 1;
+    margin-bottom: 55px;
+}
+
+.youtube-projects-header .section-tag {
+    text-align: left;
+}
+
+.youtube-projects-header .section-title {
+    max-width: 900px;
+    margin: 0;
+    text-align: left;
+}
+
+.youtube-projects-grid {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 38px;
+}
+
+.youtube-project-card {
+    min-width: 0;
+}
+
+.youtube-project-link {
+    display: block;
+    height: 100%;
+    padding: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(7, 7, 7, 0.82);
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition);
+}
+
+a.youtube-project-link:hover,
+a.youtube-project-link:focus-visible {
+    border-color: rgba(230, 57, 70, 0.72);
+    box-shadow: 0 20px 55px rgba(0, 0, 0, 0.42);
+    transform: translateY(-8px);
+}
+
+a.youtube-project-link:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 5px;
+}
+
+.youtube-project-media {
+    position: relative;
+    display: block;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    margin-bottom: 20px;
+    background: radial-gradient(circle at 50% 42%, rgba(230, 57, 70, 0.2), #090909 66%);
+}
+
+.youtube-project-media img {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease, filter 0.6s ease;
+}
+
+.youtube-project-media.is-contain img {
+    padding: 13%;
+    object-fit: contain;
+}
+
+a.youtube-project-link:hover .youtube-project-media img {
+    filter: brightness(0.78);
+    transform: scale(1.045);
+}
+
+.youtube-project-placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    padding: 24px;
+    color: rgba(255, 255, 255, 0.5);
+    text-align: center;
+}
+
+.youtube-project-placeholder i {
+    color: var(--accent);
+    font-size: 3rem;
+}
+
+.youtube-project-media:not(.is-missing) .youtube-project-placeholder {
+    opacity: 0;
+}
+
+.youtube-project-media.is-missing img {
+    display: none;
+}
+
+.youtube-project-media.is-missing .youtube-project-placeholder {
+    opacity: 1;
+}
+
+.youtube-project-type {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    z-index: 3;
+    padding: 5px 8px;
+    border: 1px solid rgba(255, 255, 255, 0.38);
+    background: rgba(5, 5, 5, 0.78);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.youtube-project-play {
+    position: absolute;
+    z-index: 3;
+    right: 16px;
+    bottom: 16px;
+    width: 46px;
+    height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 10px 28px rgba(230, 57, 70, 0.4);
+}
+
+.youtube-project-play i {
+    margin-left: 3px;
+    font-size: 0.85rem;
+}
+
+.youtube-project-info {
+    display: block;
+}
+
+.youtube-project-info > strong {
+    display: block;
+    min-height: 2.6em;
+    margin-bottom: 12px;
+    font-size: 1.12rem;
+    line-height: 1.3;
+}
+
+.youtube-project-info > span {
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    color: var(--text-secondary);
+}
+
+.youtube-project-info small {
+    font-size: 0.86rem;
+}
+
+.youtube-projects-empty {
+    grid-column: 1 / -1;
+    padding: 80px 24px;
+    border: 1px dashed rgba(255, 255, 255, 0.14);
+    color: var(--text-secondary);
+    text-align: center;
 }
 
 /* About Section */
@@ -2847,6 +3112,61 @@ video {
     .lightbox-info {
         width: calc(100% - 32px);
         bottom: calc(20px + env(safe-area-inset-bottom));
+    }
+}
+
+@media (max-width: 1200px) {
+    .youtube-projects-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 28px;
+    }
+}
+
+@media (max-width: 900px) {
+    .youtube-projects-section {
+        padding: 140px 0 90px;
+    }
+
+    .youtube-projects-section::before {
+        top: -30px;
+        width: 150vw;
+        height: 380px;
+    }
+
+    .youtube-projects-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 22px;
+    }
+}
+
+@media (max-width: 600px) {
+    .partner-logo-card {
+        width: 190px;
+        height: 110px;
+        padding: 18px 22px;
+    }
+
+    .youtube-projects-section {
+        padding: calc(120px + env(safe-area-inset-top)) 0 70px;
+    }
+
+    .youtube-projects-header {
+        margin-bottom: 34px;
+    }
+
+    .youtube-projects-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .youtube-project-card {
+        width: 100%;
+        max-width: 390px;
+        margin: 0 auto;
+    }
+
+    .youtube-project-link {
+        padding: 18px;
     }
 }
 

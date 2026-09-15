@@ -226,6 +226,16 @@ document.addEventListener('DOMContentLoaded', () => {
                         updated = true;
                     }
 
+                    if (!parsed.youtubeProjects && siteData.youtubeProjects) {
+                        parsed.youtubeProjects = siteData.youtubeProjects;
+                        updated = true;
+                    }
+
+                    if (!parsed.partners && siteData.partners) {
+                        parsed.partners = siteData.partners;
+                        updated = true;
+                    }
+
                     if (updated) localStorage.setItem('sb_site_data', JSON.stringify(parsed));
                 }
                 return parsed;
@@ -711,9 +721,105 @@ document.addEventListener('DOMContentLoaded', () => {
         homeRotatingGalleryTrack.closest('.rotating-gallery')?.classList.add('active');
     }
 
+    function safeExternalUrl(value) {
+        const url = String(value || '').trim();
+        return /^https?:\/\//i.test(url) ? url : '';
+    }
+
+    function loadYoutubeProjects() {
+        const grid = document.getElementById('youtubeProjectsGrid');
+        if (!grid) return;
+
+        const projects = (currentSiteData.youtubeProjects || (typeof siteData !== 'undefined' ? siteData.youtubeProjects : []) || [])
+            .filter(project => project && project.title);
+        grid.innerHTML = '';
+
+        if (!projects.length) {
+            grid.innerHTML = '<p class="youtube-projects-empty">Henüz YouTube çekimi eklenmedi.</p>';
+            return;
+        }
+
+        projects.forEach(project => {
+            const article = document.createElement('article');
+            article.className = 'youtube-project-card reveal active';
+            const projectUrl = safeExternalUrl(project.url);
+            const cardTag = projectUrl ? 'a' : 'div';
+            const linkAttributes = projectUrl ? `href="${escapeHtml(projectUrl)}" target="_blank" rel="noopener noreferrer" aria-label="${escapeHtml(project.title)} YouTube çekimini aç"` : '';
+            article.innerHTML = `
+                <${cardTag} class="youtube-project-link" ${linkAttributes}>
+                    <span class="youtube-project-media ${project.thumbnailFit === 'contain' ? 'is-contain' : ''}">
+                        ${project.thumbnail ? `<img src="${escapeHtml(project.thumbnail)}" alt="${escapeHtml(project.title)}" loading="lazy" decoding="async">` : ''}
+                        <span class="youtube-project-placeholder"><i class="fab fa-youtube" aria-hidden="true"></i><small>${escapeHtml(project.title)}</small></span>
+                        <span class="youtube-project-type">${escapeHtml(project.category || 'YOUTUBE')}</span>
+                        ${projectUrl ? '<span class="youtube-project-play"><i class="fas fa-play" aria-hidden="true"></i></span>' : ''}
+                    </span>
+                    <span class="youtube-project-info">
+                        <strong>${escapeHtml(project.title)}</strong>
+                        <span><small>${escapeHtml(project.year || '')}</small><small>${projectUrl ? 'Videoyu izle' : 'Yakında'}</small></span>
+                    </span>
+                </${cardTag}>
+            `;
+            const media = article.querySelector('.youtube-project-media');
+            article.querySelector('img')?.addEventListener('error', () => media?.classList.add('is-missing'));
+            grid.appendChild(article);
+        });
+    }
+
+    function loadPartnerLogos() {
+        const track = document.getElementById('partnerLogoTrack');
+        if (!track) return;
+
+        const partners = (currentSiteData.partners || (typeof siteData !== 'undefined' ? siteData.partners : []) || [])
+            .filter(partner => partner && (partner.logo || partner.name));
+        track.innerHTML = '';
+
+        if (!partners.length) {
+            track.innerHTML = '<p class="partner-logo-empty">Henüz kurum logosu eklenmedi.</p>';
+            track.classList.add('is-empty');
+            return;
+        }
+
+        track.classList.remove('is-empty');
+        const repeatedPartners = [];
+        const minimumItems = Math.max(6, partners.length);
+        for (let index = 0; index < minimumItems; index += 1) {
+            repeatedPartners.push(partners[index % partners.length]);
+        }
+        track.style.setProperty('--partner-duration', `${Math.max(26, repeatedPartners.length * 4.5)}s`);
+
+        const createGroup = (isDuplicate = false) => {
+            const group = document.createElement('div');
+            group.className = 'brand-marquee-group partner-logo-group';
+            if (isDuplicate) group.setAttribute('aria-hidden', 'true');
+
+            repeatedPartners.forEach(partner => {
+                const partnerUrl = safeExternalUrl(partner.url);
+                const element = document.createElement(partnerUrl ? 'a' : 'span');
+                element.className = 'partner-logo-card';
+                if (partnerUrl) {
+                    element.href = partnerUrl;
+                    element.target = '_blank';
+                    element.rel = 'noopener noreferrer';
+                    element.setAttribute('aria-label', `${partner.name || 'Kurum'} web sitesini aç`);
+                }
+                element.innerHTML = `
+                    ${partner.logo ? `<img src="${escapeHtml(partner.logo)}" alt="${isDuplicate ? '' : escapeHtml(partner.name || 'Kurum logosu')}" loading="${isDuplicate ? 'lazy' : 'eager'}" decoding="async">` : ''}
+                    <strong>${escapeHtml(partner.name || 'Kurum')}</strong>
+                `;
+                element.querySelector('img')?.addEventListener('error', event => event.currentTarget.remove());
+                group.appendChild(element);
+            });
+            return group;
+        };
+
+        track.append(createGroup(), createGroup(true));
+    }
+
     loadArtistDirectory();
     loadArtistDetail();
     loadHomeRotatingGallery();
+    loadYoutubeProjects();
+    loadPartnerLogos();
 
     // ============================================
     // LIGHTBOX

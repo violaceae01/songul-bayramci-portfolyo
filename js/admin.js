@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function loadData() {
         const defaults = typeof siteData !== 'undefined' ? clone(siteData) : {
-            hero: {}, stats: [], artists: [], homeGallery: [], about: {}, testimonials: [], contact: {}
+            hero: {}, stats: [], artists: [], homeGallery: [], youtubeProjects: [], partners: [], about: {}, testimonials: [], contact: {}
         };
         try {
             const saved = localStorage.getItem(STORAGE_KEY);
@@ -63,6 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const tabDescriptions = {
         'tab-portfolio': { title: 'Sanatçı & Konser Yönetimi', desc: 'Sanatçıları, konserlerini, galerilerini ve video bağlantılarını yönetin.' },
         'tab-hero': { title: 'Hero & Başlıklar', desc: 'Ana sayfa giriş alanındaki başlıkları, alt başlığı ve arka plan videosunu güncelleyin.' },
+        'tab-youtube': { title: 'YouTube Çekimleri & Logolar', desc: 'YouTube projelerini ve ana sayfada kayan kurum logolarını yönetin.' },
         'tab-stats': { title: 'İstatistik Sayaçları', desc: 'Sitede yer alan deneyim ve istatistik sayılarını düzenleyin.' },
         'tab-about': { title: 'Hakkımda Bölümü', desc: 'Biyografi metinlerini ve profil fotoğrafını yönetin.' },
         'tab-testimonials': { title: 'Referanslar & Yorumlar', desc: 'Sanatçı ve müşteri referanslarını düzenleyin.' },
@@ -332,6 +333,125 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     heroBgVideo?.addEventListener('input', updateHeroVideoPreview);
 
+    const youtubeProjectsAdmin = document.getElementById('youtubeProjectsAdmin');
+    const partnersAdmin = document.getElementById('partnersAdmin');
+
+    function renderYoutubeProjectsForm() {
+        if (!youtubeProjectsAdmin) return;
+        youtubeProjectsAdmin.innerHTML = '';
+        const projects = appData.youtubeProjects || [];
+        if (!projects.length) {
+            youtubeProjectsAdmin.innerHTML = '<p class="admin-empty compact">Henüz YouTube çekimi eklenmedi.</p>';
+            return;
+        }
+
+        projects.forEach((project, index) => {
+            const card = document.createElement('div');
+            card.className = 'admin-form-card media-admin-card';
+            card.dataset.youtubeProject = String(project.id || Date.now() + index);
+            card.innerHTML = `
+                <div class="media-admin-card-header">
+                    <strong>YouTube Çekimi ${index + 1}</strong>
+                    <button class="btn btn-danger btn-sm" type="button" data-delete-youtube aria-label="YouTube çekimini sil"><i class="fas fa-trash-alt"></i></button>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group"><label>Proje / Kurum Adı</label><input type="text" class="form-control youtube-title" value="${escapeHtml(project.title)}" placeholder="Afyonkarahisar Belediyesi"></div>
+                    <div class="form-group"><label>Yıl</label><input type="text" class="form-control youtube-year" value="${escapeHtml(project.year)}" placeholder="2026"></div>
+                    <div class="form-group"><label>Etiket</label><input type="text" class="form-control youtube-category" value="${escapeHtml(project.category || 'YouTube Çekimi')}" placeholder="YouTube Çekimi"></div>
+                    <div class="form-group"><label>Kapak Yerleşimi</label><select class="form-control youtube-fit"><option value="cover" ${project.thumbnailFit !== 'contain' ? 'selected' : ''}>Görseli kapla</option><option value="contain" ${project.thumbnailFit === 'contain' ? 'selected' : ''}>Logoyu sığdır</option></select></div>
+                    <div class="form-group form-full"><label>Kapak Görseli Yolu / URL</label><input type="text" class="form-control youtube-thumbnail" value="${escapeHtml(project.thumbnail)}" placeholder="Görsel/youtube-kapak.jpg"></div>
+                    <div class="form-group form-full"><label>YouTube Video / Kanal Bağlantısı</label><input type="url" class="form-control youtube-url" value="${escapeHtml(project.url)}" placeholder="https://www.youtube.com/watch?v=..."></div>
+                </div>`;
+            youtubeProjectsAdmin.appendChild(card);
+        });
+    }
+
+    function readYoutubeProjectsForm() {
+        if (!youtubeProjectsAdmin) return;
+        appData.youtubeProjects = [...youtubeProjectsAdmin.querySelectorAll('[data-youtube-project]')].map(card => ({
+            id: Number(card.dataset.youtubeProject) || Date.now(),
+            title: card.querySelector('.youtube-title')?.value.trim() || '',
+            year: card.querySelector('.youtube-year')?.value.trim() || '',
+            category: card.querySelector('.youtube-category')?.value.trim() || 'YouTube Çekimi',
+            thumbnail: card.querySelector('.youtube-thumbnail')?.value.trim() || '',
+            thumbnailFit: card.querySelector('.youtube-fit')?.value || 'cover',
+            url: card.querySelector('.youtube-url')?.value.trim() || ''
+        }));
+    }
+
+    document.getElementById('btnAddYoutubeProject')?.addEventListener('click', () => {
+        readYoutubeProjectsForm();
+        appData.youtubeProjects.push({ id: Date.now(), title: '', year: String(new Date().getFullYear()), category: 'YouTube Çekimi', thumbnail: '', thumbnailFit: 'cover', url: '' });
+        renderYoutubeProjectsForm();
+        youtubeProjectsAdmin.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+
+    youtubeProjectsAdmin?.addEventListener('click', event => {
+        const button = event.target.closest('[data-delete-youtube]');
+        if (!button || !confirm('Bu YouTube çekimi silinsin mi?')) return;
+        readYoutubeProjectsForm();
+        const card = button.closest('[data-youtube-project]');
+        appData.youtubeProjects = appData.youtubeProjects.filter(project => String(project.id) !== card?.dataset.youtubeProject);
+        saveData(false);
+        renderYoutubeProjectsForm();
+        showToast('YouTube çekimi silindi.');
+    });
+
+    function renderPartnersForm() {
+        if (!partnersAdmin) return;
+        partnersAdmin.innerHTML = '';
+        const partners = appData.partners || [];
+        if (!partners.length) {
+            partnersAdmin.innerHTML = '<p class="admin-empty compact">Henüz kurum logosu eklenmedi.</p>';
+            return;
+        }
+
+        partners.forEach((partner, index) => {
+            const card = document.createElement('div');
+            card.className = 'admin-form-card media-admin-card';
+            card.dataset.partner = String(partner.id || Date.now() + index);
+            card.innerHTML = `
+                <div class="media-admin-card-header">
+                    <strong>Kurum Logosu ${index + 1}</strong>
+                    <button class="btn btn-danger btn-sm" type="button" data-delete-partner aria-label="Kurum logosunu sil"><i class="fas fa-trash-alt"></i></button>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group"><label>Kurum Adı</label><input type="text" class="form-control partner-name" value="${escapeHtml(partner.name)}" placeholder="Afyonkarahisar Belediyesi"></div>
+                    <div class="form-group"><label>Kurum Web Sitesi</label><input type="url" class="form-control partner-url" value="${escapeHtml(partner.url)}" placeholder="https://..."></div>
+                    <div class="form-group form-full"><label>Logo Yolu / URL</label><input type="text" class="form-control partner-logo" value="${escapeHtml(partner.logo)}" placeholder="assets/logos/kurum-logo.png"></div>
+                </div>`;
+            partnersAdmin.appendChild(card);
+        });
+    }
+
+    function readPartnersForm() {
+        if (!partnersAdmin) return;
+        appData.partners = [...partnersAdmin.querySelectorAll('[data-partner]')].map(card => ({
+            id: Number(card.dataset.partner) || Date.now(),
+            name: card.querySelector('.partner-name')?.value.trim() || '',
+            logo: card.querySelector('.partner-logo')?.value.trim() || '',
+            url: card.querySelector('.partner-url')?.value.trim() || ''
+        }));
+    }
+
+    document.getElementById('btnAddPartner')?.addEventListener('click', () => {
+        readPartnersForm();
+        appData.partners.push({ id: Date.now(), name: '', logo: '', url: '' });
+        renderPartnersForm();
+        partnersAdmin.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+
+    partnersAdmin?.addEventListener('click', event => {
+        const button = event.target.closest('[data-delete-partner]');
+        if (!button || !confirm('Bu kurum logosu silinsin mi?')) return;
+        readPartnersForm();
+        const card = button.closest('[data-partner]');
+        appData.partners = appData.partners.filter(partner => String(partner.id) !== card?.dataset.partner);
+        saveData(false);
+        renderPartnersForm();
+        showToast('Kurum logosu silindi.');
+    });
+
     const statsContainer = document.getElementById('statsInputsContainer');
     function renderStatsForm() {
         statsContainer.innerHTML = '';
@@ -363,7 +483,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function populateContactForm() { Object.entries(contactFields).forEach(([key, input]) => { input.value = appData.contact?.[key] || ''; }); }
     function readContactForm() { appData.contact = Object.fromEntries(Object.entries(contactFields).map(([key, input]) => [key, input.value.trim()])); }
 
-    function readAllForms() { readHeroForm(); readStatsForm(); readAboutForm(); readTestimonialsForm(); readContactForm(); }
+    function readAllForms() { readHeroForm(); readYoutubeProjectsForm(); readPartnersForm(); readStatsForm(); readAboutForm(); readTestimonialsForm(); readContactForm(); }
     document.getElementById('btnSaveAll')?.addEventListener('click', () => { readAllForms(); saveData(true); });
     document.getElementById('btnResetData')?.addEventListener('click', () => { if (!confirm('Tüm veriler varsayılana sıfırlansın mı?')) return; localStorage.removeItem(STORAGE_KEY); appData = loadData(); initAll(); showToast('Varsayılan veriler geri yüklendi.'); });
     document.getElementById('btnDownloadDataJs')?.addEventListener('click', () => {
@@ -372,6 +492,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     document.getElementById('btnCopyJson')?.addEventListener('click', () => { readAllForms(); navigator.clipboard.writeText(JSON.stringify(appData, null, 2)).then(() => showToast('JSON panoya kopyalandı.')).catch(() => showToast('Kopyalama başarısız.', 'error')); });
 
-    function initAll() { renderArtistsList(); populateHeroForm(); renderStatsForm(); populateAboutForm(); renderTestimonialsForm(); populateContactForm(); }
+    function initAll() { renderArtistsList(); populateHeroForm(); renderYoutubeProjectsForm(); renderPartnersForm(); renderStatsForm(); populateAboutForm(); renderTestimonialsForm(); populateContactForm(); }
     initAll();
 });

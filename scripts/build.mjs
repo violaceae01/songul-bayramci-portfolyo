@@ -15,6 +15,7 @@ const staticFiles = [
   "index.html",
   "sanatci.html",
   "songul.html",
+  "youtube.html",
 ];
 
 await rm(outputRoot, { recursive: true, force: true });

@@ -456,6 +456,27 @@ body {
     background: var(--bg-darker);
 }
 
+.admin-card-description {
+    margin-top: 6px;
+    color: var(--text-secondary);
+    font-size: 0.86rem;
+    line-height: 1.5;
+}
+
+.media-admin-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.media-admin-card-header strong {
+    font-size: 0.95rem;
+}
+
 .artist-subphotos-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));

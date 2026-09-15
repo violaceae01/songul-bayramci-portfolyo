@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/admin.css?v=20260831-hero-video-admin">
+    <link rel="stylesheet" href="css/admin.css?v=20260915-youtube-logos">
 </head>
 <body>
 
@@ -33,6 +33,12 @@
                 <a href="#hero" class="sidebar-link" data-tab="tab-hero">
                     <i class="fas fa-heading"></i>
                     <span>Hero & Başlıklar</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="#youtube" class="sidebar-link" data-tab="tab-youtube">
+                    <i class="fab fa-youtube"></i>
+                    <span>YouTube & Logolar</span>
                 </a>
             </li>
             <li class="sidebar-item">
@@ -105,6 +111,35 @@
                 <div class="artists-admin-list" id="artistsList">
                     <!-- Loaded dynamically via JS -->
                 </div>
+            </div>
+        </section>
+
+        <!-- YOUTUBE PROJECTS & PARTNER LOGOS -->
+        <section id="tab-youtube" class="tab-panel">
+            <div class="admin-card">
+                <div class="card-header">
+                    <div>
+                        <h2>YouTube Çekimleri</h2>
+                        <p class="admin-card-description">Her kart için kapak görseli ve açılacak YouTube bağlantısını ekleyin.</p>
+                    </div>
+                    <button class="btn btn-primary btn-sm" id="btnAddYoutubeProject" type="button">
+                        <i class="fas fa-plus"></i> Yeni Çekim Ekle
+                    </button>
+                </div>
+                <div id="youtubeProjectsAdmin"></div>
+            </div>
+
+            <div class="admin-card">
+                <div class="card-header">
+                    <div>
+                        <h2>Çalışılan Kurum Logoları</h2>
+                        <p class="admin-card-description">Bu logolar ana sayfadaki kayan bölümde otomatik olarak döner.</p>
+                    </div>
+                    <button class="btn btn-primary btn-sm" id="btnAddPartner" type="button">
+                        <i class="fas fa-plus"></i> Yeni Logo Ekle
+                    </button>
+                </div>
+                <div id="partnersAdmin"></div>
             </div>
         </section>
 
@@ -393,8 +428,8 @@
     <!-- Toast Notifications Container -->
     <div class="toast-container" id="toastContainer"></div>
 
-    <script src="data/data.js?v=20260831-hero-video-admin"></script>
+    <script src="data/data.js?v=20260915-youtube-logos"></script>
     <script src="js/data-utils.js"></script>
-    <script src="js/admin.js?v=20260831-hero-video-admin"></script>
+    <script src="js/admin.js?v=20260915-youtube-logos"></script>
 </body>
 </html>

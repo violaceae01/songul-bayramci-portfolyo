@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="description" content="Songül Bayramcı'nın konser ve etkinlik çekimlerinden seçkiler.">
-    <title>Çalışmalarım | Songül Bayramcı</title>
+    <meta name="description" content="Songül Bayramcı YouTube çekimleri ve video prodüksiyonları.">
+    <title>YouTube Çekimleri | Songül Bayramcı</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,43 +12,36 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/styles.css?v=20260915-youtube-logos">
 </head>
-<body class="works-page">
+<body class="youtube-page">
     <div class="cursor-dot"></div>
     <div class="cursor-outline"></div>
     <div class="scroll-progress" id="scrollProgress"></div>
 
-    <nav class="main-nav scrolled" id="mainNav">
+    <nav class="main-nav" id="mainNav">
         <div class="nav-container">
-            <a href="index.html#home" class="nav-logo" aria-label="Ana sayfaya dön">SB</a>
+            <a href="index.html#home" class="nav-logo">SB</a>
             <div class="nav-links" id="mainMenu">
                 <a href="index.html#home" class="nav-link">ANA SAYFA</a>
-                <a href="calismalarim.html" class="nav-link active" aria-current="page">ÇALIŞMALARIM</a>
-                <a href="youtube.html" class="nav-link">YOUTUBE</a>
+                <a href="calismalarim.html" class="nav-link">ÇALIŞMALARIM</a>
+                <a href="youtube.html" class="nav-link active" aria-current="page">YOUTUBE</a>
                 <a href="hakkimda.html" class="nav-link">HAKKIMDA</a>
                 <a href="iletisim.html" class="nav-link">İLETİŞİM</a>
             </div>
             <button class="nav-toggle" id="navToggle" type="button" aria-label="Menüyü aç" aria-expanded="false" aria-controls="mainMenu">
-                <span></span>
-                <span></span>
-                <span></span>
+                <span></span><span></span><span></span>
             </button>
         </div>
     </nav>
 
-    <main class="works-main">
-        <section class="artist-directory-section works-section-first">
+    <main>
+        <section class="youtube-projects-section" aria-labelledby="youtubeProjectsTitle">
             <div class="container">
-                <div class="section-header reveal">
-                    <span class="section-tag">SANATÇI ARŞİVİ</span>
-                    <h1 class="section-title">SANATÇILAR</h1>
-                    <p class="section-desc">Sanatçıyı seçin; konserlerini, fotoğraf galerilerini ve video bağlantılarını inceleyin.</p>
-                </div>
-
-                <div class="artist-directory-meta reveal">
-                    <span id="artistDirectoryCount">0 sanatçı</span>
-                </div>
-                <div class="artist-directory" id="artistDirectory">
-                    <!-- Artists will be sorted alphabetically -->
+                <header class="youtube-projects-header reveal active">
+                    <span class="section-tag">VİDEO PRODÜKSİYONLARI</span>
+                    <h1 class="section-title" id="youtubeProjectsTitle">YOUTUBE ÇEKİMLERİ</h1>
+                </header>
+                <div class="youtube-projects-grid" id="youtubeProjectsGrid">
+                    <p class="youtube-projects-empty">YouTube çekimleri yükleniyor...</p>
                 </div>
             </div>
         </section>

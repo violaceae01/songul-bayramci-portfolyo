@@ -155,6 +155,25 @@ const siteData = {
     { "id": 7, "src": "Görsel/Mert Demir2.PNG", "title": "Mert Demir", "desc": "Sahne Işıkları" },
     { "id": 8, "src": "Görsel/Zeynep bastık2.PNG", "title": "Zeynep Bastık", "desc": "Konser Detayı" }
   ],
+  "youtubeProjects": [
+    {
+      "id": 1,
+      "title": "Afyonkarahisar Belediyesi",
+      "year": "2026",
+      "category": "YouTube Çekimi",
+      "thumbnail": "assets/logos/afyonkarahisar-belediyesi.webp",
+      "thumbnailFit": "contain",
+      "url": "https://www.youtube.com/c/AfyonkarahisarBelediyesi"
+    }
+  ],
+  "partners": [
+    {
+      "id": 1,
+      "name": "Afyonkarahisar Belediyesi",
+      "logo": "assets/logos/afyonkarahisar-belediyesi.webp",
+      "url": "https://www.afyon.bel.tr/"
+    }
+  ],
   "about": {
     "tag": "HAKKIMDA",
     "name": "Songül Bayramcı",
