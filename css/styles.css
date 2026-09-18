@@ -1212,6 +1212,21 @@ a.creative-project-card:focus-visible {
     transition: transform 0.65s ease, filter 0.65s ease;
 }
 
+body[data-page-section="graphicDesign"] .creative-projects-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-width: 1040px;
+    margin: 0 auto;
+}
+
+body[data-page-section="graphicDesign"] .creative-project-media {
+    aspect-ratio: 4 / 5;
+    background: #050505;
+}
+
+body[data-page-section="graphicDesign"] .creative-project-media img {
+    object-fit: contain;
+}
+
 a.creative-project-card:hover img {
     transform: scale(1.045);
     filter: brightness(0.8);
@@ -1296,6 +1311,10 @@ a.creative-project-card:hover img {
     .creative-projects-grid {
         grid-template-columns: 1fr;
         gap: 24px;
+    }
+
+    body[data-page-section="graphicDesign"] .creative-projects-grid {
+        grid-template-columns: 1fr;
     }
 
     .featured-artist-card,

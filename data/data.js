@@ -1,4 +1,5 @@
 const siteData = {
+  "contentVersion": 2,
   "hero": {
     "tag": "KONSER & ETKİNLİK ÇEKİMİ",
     "titleLine1": "HER ANI",
@@ -184,7 +185,26 @@ const siteData = {
       "enabled": true
     }
   ],
-  "graphicProjects": [],
+  "graphicProjects": [
+    {
+      "id": "kubilay-karca-turne-afisi-siyah",
+      "title": "Kubilay Karça — Turne Afişi",
+      "year": "2026",
+      "category": "Afiş Tasarımı",
+      "image": "assets/images/kubilay-karca-turne-afisi-siyah.jpeg",
+      "url": "",
+      "enabled": true
+    },
+    {
+      "id": "kubilay-karca-turne-afisi-kirmizi",
+      "title": "Kubilay Karça — Turne Afişi",
+      "year": "2026",
+      "category": "Afiş Tasarımı",
+      "image": "assets/images/kubilay-karca-turne-afisi-kirmizi.jpeg",
+      "url": "",
+      "enabled": true
+    }
+  ],
   "videoClips": [
     {
       "id": 1,

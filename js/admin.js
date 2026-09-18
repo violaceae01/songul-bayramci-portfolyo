@@ -17,6 +17,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const merged = { ...defaults, ...parsed };
             merged.hero = { ...(defaults.hero || {}), ...(parsed.hero || {}) };
             merged.sectionVisibility = { ...(defaults.sectionVisibility || {}), ...(parsed.sectionVisibility || {}) };
+            const savedContentVersion = Number(parsed.contentVersion || 0);
+            const currentContentVersion = Number(defaults.contentVersion || 0);
+            if (savedContentVersion < currentContentVersion && Array.isArray(defaults.graphicProjects)) {
+                const existingGraphicIds = new Set((parsed.graphicProjects || []).map(item => String(item.id)));
+                const missingGraphicProjects = defaults.graphicProjects
+                    .filter(item => !existingGraphicIds.has(String(item.id)))
+                    .map(clone);
+                merged.graphicProjects = [...(parsed.graphicProjects || []), ...missingGraphicProjects];
+                merged.contentVersion = currentContentVersion;
+            }
             if (!merged.hero.bgVideo && defaults.hero?.bgVideo) merged.hero.bgVideo = defaults.hero.bgVideo;
             delete merged.hero.bgImage;
             merged.artists = utils ? utils.normalizeArtists(parsed.artists || defaults.artists) : (parsed.artists || defaults.artists);

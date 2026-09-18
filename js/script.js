@@ -229,7 +229,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     const defaultVisibility = siteData.sectionVisibility || {};
                     const savedVisibility = parsed.sectionVisibility || {};
                     parsed.sectionVisibility = { ...defaultVisibility, ...savedVisibility };
-                    if (!parsed.graphicProjects && siteData.graphicProjects) {
+                    const savedContentVersion = Number(parsed.contentVersion || 0);
+                    const currentContentVersion = Number(siteData.contentVersion || 0);
+                    if (savedContentVersion < currentContentVersion && Array.isArray(siteData.graphicProjects)) {
+                        const existingGraphicIds = new Set((parsed.graphicProjects || []).map(item => String(item.id)));
+                        const missingGraphicProjects = siteData.graphicProjects
+                            .filter(item => !existingGraphicIds.has(String(item.id)))
+                            .map(item => JSON.parse(JSON.stringify(item)));
+                        parsed.graphicProjects = [...(parsed.graphicProjects || []), ...missingGraphicProjects];
+                        parsed.contentVersion = currentContentVersion;
+                        updated = true;
+                    } else if (!parsed.graphicProjects && siteData.graphicProjects) {
                         parsed.graphicProjects = siteData.graphicProjects;
                         updated = true;
                     }
