@@ -9,8 +9,8 @@
     --accent-dark: #c1121f;
     --accent-glow: rgba(230, 57, 70, 0.4);
     --gold: #ffd700;
-    --font-main: 'Instrument Sans', sans-serif;
-    --font-display: 'Playfair Display', serif;
+    --font-main: 'Poppins', sans-serif;
+    --font-display: 'Poppins', sans-serif;
     --transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     --transition-fast: 0.2s ease;
 }
@@ -19,6 +19,10 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+}
+
+[hidden] {
+    display: none !important;
 }
 
 html {
@@ -133,29 +137,39 @@ body:hover .cursor-outline {
 }
 
 .nav-logo {
-    font-family: var(--font-display);
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--text-primary);
+    display: inline-flex;
+    width: clamp(132px, 11vw, 172px);
+    height: 46px;
+    flex: 0 0 auto;
+    align-items: center;
     text-decoration: none;
-    letter-spacing: 3px;
+    transition: opacity var(--transition-fast), transform var(--transition-fast);
 }
 
 .nav-logo:hover {
-    color: var(--accent);
+    opacity: 0.82;
+    transform: translateY(-1px);
+}
+
+.nav-logo img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: left center;
 }
 
 .nav-links {
     display: flex;
-    gap: 40px;
+    gap: clamp(22px, 2.4vw, 38px);
 }
 
 .nav-link {
-    font-size: 0.85rem;
+    font-size: 0.78rem;
     font-weight: 500;
     color: var(--text-secondary);
     text-decoration: none;
-    letter-spacing: 2px;
+    letter-spacing: 1.5px;
     position: relative;
     transition: color var(--transition-fast);
 }
@@ -1030,6 +1044,286 @@ footer {
     }
 }
 
+/* Featured Artists */
+.featured-artists-section {
+    padding: 100px 0 120px;
+}
+
+.featured-artists-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 38px;
+}
+
+.featured-artist-card {
+    min-width: 0;
+    padding: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(5, 5, 5, 0.72);
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition);
+}
+
+.featured-artist-card:hover,
+.featured-artist-card:focus-visible {
+    border-color: rgba(230, 57, 70, 0.78);
+    box-shadow: 0 22px 55px rgba(0, 0, 0, 0.48), 0 0 28px rgba(230, 57, 70, 0.13);
+    transform: translateY(-8px);
+    outline: none;
+}
+
+.featured-artist-media {
+    position: relative;
+    display: block;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    background: #0d0d0d;
+}
+
+.featured-artist-media img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: saturate(0.88) contrast(1.04);
+    transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1), filter 0.6s ease;
+}
+
+.featured-artist-card:hover img,
+.featured-artist-card:focus-visible img {
+    transform: scale(1.055);
+    filter: saturate(1.05) contrast(1.04);
+}
+
+.featured-artist-media > small {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    padding: 4px 7px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    background: rgba(5, 5, 5, 0.78);
+    color: #fff;
+    font-size: 0.66rem;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: 0.6px;
+}
+
+.featured-artist-info {
+    display: block;
+    padding: 18px 2px 2px;
+}
+
+.featured-artist-info strong {
+    display: block;
+    margin-bottom: 13px;
+    font-size: 1.08rem;
+    line-height: 1.3;
+}
+
+.featured-artist-info > span,
+.creative-project-info > span {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    color: var(--text-secondary);
+}
+
+.featured-artist-info small,
+.creative-project-info small {
+    font-size: 0.78rem;
+}
+
+.featured-artists-actions {
+    margin-top: 46px;
+    text-align: center;
+}
+
+.featured-artists-actions .btn {
+    min-width: 190px;
+}
+
+.featured-artists-empty,
+.creative-projects-empty {
+    grid-column: 1 / -1;
+    padding: 70px 24px;
+    border: 1px dashed rgba(255, 255, 255, 0.12);
+    color: var(--text-secondary);
+    text-align: center;
+}
+
+/* Graphic Design & Video Clips */
+.creative-projects-section {
+    min-height: 100vh;
+    padding: 170px 0 120px;
+    background: linear-gradient(180deg, rgba(230, 57, 70, 0.035), transparent 34%);
+}
+
+.creative-projects-header {
+    margin-bottom: 58px;
+}
+
+.creative-projects-header .section-tag,
+.creative-projects-header .section-title {
+    text-align: left;
+}
+
+.creative-projects-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 38px;
+}
+
+.creative-project-card {
+    display: block;
+    min-width: 0;
+    padding: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(5, 5, 5, 0.78);
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition);
+}
+
+a.creative-project-card:hover,
+a.creative-project-card:focus-visible {
+    border-color: rgba(230, 57, 70, 0.78);
+    box-shadow: 0 22px 55px rgba(0, 0, 0, 0.5);
+    transform: translateY(-8px);
+    outline: none;
+}
+
+.creative-project-media {
+    position: relative;
+    display: block;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    background: radial-gradient(circle at 50% 42%, rgba(230, 57, 70, 0.18), #090909 68%);
+}
+
+.creative-project-media img {
+    position: relative;
+    z-index: 1;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.65s ease, filter 0.65s ease;
+}
+
+a.creative-project-card:hover img {
+    transform: scale(1.045);
+    filter: brightness(0.8);
+}
+
+.creative-project-placeholder {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    color: rgba(255, 255, 255, 0.34);
+    font-size: 2.6rem;
+}
+
+.creative-project-media:not(.is-missing) .creative-project-placeholder {
+    opacity: 0;
+}
+
+.creative-project-media.is-missing img {
+    display: none;
+}
+
+.creative-project-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 2;
+    padding: 4px 7px;
+    border: 1px solid rgba(255, 255, 255, 0.48);
+    background: rgba(5, 5, 5, 0.82);
+    color: #fff;
+    font-size: 0.64rem;
+    font-weight: 600;
+    line-height: 1;
+    text-transform: uppercase;
+}
+
+.creative-project-info {
+    display: block;
+    padding: 18px 2px 2px;
+}
+
+.creative-project-info strong {
+    display: block;
+    margin-bottom: 13px;
+    font-size: 1.08rem;
+    line-height: 1.35;
+}
+
+@media (min-width: 901px) and (max-width: 1300px) {
+    .nav-container {
+        padding-right: 24px;
+        padding-left: 24px;
+    }
+
+    .nav-logo {
+        width: 118px;
+    }
+
+    .nav-links {
+        gap: 14px;
+    }
+
+    .nav-link {
+        font-size: 0.66rem;
+        letter-spacing: 0.8px;
+    }
+
+    .featured-artists-grid,
+    .creative-projects-grid {
+        gap: 20px;
+    }
+
+    .featured-artist-card,
+    .creative-project-card {
+        padding: 16px;
+    }
+}
+
+@media (max-width: 900px) {
+    .featured-artists-grid,
+    .creative-projects-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+
+    .featured-artist-card,
+    .creative-project-card {
+        width: min(100%, 440px);
+        margin: 0 auto;
+    }
+
+    .creative-projects-section {
+        padding: 135px 0 90px;
+    }
+}
+
+@media (max-width: 600px) {
+    .featured-artists-section {
+        padding: 70px 0 85px;
+    }
+
+    .featured-artist-card,
+    .creative-project-card {
+        padding: 16px;
+    }
+
+    .creative-projects-header {
+        margin-bottom: 36px;
+    }
+}
+
 .portfolio-filter {
     display: flex;
     justify-content: center;
@@ -1339,7 +1633,7 @@ footer {
     text-align: center;
 }
 
-/* YouTube Projects */
+/* Clip Projects */
 .youtube-projects-section {
     min-height: 100vh;
     padding: 180px 0 130px;
@@ -1348,16 +1642,7 @@ footer {
 }
 
 .youtube-projects-section::before {
-    content: '';
-    position: absolute;
-    top: -90px;
-    left: 50%;
-    width: min(1500px, 130vw);
-    height: 520px;
-    background: url('../assets/images/songul-signature-transparent.png') center / contain no-repeat;
-    opacity: 0.13;
-    transform: translateX(-50%) rotate(-4deg);
-    pointer-events: none;
+    content: none;
 }
 
 .youtube-projects-header {
@@ -1414,7 +1699,7 @@ a.youtube-project-link:focus-visible {
 .youtube-project-media {
     position: relative;
     display: block;
-    aspect-ratio: 4 / 5;
+    aspect-ratio: 16 / 9;
     overflow: hidden;
     margin-bottom: 20px;
     background: radial-gradient(circle at 50% 42%, rgba(230, 57, 70, 0.2), #090909 66%);
@@ -1936,12 +2221,72 @@ a.youtube-project-link:hover .youtube-project-media img {
     background: transparent;
 }
 
-.home-signature-section img {
-    display: block;
+.home-signature-artwork {
+    position: relative;
     width: min(1100px, 92vw);
+}
+
+.home-signature-artwork img {
+    display: block;
+    width: 100%;
     opacity: 0.58;
     filter: saturate(0.9) brightness(1.05);
     transform: rotate(-2deg);
+    animation: signatureFloat 6s ease-in-out infinite;
+}
+
+.signature-paint-drips {
+    position: absolute;
+    right: 8%;
+    bottom: 2%;
+    left: 8%;
+    height: clamp(60px, 8vw, 105px);
+    pointer-events: none;
+}
+
+.signature-paint-drips i {
+    --drip-height: 72px;
+    position: absolute;
+    top: 0;
+    width: 4px;
+    height: var(--drip-height);
+    border-radius: 0 0 999px 999px;
+    background: linear-gradient(180deg, rgba(230, 57, 70, 0.9), rgba(193, 18, 31, 0.12));
+    box-shadow: 0 8px 18px rgba(230, 57, 70, 0.18);
+    transform: scaleY(0.18);
+    transform-origin: top;
+    opacity: 0.15;
+    animation: signaturePaintDrip 4.6s ease-in-out infinite;
+}
+
+.signature-paint-drips i::after {
+    content: '';
+    position: absolute;
+    right: 50%;
+    bottom: -4px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent-dark);
+    transform: translateX(50%);
+}
+
+.signature-paint-drips i:nth-child(1) { left: 7%; --drip-height: 58px; animation-delay: -1.1s; }
+.signature-paint-drips i:nth-child(2) { left: 22%; --drip-height: 92px; animation-delay: -3.4s; animation-duration: 5.4s; }
+.signature-paint-drips i:nth-child(3) { left: 39%; --drip-height: 66px; animation-delay: -2.2s; }
+.signature-paint-drips i:nth-child(4) { left: 55%; --drip-height: 104px; animation-delay: -4.1s; animation-duration: 5.8s; }
+.signature-paint-drips i:nth-child(5) { left: 69%; --drip-height: 74px; animation-delay: -0.7s; }
+.signature-paint-drips i:nth-child(6) { left: 82%; --drip-height: 96px; animation-delay: -2.9s; animation-duration: 5.1s; }
+.signature-paint-drips i:nth-child(7) { left: 94%; --drip-height: 55px; animation-delay: -1.8s; }
+
+@keyframes signatureFloat {
+    0%, 100% { transform: translateY(0) rotate(-2deg); filter: saturate(0.9) brightness(1.05); }
+    50% { transform: translateY(-8px) rotate(-1.4deg); filter: saturate(1.05) brightness(1.12); }
+}
+
+@keyframes signaturePaintDrip {
+    0%, 100% { transform: scaleY(0.18); opacity: 0.12; }
+    45%, 62% { transform: scaleY(1); opacity: 0.7; }
 }
 
 /* ============================================
@@ -2242,7 +2587,9 @@ a.youtube-project-link:hover .youtube-project-media img {
 
 @media (prefers-reduced-motion: reduce) {
     .brand-marquee-track,
-    .rotating-gallery-track {
+    .rotating-gallery-track,
+    .home-signature-artwork img,
+    .signature-paint-drips i {
         animation: none;
     }
 
@@ -2680,9 +3027,12 @@ a.youtube-project-link:hover .youtube-project-media img {
         padding: 15px 12px 60px;
     }
 
-    .home-signature-section img {
+    .home-signature-artwork {
         width: 120vw;
         max-width: none;
+    }
+
+    .home-signature-artwork img {
         opacity: 0.52;
     }
 
@@ -2850,6 +3200,8 @@ video {
     .nav-logo {
         position: relative;
         z-index: 1002;
+        width: 142px;
+        height: 42px;
     }
 
     .nav-toggle {
@@ -2923,7 +3275,8 @@ video {
     }
 
     .nav-logo {
-        font-size: 1.65rem;
+        width: 124px;
+        height: 38px;
     }
 
     .nav-links {
@@ -3080,10 +3433,23 @@ video {
         padding-left: 0;
     }
 
-    .home-signature-section img {
+    .home-signature-artwork {
         width: min(900px, 112vw);
         max-width: none;
+    }
+
+    .home-signature-artwork img {
         transform: rotate(-1.5deg);
+    }
+
+    .signature-paint-drips {
+        right: 5%;
+        left: 5%;
+        height: 70px;
+    }
+
+    .signature-paint-drips i {
+        width: 3px;
     }
 
     .footer-content {
@@ -3125,12 +3491,6 @@ video {
 @media (max-width: 900px) {
     .youtube-projects-section {
         padding: 140px 0 90px;
-    }
-
-    .youtube-projects-section::before {
-        top: -30px;
-        width: 150vw;
-        height: 380px;
     }
 
     .youtube-projects-grid {

@@ -7,9 +7,9 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/styles.css?v=20260915-youtube-logos">
+    <link rel="stylesheet" href="css/styles.css?v=20260918-portfolio-pages">
 </head>
 <body>
     <!-- Cursor -->
@@ -22,11 +22,13 @@
     <!-- Navigation -->
     <nav class="main-nav" id="mainNav">
         <div class="nav-container">
-            <a href="#home" class="nav-logo">SB</a>
+            <a href="#home" class="nav-logo" aria-label="Les Mejor Creative ana sayfa"><img src="assets/images/les-mejor-logo-white.png" alt="Les Mejor Creative"></a>
             <div class="nav-links" id="mainMenu">
                 <a href="#home" class="nav-link active">ANA SAYFA</a>
                 <a href="calismalarim.html" class="nav-link">ÇALIŞMALARIM</a>
-                <a href="youtube.html" class="nav-link">YOUTUBE</a>
+                <a href="klip-cekimleri.html" class="nav-link" data-nav-section="clipShootings">KLİP ÇEKİMLERİ</a>
+                <a href="video-klipleri.html" class="nav-link" data-nav-section="videoClips">VİDEO KLİPLERİ</a>
+                <a href="grafik-tasarim.html" class="nav-link" data-nav-section="graphicDesign">GRAFİK TASARIM</a>
                 <a href="hakkimda.html" class="nav-link">HAKKIMDA</a>
                 <a href="iletisim.html" class="nav-link">İLETİŞİM</a>
             </div>
@@ -134,7 +136,7 @@
     </section>
 
     <!-- Partner Logo Marquee -->
-    <section class="brand-marquee-section" aria-labelledby="brandMarqueeTitle">
+    <section class="brand-marquee-section" data-section-key="partnerLogos" aria-labelledby="brandMarqueeTitle">
         <div class="brand-marquee-heading reveal">
             <span class="section-tag" id="brandMarqueeTitle">ÇALIŞTIĞIM MARKALAR</span>
         </div>
@@ -145,20 +147,20 @@
         </div>
     </section>
 
-    <!-- Mixed Rotating Gallery -->
-    <section class="portfolio-section home-rotating-gallery-section" aria-labelledby="homeGalleryTitle">
+    <!-- Featured Artists -->
+    <section class="portfolio-section featured-artists-section" id="featuredArtistsSection" data-section-key="featuredArtists" aria-labelledby="featuredArtistsTitle">
         <div class="container">
             <div class="section-header reveal">
-                <span class="section-tag">SEÇKİLER</span>
-                <h2 class="section-title" id="homeGalleryTitle">KARIŞIK GALERİ</h2>
+                <span class="section-tag">PORTFÖY</span>
+                <h2 class="section-title" id="featuredArtistsTitle">ÖNE ÇIKAN SANATÇILAR</h2>
             </div>
-
-            <div class="rotating-gallery reveal" aria-label="Otomatik dönen karışık fotoğraf galerisi">
-                <div class="rotating-gallery-viewport">
-                    <div class="rotating-gallery-track" id="homeRotatingGalleryTrack">
-                        <!-- Images will be loaded dynamically from the homeGallery list -->
-                    </div>
-                </div>
+            <div class="featured-artists-grid reveal" id="featuredArtistsGrid">
+                <!-- Featured artists are loaded dynamically -->
+            </div>
+            <div class="featured-artists-actions" id="featuredArtistsActions" hidden>
+                <button class="btn btn-outline" id="featuredArtistsMore" type="button" aria-expanded="false">
+                    Daha Fazla <i class="fas fa-arrow-down" aria-hidden="true"></i>
+                </button>
             </div>
         </div>
     </section>
@@ -278,7 +280,12 @@
 
     <!-- Signature Artwork -->
     <section class="home-signature-section" aria-hidden="true">
-        <img src="assets/images/songul-signature-transparent.png" alt="">
+        <div class="home-signature-artwork">
+            <img src="assets/images/songul-signature-transparent.png" alt="">
+            <div class="signature-paint-drips">
+                <i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+            </div>
+        </div>
     </section>
 
     <!-- Footer -->
@@ -307,8 +314,8 @@
         <i class="fas fa-arrow-up" aria-hidden="true"></i>
     </button>
 
-    <script src="data/data.js?v=20260915-youtube-logos"></script>
-    <script src="js/data-utils.js"></script>
-    <script src="js/script.js?v=20260915-youtube-logos"></script>
+    <script src="data/data.js?v=20260918-portfolio-pages"></script>
+    <script src="js/data-utils.js?v=20260918-portfolio-pages"></script>
+    <script src="js/script.js?v=20260918-portfolio-pages"></script>
 </body>
 </html>

@@ -9,13 +9,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function loadData() {
         const defaults = typeof siteData !== 'undefined' ? clone(siteData) : {
-            hero: {}, stats: [], artists: [], homeGallery: [], youtubeProjects: [], partners: [], about: {}, testimonials: [], contact: {}
+            hero: {}, stats: [], artists: [], homeGallery: [], youtubeProjects: [], graphicProjects: [], videoClips: [], partners: [], sectionVisibility: {}, about: {}, testimonials: [], contact: {}
         };
         try {
             const saved = localStorage.getItem(STORAGE_KEY);
             const parsed = saved ? JSON.parse(saved) : {};
             const merged = { ...defaults, ...parsed };
             merged.hero = { ...(defaults.hero || {}), ...(parsed.hero || {}) };
+            merged.sectionVisibility = { ...(defaults.sectionVisibility || {}), ...(parsed.sectionVisibility || {}) };
             if (!merged.hero.bgVideo && defaults.hero?.bgVideo) merged.hero.bgVideo = defaults.hero.bgVideo;
             delete merged.hero.bgImage;
             merged.artists = utils ? utils.normalizeArtists(parsed.artists || defaults.artists) : (parsed.artists || defaults.artists);
@@ -24,6 +25,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 merged.artists.forEach(artist => {
                     const defaultArtist = defaultArtists.find(item => String(item.id) === String(artist.id));
                     if (!artist.bio && defaultArtist?.bio) artist.bio = defaultArtist.bio;
+                });
+            }
+            if (Array.isArray(merged.youtubeProjects) && defaults.youtubeProjects?.[0]) {
+                merged.youtubeProjects = merged.youtubeProjects.map(project => {
+                    const isOldDemo = project?.title === 'Afyonkarahisar Belediyesi'
+                        && project?.url === 'https://www.youtube.com/c/AfyonkarahisarBelediyesi';
+                    return isOldDemo ? clone(defaults.youtubeProjects[0]) : project;
                 });
             }
             localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
@@ -63,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const tabDescriptions = {
         'tab-portfolio': { title: 'Sanatçı & Konser Yönetimi', desc: 'Sanatçıları, konserlerini, galerilerini ve video bağlantılarını yönetin.' },
         'tab-hero': { title: 'Hero & Başlıklar', desc: 'Ana sayfa giriş alanındaki başlıkları, alt başlığı ve arka plan videosunu güncelleyin.' },
-        'tab-youtube': { title: 'YouTube Çekimleri & Logolar', desc: 'YouTube projelerini ve ana sayfada kayan kurum logolarını yönetin.' },
+        'tab-youtube': { title: 'Projeler & Görünürlük', desc: 'Klip, grafik tasarım, video projeleri ve ana sayfa bölümlerini yönetin.' },
         'tab-stats': { title: 'İstatistik Sayaçları', desc: 'Sitede yer alan deneyim ve istatistik sayılarını düzenleyin.' },
         'tab-about': { title: 'Hakkımda Bölümü', desc: 'Biyografi metinlerini ve profil fotoğrafını yönetin.' },
         'tab-testimonials': { title: 'Referanslar & Yorumlar', desc: 'Sanatçı ve müşteri referanslarını düzenleyin.' },
@@ -95,6 +103,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const artistBio = document.getElementById('artistBio');
     const artistCover = document.getElementById('artistCover');
     const artistCoverPreview = document.getElementById('artistCoverPreview');
+    const artistVisible = document.getElementById('artistVisible');
+    const artistFeatured = document.getElementById('artistFeatured');
 
     const concertModal = document.getElementById('concertModal');
     const concertForm = document.getElementById('concertForm');
@@ -139,6 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="artist-info-wrap">
                         <h3>${escapeHtml(artist.name)}</h3>
                         <p>${artist.concerts.length} konser · <a href="sanatci.html?artist=${encodeURIComponent(artist.slug)}" target="_blank">sanatçı sayfasını aç</a></p>
+                        <div class="admin-state-row"><span class="admin-state ${artist.visible !== false ? 'is-on' : 'is-off'}">${artist.visible !== false ? 'Sitede açık' : 'Sitede kapalı'}</span><span class="admin-state ${artist.featured !== false ? 'is-on' : 'is-off'}">${artist.featured !== false ? 'Öne çıkıyor' : 'Öne çıkarılmıyor'}</span></div>
                         ${artist.bio ? `<p class="artist-bio-preview">${escapeHtml(artist.bio)}</p>` : ''}
                     </div>
                     <div class="artist-actions-wrap">
@@ -208,6 +219,8 @@ document.addEventListener('DOMContentLoaded', () => {
         artistName.value = artist?.name || '';
         artistBio.value = artist?.bio || '';
         artistCover.value = artist?.cover || '';
+        artistVisible.checked = artist?.visible !== false;
+        artistFeatured.checked = artist?.featured !== false;
         if (artist?.cover) { artistCoverPreview.src = artist.cover; artistCoverPreview.style.display = 'block'; }
         artistModal.classList.add('active');
     }
@@ -222,11 +235,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const name = artistName.value.trim();
         const bio = artistBio.value.trim();
         const cover = artistCover.value.trim();
+        const visible = artistVisible.checked;
+        const featured = artistFeatured.checked;
         if (existing) {
-            existing.name = name; existing.bio = bio; existing.cover = cover; showToast('Sanatçı güncellendi.');
+            existing.name = name; existing.bio = bio; existing.cover = cover; existing.visible = visible; existing.featured = featured; showToast('Sanatçı güncellendi.');
         } else {
             const id = Date.now();
-            appData.artists.push({ id, slug: utils ? utils.slugify(name) : String(id), name, bio, cover, concerts: [] });
+            appData.artists.push({ id, slug: utils ? utils.slugify(name) : String(id), name, bio, cover, visible, featured, concerts: [] });
             showToast('Yeni sanatçı eklendi.');
         }
         saveData(false); renderArtistsList(); closeArtistModal();
@@ -333,15 +348,115 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     heroBgVideo?.addEventListener('input', updateHeroVideoPreview);
 
+    const sectionVisibilityAdmin = document.getElementById('sectionVisibilityAdmin');
+    function populateSectionVisibilityForm() {
+        sectionVisibilityAdmin?.querySelectorAll('[data-section-toggle]').forEach(input => {
+            input.checked = appData.sectionVisibility?.[input.dataset.sectionToggle] !== false;
+        });
+    }
+    function readSectionVisibilityForm() {
+        const nextVisibility = { ...(appData.sectionVisibility || {}) };
+        sectionVisibilityAdmin?.querySelectorAll('[data-section-toggle]').forEach(input => {
+            nextVisibility[input.dataset.sectionToggle] = input.checked;
+        });
+        appData.sectionVisibility = nextVisibility;
+    }
+
     const youtubeProjectsAdmin = document.getElementById('youtubeProjectsAdmin');
+    const videoClipsAdmin = document.getElementById('videoClipsAdmin');
+    const graphicProjectsAdmin = document.getElementById('graphicProjectsAdmin');
     const partnersAdmin = document.getElementById('partnersAdmin');
+
+    function renderCreativeProjectsForm(container, items, options) {
+        if (!container) return;
+        container.innerHTML = '';
+        if (!items.length) {
+            container.innerHTML = `<p class="admin-empty compact">Henüz ${escapeHtml(options.emptyLabel)} eklenmedi.</p>`;
+            return;
+        }
+
+        items.forEach((project, index) => {
+            const card = document.createElement('div');
+            card.className = 'admin-form-card media-admin-card';
+            card.dataset.creativeProject = String(project.id || Date.now() + index);
+            card.innerHTML = `
+                <div class="media-admin-card-header">
+                    <strong>${escapeHtml(options.itemLabel)} ${index + 1}</strong>
+                    <button class="btn btn-danger btn-sm" type="button" data-delete-creative aria-label="${escapeHtml(options.itemLabel)} projesini sil"><i class="fas fa-trash-alt"></i></button>
+                </div>
+                <div class="form-grid">
+                    <label class="admin-toggle form-full"><input type="checkbox" class="creative-enabled" ${project.enabled !== false ? 'checked' : ''}><span><strong>Yayında</strong><small>Kapatılırsa kart sayfada görünmez.</small></span></label>
+                    <div class="form-group"><label>Proje / Sanatçı Adı</label><input type="text" class="form-control creative-title" value="${escapeHtml(project.title)}" placeholder="${escapeHtml(options.titlePlaceholder)}"></div>
+                    <div class="form-group"><label>Yıl</label><input type="text" class="form-control creative-year" value="${escapeHtml(project.year)}" placeholder="2026"></div>
+                    <div class="form-group form-full"><label>Etiket</label><input type="text" class="form-control creative-category" value="${escapeHtml(project.category || options.defaultCategory)}" placeholder="${escapeHtml(options.defaultCategory)}"></div>
+                    <div class="form-group form-full"><label>${options.isVideo ? 'Özel Kapak Görseli (isteğe bağlı)' : 'Proje Görseli Yolu / URL'}</label><input type="text" class="form-control creative-image" value="${escapeHtml(project.image)}" placeholder="${options.isVideo ? 'Boş bırakırsanız YouTube kapağı otomatik alınır' : 'Görsel/tasarim.jpg'}"></div>
+                    <div class="form-group form-full"><label>${options.isVideo ? 'YouTube Video Bağlantısı' : 'Proje Bağlantısı (isteğe bağlı)'}</label><input type="url" class="form-control creative-url" value="${escapeHtml(project.url)}" placeholder="https://..."></div>
+                </div>`;
+            container.appendChild(card);
+        });
+    }
+
+    function readCreativeProjectsForm(container, defaultCategory) {
+        if (!container) return [];
+        return [...container.querySelectorAll('[data-creative-project]')].map(card => ({
+            id: Number(card.dataset.creativeProject) || Date.now(),
+            title: card.querySelector('.creative-title')?.value.trim() || '',
+            year: card.querySelector('.creative-year')?.value.trim() || '',
+            category: card.querySelector('.creative-category')?.value.trim() || defaultCategory,
+            image: card.querySelector('.creative-image')?.value.trim() || '',
+            url: card.querySelector('.creative-url')?.value.trim() || '',
+            enabled: card.querySelector('.creative-enabled')?.checked !== false
+        }));
+    }
+
+    function renderVideoClipsForm() {
+        renderCreativeProjectsForm(videoClipsAdmin, appData.videoClips || [], {
+            itemLabel: 'Video Klip', emptyLabel: 'video klip', titlePlaceholder: 'Kubilay Karça', defaultCategory: 'Video Klip', isVideo: true
+        });
+    }
+
+    function renderGraphicProjectsForm() {
+        renderCreativeProjectsForm(graphicProjectsAdmin, appData.graphicProjects || [], {
+            itemLabel: 'Grafik Tasarım', emptyLabel: 'grafik tasarım projesi', titlePlaceholder: 'Proje adı', defaultCategory: 'Grafik Tasarım', isVideo: false
+        });
+    }
+
+    document.getElementById('btnAddVideoClip')?.addEventListener('click', () => {
+        appData.videoClips = readCreativeProjectsForm(videoClipsAdmin, 'Video Klip');
+        appData.videoClips.push({ id: Date.now(), title: '', year: String(new Date().getFullYear()), category: 'Video Klip', image: '', url: '', enabled: true });
+        renderVideoClipsForm();
+        videoClipsAdmin.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+
+    document.getElementById('btnAddGraphicProject')?.addEventListener('click', () => {
+        appData.graphicProjects = readCreativeProjectsForm(graphicProjectsAdmin, 'Grafik Tasarım');
+        appData.graphicProjects.push({ id: Date.now(), title: '', year: String(new Date().getFullYear()), category: 'Grafik Tasarım', image: '', url: '', enabled: true });
+        renderGraphicProjectsForm();
+        graphicProjectsAdmin.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+
+    function bindCreativeDelete(container, dataKey, defaultCategory, render, label) {
+        container?.addEventListener('click', event => {
+            const button = event.target.closest('[data-delete-creative]');
+            if (!button || !confirm(`Bu ${label} projesi silinsin mi?`)) return;
+            appData[dataKey] = readCreativeProjectsForm(container, defaultCategory);
+            const card = button.closest('[data-creative-project]');
+            appData[dataKey] = appData[dataKey].filter(project => String(project.id) !== card?.dataset.creativeProject);
+            saveData(false);
+            render();
+            showToast(`${label} projesi silindi.`);
+        });
+    }
+
+    bindCreativeDelete(videoClipsAdmin, 'videoClips', 'Video Klip', renderVideoClipsForm, 'video klip');
+    bindCreativeDelete(graphicProjectsAdmin, 'graphicProjects', 'Grafik Tasarım', renderGraphicProjectsForm, 'grafik tasarım');
 
     function renderYoutubeProjectsForm() {
         if (!youtubeProjectsAdmin) return;
         youtubeProjectsAdmin.innerHTML = '';
         const projects = appData.youtubeProjects || [];
         if (!projects.length) {
-            youtubeProjectsAdmin.innerHTML = '<p class="admin-empty compact">Henüz YouTube çekimi eklenmedi.</p>';
+            youtubeProjectsAdmin.innerHTML = '<p class="admin-empty compact">Henüz klip çekimi eklenmedi.</p>';
             return;
         }
 
@@ -351,16 +466,17 @@ document.addEventListener('DOMContentLoaded', () => {
             card.dataset.youtubeProject = String(project.id || Date.now() + index);
             card.innerHTML = `
                 <div class="media-admin-card-header">
-                    <strong>YouTube Çekimi ${index + 1}</strong>
-                    <button class="btn btn-danger btn-sm" type="button" data-delete-youtube aria-label="YouTube çekimini sil"><i class="fas fa-trash-alt"></i></button>
+                    <strong>Klip Çekimi ${index + 1}</strong>
+                    <button class="btn btn-danger btn-sm" type="button" data-delete-youtube aria-label="Klip çekimini sil"><i class="fas fa-trash-alt"></i></button>
                 </div>
                 <div class="form-grid">
-                    <div class="form-group"><label>Proje / Kurum Adı</label><input type="text" class="form-control youtube-title" value="${escapeHtml(project.title)}" placeholder="Afyonkarahisar Belediyesi"></div>
+                    <label class="admin-toggle form-full"><input type="checkbox" class="youtube-enabled" ${project.enabled !== false ? 'checked' : ''}><span><strong>Yayında</strong><small>Kapatılırsa bu kart klip çekimleri sayfasında görünmez.</small></span></label>
+                    <div class="form-group"><label>Sanatçı / Klip Adı</label><input type="text" class="form-control youtube-title" value="${escapeHtml(project.title)}" placeholder="Kubilay Karça"></div>
                     <div class="form-group"><label>Yıl</label><input type="text" class="form-control youtube-year" value="${escapeHtml(project.year)}" placeholder="2026"></div>
-                    <div class="form-group"><label>Etiket</label><input type="text" class="form-control youtube-category" value="${escapeHtml(project.category || 'YouTube Çekimi')}" placeholder="YouTube Çekimi"></div>
+                    <div class="form-group"><label>Etiket</label><input type="text" class="form-control youtube-category" value="${escapeHtml(project.category || 'Klip Çekimi')}" placeholder="Klip Çekimi"></div>
                     <div class="form-group"><label>Kapak Yerleşimi</label><select class="form-control youtube-fit"><option value="cover" ${project.thumbnailFit !== 'contain' ? 'selected' : ''}>Görseli kapla</option><option value="contain" ${project.thumbnailFit === 'contain' ? 'selected' : ''}>Logoyu sığdır</option></select></div>
-                    <div class="form-group form-full"><label>Kapak Görseli Yolu / URL</label><input type="text" class="form-control youtube-thumbnail" value="${escapeHtml(project.thumbnail)}" placeholder="Görsel/youtube-kapak.jpg"></div>
-                    <div class="form-group form-full"><label>YouTube Video / Kanal Bağlantısı</label><input type="url" class="form-control youtube-url" value="${escapeHtml(project.url)}" placeholder="https://www.youtube.com/watch?v=..."></div>
+                    <div class="form-group form-full"><label>Özel Kapak Görseli Yolu / URL (isteğe bağlı)</label><input type="text" class="form-control youtube-thumbnail" value="${escapeHtml(project.thumbnail)}" placeholder="Boş bırakırsanız klip kapağı otomatik alınır"></div>
+                    <div class="form-group form-full"><label>YouTube Klip Bağlantısı</label><input type="url" class="form-control youtube-url" value="${escapeHtml(project.url)}" placeholder="https://www.youtube.com/watch?v=..."><p class="form-help">Bağlantıdaki klibin kapak görseli otomatik olarak kullanılır.</p></div>
                 </div>`;
             youtubeProjectsAdmin.appendChild(card);
         });
@@ -372,29 +488,30 @@ document.addEventListener('DOMContentLoaded', () => {
             id: Number(card.dataset.youtubeProject) || Date.now(),
             title: card.querySelector('.youtube-title')?.value.trim() || '',
             year: card.querySelector('.youtube-year')?.value.trim() || '',
-            category: card.querySelector('.youtube-category')?.value.trim() || 'YouTube Çekimi',
+            category: card.querySelector('.youtube-category')?.value.trim() || 'Klip Çekimi',
             thumbnail: card.querySelector('.youtube-thumbnail')?.value.trim() || '',
             thumbnailFit: card.querySelector('.youtube-fit')?.value || 'cover',
-            url: card.querySelector('.youtube-url')?.value.trim() || ''
+            url: card.querySelector('.youtube-url')?.value.trim() || '',
+            enabled: card.querySelector('.youtube-enabled')?.checked !== false
         }));
     }
 
     document.getElementById('btnAddYoutubeProject')?.addEventListener('click', () => {
         readYoutubeProjectsForm();
-        appData.youtubeProjects.push({ id: Date.now(), title: '', year: String(new Date().getFullYear()), category: 'YouTube Çekimi', thumbnail: '', thumbnailFit: 'cover', url: '' });
+        appData.youtubeProjects.push({ id: Date.now(), title: '', year: String(new Date().getFullYear()), category: 'Klip Çekimi', thumbnail: '', thumbnailFit: 'cover', url: '', enabled: true });
         renderYoutubeProjectsForm();
         youtubeProjectsAdmin.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     });
 
     youtubeProjectsAdmin?.addEventListener('click', event => {
         const button = event.target.closest('[data-delete-youtube]');
-        if (!button || !confirm('Bu YouTube çekimi silinsin mi?')) return;
+        if (!button || !confirm('Bu klip çekimi silinsin mi?')) return;
         readYoutubeProjectsForm();
         const card = button.closest('[data-youtube-project]');
         appData.youtubeProjects = appData.youtubeProjects.filter(project => String(project.id) !== card?.dataset.youtubeProject);
         saveData(false);
         renderYoutubeProjectsForm();
-        showToast('YouTube çekimi silindi.');
+        showToast('Klip çekimi silindi.');
     });
 
     function renderPartnersForm() {
@@ -416,6 +533,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <button class="btn btn-danger btn-sm" type="button" data-delete-partner aria-label="Kurum logosunu sil"><i class="fas fa-trash-alt"></i></button>
                 </div>
                 <div class="form-grid">
+                    <label class="admin-toggle form-full"><input type="checkbox" class="partner-enabled" ${partner.enabled !== false ? 'checked' : ''}><span><strong>Yayında</strong><small>Kapatılırsa logo ana sayfada görünmez.</small></span></label>
                     <div class="form-group"><label>Kurum Adı</label><input type="text" class="form-control partner-name" value="${escapeHtml(partner.name)}" placeholder="Afyonkarahisar Belediyesi"></div>
                     <div class="form-group"><label>Kurum Web Sitesi</label><input type="url" class="form-control partner-url" value="${escapeHtml(partner.url)}" placeholder="https://..."></div>
                     <div class="form-group form-full"><label>Logo Yolu / URL</label><input type="text" class="form-control partner-logo" value="${escapeHtml(partner.logo)}" placeholder="assets/logos/kurum-logo.png"></div>
@@ -430,13 +548,14 @@ document.addEventListener('DOMContentLoaded', () => {
             id: Number(card.dataset.partner) || Date.now(),
             name: card.querySelector('.partner-name')?.value.trim() || '',
             logo: card.querySelector('.partner-logo')?.value.trim() || '',
-            url: card.querySelector('.partner-url')?.value.trim() || ''
+            url: card.querySelector('.partner-url')?.value.trim() || '',
+            enabled: card.querySelector('.partner-enabled')?.checked !== false
         }));
     }
 
     document.getElementById('btnAddPartner')?.addEventListener('click', () => {
         readPartnersForm();
-        appData.partners.push({ id: Date.now(), name: '', logo: '', url: '' });
+        appData.partners.push({ id: Date.now(), name: '', logo: '', url: '', enabled: true });
         renderPartnersForm();
         partnersAdmin.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     });
@@ -483,7 +602,18 @@ document.addEventListener('DOMContentLoaded', () => {
     function populateContactForm() { Object.entries(contactFields).forEach(([key, input]) => { input.value = appData.contact?.[key] || ''; }); }
     function readContactForm() { appData.contact = Object.fromEntries(Object.entries(contactFields).map(([key, input]) => [key, input.value.trim()])); }
 
-    function readAllForms() { readHeroForm(); readYoutubeProjectsForm(); readPartnersForm(); readStatsForm(); readAboutForm(); readTestimonialsForm(); readContactForm(); }
+    function readAllForms() {
+        readHeroForm();
+        readSectionVisibilityForm();
+        readYoutubeProjectsForm();
+        appData.videoClips = readCreativeProjectsForm(videoClipsAdmin, 'Video Klip');
+        appData.graphicProjects = readCreativeProjectsForm(graphicProjectsAdmin, 'Grafik Tasarım');
+        readPartnersForm();
+        readStatsForm();
+        readAboutForm();
+        readTestimonialsForm();
+        readContactForm();
+    }
     document.getElementById('btnSaveAll')?.addEventListener('click', () => { readAllForms(); saveData(true); });
     document.getElementById('btnResetData')?.addEventListener('click', () => { if (!confirm('Tüm veriler varsayılana sıfırlansın mı?')) return; localStorage.removeItem(STORAGE_KEY); appData = loadData(); initAll(); showToast('Varsayılan veriler geri yüklendi.'); });
     document.getElementById('btnDownloadDataJs')?.addEventListener('click', () => {
@@ -492,6 +622,18 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     document.getElementById('btnCopyJson')?.addEventListener('click', () => { readAllForms(); navigator.clipboard.writeText(JSON.stringify(appData, null, 2)).then(() => showToast('JSON panoya kopyalandı.')).catch(() => showToast('Kopyalama başarısız.', 'error')); });
 
-    function initAll() { renderArtistsList(); populateHeroForm(); renderYoutubeProjectsForm(); renderPartnersForm(); renderStatsForm(); populateAboutForm(); renderTestimonialsForm(); populateContactForm(); }
+    function initAll() {
+        renderArtistsList();
+        populateHeroForm();
+        populateSectionVisibilityForm();
+        renderYoutubeProjectsForm();
+        renderVideoClipsForm();
+        renderGraphicProjectsForm();
+        renderPartnersForm();
+        renderStatsForm();
+        populateAboutForm();
+        renderTestimonialsForm();
+        populateContactForm();
+    }
     initAll();
 });

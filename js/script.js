@@ -226,9 +226,29 @@ document.addEventListener('DOMContentLoaded', () => {
                         updated = true;
                     }
 
+                    const defaultVisibility = siteData.sectionVisibility || {};
+                    const savedVisibility = parsed.sectionVisibility || {};
+                    parsed.sectionVisibility = { ...defaultVisibility, ...savedVisibility };
+                    if (!parsed.graphicProjects && siteData.graphicProjects) {
+                        parsed.graphicProjects = siteData.graphicProjects;
+                        updated = true;
+                    }
+                    if (!parsed.videoClips && siteData.videoClips) {
+                        parsed.videoClips = siteData.videoClips;
+                        updated = true;
+                    }
+
                     if (!parsed.youtubeProjects && siteData.youtubeProjects) {
                         parsed.youtubeProjects = siteData.youtubeProjects;
                         updated = true;
+                    } else if (Array.isArray(parsed.youtubeProjects) && siteData.youtubeProjects?.[0]) {
+                        parsed.youtubeProjects = parsed.youtubeProjects.map(project => {
+                            const isOldDemo = project?.title === 'Afyonkarahisar Belediyesi'
+                                && project?.url === 'https://www.youtube.com/c/AfyonkarahisarBelediyesi';
+                            if (!isOldDemo) return project;
+                            updated = true;
+                            return JSON.parse(JSON.stringify(siteData.youtubeProjects[0]));
+                        });
                     }
 
                     if (!parsed.partners && siteData.partners) {
@@ -545,7 +565,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const artistDetailBio = document.getElementById('artistDetailBio');
     const artistConcertsList = document.getElementById('artistConcertsList');
     const artistDetailEmpty = document.getElementById('artistDetailEmpty');
-    const homeRotatingGalleryTrack = document.getElementById('homeRotatingGalleryTrack');
+    const featuredArtistsGrid = document.getElementById('featuredArtistsGrid');
+    const featuredArtistsActions = document.getElementById('featuredArtistsActions');
+    const featuredArtistsMore = document.getElementById('featuredArtistsMore');
 
     const escapeHtml = value => dataUtils ? dataUtils.escapeHtml(value) : String(value || '');
 
@@ -553,7 +575,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!artistDirectory) return;
         artistDirectory.innerHTML = '';
 
-        const sortedArtists = dataUtils ? dataUtils.sortArtists(artistsList) : [...artistsList];
+        const visibleArtists = artistsList.filter(artist => artist.visible !== false);
+        const sortedArtists = dataUtils ? dataUtils.sortArtists(visibleArtists) : [...visibleArtists];
         if (artistDirectoryCount) artistDirectoryCount.textContent = `${sortedArtists.length} sanatçı`;
 
         if (!sortedArtists.length) {
@@ -594,7 +617,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!artistDetailRoot || !artistConcertsList) return;
 
         const artistParam = new URLSearchParams(window.location.search).get('artist');
-        const artist = artistsList.find(item => item.slug === artistParam || String(item.id) === String(artistParam));
+        const artist = artistsList.find(item => item.visible !== false && (item.slug === artistParam || String(item.id) === String(artistParam)));
 
         if (!artist) {
             document.title = 'Sanatçı Bulunamadı | Songül Bayramcı';
@@ -674,68 +697,132 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function loadHomeRotatingGallery() {
-        if (!homeRotatingGalleryTrack) return;
-        homeRotatingGalleryTrack.innerHTML = '';
+    function loadFeaturedArtists() {
+        if (!featuredArtistsGrid) return;
+        featuredArtistsGrid.innerHTML = '';
 
-        const galleryItems = ((typeof siteData !== 'undefined' ? siteData.homeGallery : null) || currentSiteData.homeGallery || [])
-            .filter(item => item && item.src);
+        const featuredArtists = (dataUtils ? dataUtils.sortArtists(artistsList) : [...artistsList])
+            .filter(artist => artist.visible !== false && artist.featured !== false && artist.cover);
 
-        if (!galleryItems.length) {
-            homeRotatingGalleryTrack.innerHTML = '<p class="rotating-gallery-empty">Galeriye henüz görsel eklenmedi.</p>';
-            homeRotatingGalleryTrack.classList.add('is-empty');
+        if (!featuredArtists.length) {
+            featuredArtistsGrid.innerHTML = '<p class="featured-artists-empty">Henüz öne çıkan sanatçı seçilmedi.</p>';
+            if (featuredArtistsActions) featuredArtistsActions.hidden = true;
             return;
         }
 
-        homeRotatingGalleryTrack.classList.remove('is-empty');
-        homeRotatingGalleryTrack.style.setProperty('--gallery-duration', `${Math.max(32, galleryItems.length * 4.5)}s`);
+        featuredArtists.forEach((artist, index) => {
+            const photoCount = artist.concerts.reduce((total, concert) => total + (concert.images?.length || 0), 0);
+            const card = document.createElement('a');
+            card.className = 'featured-artist-card';
+            card.href = `sanatci.html?artist=${encodeURIComponent(artist.slug)}`;
+            card.dataset.featuredExtra = index >= 4 ? 'true' : 'false';
+            card.hidden = index >= 4;
+            card.setAttribute('aria-label', `${artist.name} sanatçı sayfasını aç`);
+            card.innerHTML = `
+                <span class="featured-artist-media">
+                    <img src="${escapeHtml(artist.cover)}" alt="${escapeHtml(artist.name)}" loading="${index < 4 ? 'eager' : 'lazy'}" decoding="async">
+                    <small>SANATÇI</small>
+                </span>
+                <span class="featured-artist-info">
+                    <strong>${escapeHtml(artist.name)}</strong>
+                    <span><small>${artist.concerts.length} konser</small><small>${photoCount} kare</small></span>
+                </span>`;
+            featuredArtistsGrid.appendChild(card);
+        });
 
-        const createGroup = (isDuplicate = false) => {
-            const group = document.createElement('div');
-            group.className = 'rotating-gallery-group';
-            if (isDuplicate) group.setAttribute('aria-hidden', 'true');
-
-            galleryItems.forEach((item, index) => {
-                const card = document.createElement('button');
-                card.className = 'rotating-gallery-card';
-                card.type = 'button';
-                card.tabIndex = isDuplicate ? -1 : 0;
-                card.setAttribute('aria-label', `${item.title || 'Galeri'} görselini büyüt`);
-                card.innerHTML = `
-                    <img src="${item.src}" alt="${isDuplicate ? '' : (item.title || 'Galeri görseli')}" loading="${isDuplicate ? 'lazy' : 'eager'}" decoding="async">
-                    <span class="rotating-gallery-number">${String(index + 1).padStart(2, '0')}</span>
-                    <span class="rotating-gallery-overlay">
-                        <strong>${item.title || 'Songül Bayramcı'}</strong>
-                        <small>${item.desc || ''}</small>
-                        <i class="fas fa-expand-alt" aria-hidden="true"></i>
-                    </span>
-                `;
-                card.addEventListener('click', () => openLightbox(item));
-                group.appendChild(card);
-            });
-
-            return group;
-        };
-
-        homeRotatingGalleryTrack.append(createGroup(), createGroup(true));
-        homeRotatingGalleryTrack.closest('.rotating-gallery')?.classList.add('active');
+        if (featuredArtistsActions) featuredArtistsActions.hidden = featuredArtists.length <= 4;
+        if (featuredArtistsMore) {
+            featuredArtistsMore.setAttribute('aria-expanded', 'false');
+            featuredArtistsMore.innerHTML = 'Daha Fazla <i class="fas fa-arrow-down" aria-hidden="true"></i>';
+        }
     }
+
+    featuredArtistsMore?.addEventListener('click', () => {
+        const expanded = featuredArtistsMore.getAttribute('aria-expanded') === 'true';
+        featuredArtistsGrid?.querySelectorAll('[data-featured-extra="true"]').forEach(card => {
+            card.hidden = expanded;
+        });
+        featuredArtistsMore.setAttribute('aria-expanded', String(!expanded));
+        featuredArtistsMore.innerHTML = expanded
+            ? 'Daha Fazla <i class="fas fa-arrow-down" aria-hidden="true"></i>'
+            : 'Daha Az <i class="fas fa-arrow-up" aria-hidden="true"></i>';
+    });
 
     function safeExternalUrl(value) {
         const url = String(value || '').trim();
         return /^https?:\/\//i.test(url) ? url : '';
     }
 
+    const sectionVisibility = {
+        featuredArtists: true,
+        clipShootings: true,
+        graphicDesign: true,
+        videoClips: true,
+        partnerLogos: true,
+        ...(currentSiteData.sectionVisibility || {})
+    };
+
+    function isSectionVisible(key) {
+        return sectionVisibility[key] !== false;
+    }
+
+    function applySectionVisibility() {
+        document.querySelectorAll('[data-nav-section]').forEach(link => {
+            link.hidden = !isSectionVisible(link.dataset.navSection);
+        });
+
+        const activePageSection = document.body.dataset.pageSection || '';
+        document.querySelectorAll('[data-section-key]').forEach(section => {
+            const key = section.dataset.sectionKey;
+            if (key !== activePageSection) section.hidden = !isSectionVisible(key);
+        });
+    }
+
+    function extractYouTubeVideoId(value) {
+        const source = safeExternalUrl(value);
+        if (!source) return '';
+
+        try {
+            const url = new URL(source);
+            const host = url.hostname.toLowerCase().replace(/^www\./, '');
+            let videoId = '';
+
+            if (host === 'youtu.be') {
+                videoId = url.pathname.split('/').filter(Boolean)[0] || '';
+            } else if (host === 'youtube.com' || host === 'm.youtube.com' || host === 'youtube-nocookie.com') {
+                if (url.pathname === '/watch') {
+                    videoId = url.searchParams.get('v') || '';
+                } else {
+                    const parts = url.pathname.split('/').filter(Boolean);
+                    if (['shorts', 'embed', 'live'].includes(parts[0])) videoId = parts[1] || '';
+                }
+            }
+
+            return /^[A-Za-z0-9_-]{6,}$/.test(videoId) ? videoId : '';
+        } catch (error) {
+            return '';
+        }
+    }
+
+    function youtubeThumbnail(videoId, quality = 'maxresdefault') {
+        return videoId ? `https://img.youtube.com/vi/${videoId}/${quality}.jpg` : '';
+    }
+
     function loadYoutubeProjects() {
         const grid = document.getElementById('youtubeProjectsGrid');
         if (!grid) return;
 
+        if (!isSectionVisible('clipShootings')) {
+            grid.innerHTML = '<p class="youtube-projects-empty">Klip çekimleri bölümü şu anda yayında değil.</p>';
+            return;
+        }
+
         const projects = (currentSiteData.youtubeProjects || (typeof siteData !== 'undefined' ? siteData.youtubeProjects : []) || [])
-            .filter(project => project && project.title);
+            .filter(project => project && project.title && project.enabled !== false);
         grid.innerHTML = '';
 
         if (!projects.length) {
-            grid.innerHTML = '<p class="youtube-projects-empty">Henüz YouTube çekimi eklenmedi.</p>';
+            grid.innerHTML = '<p class="youtube-projects-empty">Henüz klip çekimi eklenmedi.</p>';
             return;
         }
 
@@ -743,14 +830,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const article = document.createElement('article');
             article.className = 'youtube-project-card reveal active';
             const projectUrl = safeExternalUrl(project.url);
+            const videoId = extractYouTubeVideoId(projectUrl);
+            const usesAutomaticThumbnail = !project.thumbnail && Boolean(videoId);
+            const thumbnail = project.thumbnail || youtubeThumbnail(videoId);
             const cardTag = projectUrl ? 'a' : 'div';
-            const linkAttributes = projectUrl ? `href="${escapeHtml(projectUrl)}" target="_blank" rel="noopener noreferrer" aria-label="${escapeHtml(project.title)} YouTube çekimini aç"` : '';
+            const linkAttributes = projectUrl ? `href="${escapeHtml(projectUrl)}" target="_blank" rel="noopener noreferrer" aria-label="${escapeHtml(project.title)} klip çekimini aç"` : '';
             article.innerHTML = `
                 <${cardTag} class="youtube-project-link" ${linkAttributes}>
-                    <span class="youtube-project-media ${project.thumbnailFit === 'contain' ? 'is-contain' : ''}">
-                        ${project.thumbnail ? `<img src="${escapeHtml(project.thumbnail)}" alt="${escapeHtml(project.title)}" loading="lazy" decoding="async">` : ''}
+                    <span class="youtube-project-media ${project.thumbnailFit === 'contain' && !usesAutomaticThumbnail ? 'is-contain' : ''} ${thumbnail ? '' : 'is-missing'}">
+                        ${thumbnail ? `<img src="${escapeHtml(thumbnail)}" alt="${escapeHtml(project.title)}" loading="lazy" decoding="async"${usesAutomaticThumbnail ? ` data-youtube-video-id="${escapeHtml(videoId)}"` : ''}>` : ''}
                         <span class="youtube-project-placeholder"><i class="fab fa-youtube" aria-hidden="true"></i><small>${escapeHtml(project.title)}</small></span>
-                        <span class="youtube-project-type">${escapeHtml(project.category || 'YOUTUBE')}</span>
+                        <span class="youtube-project-type">${escapeHtml(project.category || 'KLİP ÇEKİMİ')}</span>
                         ${projectUrl ? '<span class="youtube-project-play"><i class="fas fa-play" aria-hidden="true"></i></span>' : ''}
                     </span>
                     <span class="youtube-project-info">
@@ -760,8 +850,74 @@ document.addEventListener('DOMContentLoaded', () => {
                 </${cardTag}>
             `;
             const media = article.querySelector('.youtube-project-media');
-            article.querySelector('img')?.addEventListener('error', () => media?.classList.add('is-missing'));
+            const image = article.querySelector('img');
+            image?.addEventListener('error', () => {
+                const automaticVideoId = image.dataset.youtubeVideoId;
+                if (automaticVideoId && image.dataset.thumbnailFallback !== 'true') {
+                    image.dataset.thumbnailFallback = 'true';
+                    image.src = youtubeThumbnail(automaticVideoId, 'hqdefault');
+                    return;
+                }
+                media?.classList.add('is-missing');
+            });
             grid.appendChild(article);
+        });
+    }
+
+    function loadCreativeProjects(containerId, dataKey, sectionKey, emptyText, fallbackCategory, isVideo = false) {
+        const grid = document.getElementById(containerId);
+        if (!grid) return;
+
+        if (!isSectionVisible(sectionKey)) {
+            grid.innerHTML = `<p class="creative-projects-empty">${escapeHtml(emptyText)} bölümü şu anda yayında değil.</p>`;
+            return;
+        }
+
+        const items = (currentSiteData[dataKey] || (typeof siteData !== 'undefined' ? siteData[dataKey] : []) || [])
+            .filter(item => item && item.title && item.enabled !== false);
+        grid.innerHTML = '';
+
+        if (!items.length) {
+            grid.innerHTML = `<p class="creative-projects-empty">${escapeHtml(emptyText)} henüz eklenmedi.</p>`;
+            return;
+        }
+
+        items.forEach((item, index) => {
+            const projectUrl = safeExternalUrl(item.url);
+            const videoId = isVideo ? extractYouTubeVideoId(projectUrl) : '';
+            const automaticThumbnail = isVideo && !item.image && Boolean(videoId);
+            const imageUrl = item.image || youtubeThumbnail(videoId);
+            const card = document.createElement(projectUrl ? 'a' : 'article');
+            card.className = 'creative-project-card reveal active';
+            if (projectUrl) {
+                card.href = projectUrl;
+                card.target = '_blank';
+                card.rel = 'noopener noreferrer';
+                card.setAttribute('aria-label', `${item.title} projesini aç`);
+            }
+            card.innerHTML = `
+                <span class="creative-project-media ${imageUrl ? '' : 'is-missing'}">
+                    ${imageUrl ? `<img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(item.title)}" loading="${index < 4 ? 'eager' : 'lazy'}" decoding="async"${automaticThumbnail ? ` data-youtube-video-id="${escapeHtml(videoId)}"` : ''}>` : ''}
+                    <span class="creative-project-placeholder"><i class="fas ${isVideo ? 'fa-play' : 'fa-pen-ruler'}" aria-hidden="true"></i></span>
+                    <small class="creative-project-badge">${escapeHtml(item.category || fallbackCategory)}</small>
+                </span>
+                <span class="creative-project-info">
+                    <strong>${escapeHtml(item.title)}</strong>
+                    <span><small>${escapeHtml(item.year || '')}</small><small>${projectUrl ? 'Projeyi Aç' : ''}</small></span>
+                </span>`;
+
+            const media = card.querySelector('.creative-project-media');
+            const image = card.querySelector('img');
+            image?.addEventListener('error', () => {
+                const automaticVideoId = image.dataset.youtubeVideoId;
+                if (automaticVideoId && image.dataset.thumbnailFallback !== 'true') {
+                    image.dataset.thumbnailFallback = 'true';
+                    image.src = youtubeThumbnail(automaticVideoId, 'hqdefault');
+                    return;
+                }
+                media?.classList.add('is-missing');
+            });
+            grid.appendChild(card);
         });
     }
 
@@ -770,7 +926,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!track) return;
 
         const partners = (currentSiteData.partners || (typeof siteData !== 'undefined' ? siteData.partners : []) || [])
-            .filter(partner => partner && (partner.logo || partner.name));
+            .filter(partner => partner && partner.enabled !== false && (partner.logo || partner.name));
         track.innerHTML = '';
 
         if (!partners.length) {
@@ -815,10 +971,13 @@ document.addEventListener('DOMContentLoaded', () => {
         track.append(createGroup(), createGroup(true));
     }
 
+    applySectionVisibility();
     loadArtistDirectory();
     loadArtistDetail();
-    loadHomeRotatingGallery();
+    loadFeaturedArtists();
     loadYoutubeProjects();
+    loadCreativeProjects('graphicDesignGrid', 'graphicProjects', 'graphicDesign', 'Grafik tasarım çalışmaları', 'Grafik Tasarım');
+    loadCreativeProjects('videoClipsGrid', 'videoClips', 'videoClips', 'Video klipleri', 'Video Klip', true);
     loadPartnerLogos();
 
     // ============================================

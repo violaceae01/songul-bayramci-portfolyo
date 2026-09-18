@@ -7,9 +7,9 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/admin.css?v=20260915-youtube-logos">
+    <link rel="stylesheet" href="css/admin.css?v=20260918-portfolio-pages">
 </head>
 <body>
 
@@ -38,7 +38,7 @@
             <li class="sidebar-item">
                 <a href="#youtube" class="sidebar-link" data-tab="tab-youtube">
                     <i class="fab fa-youtube"></i>
-                    <span>YouTube & Logolar</span>
+                    <span>Projeler & Logolar</span>
                 </a>
             </li>
             <li class="sidebar-item">
@@ -114,19 +114,46 @@
             </div>
         </section>
 
-        <!-- YOUTUBE PROJECTS & PARTNER LOGOS -->
+        <!-- CLIP PROJECTS & PARTNER LOGOS -->
         <section id="tab-youtube" class="tab-panel">
+            <div class="admin-card">
+                <div class="card-header"><div><h2>Sayfa ve Bölüm Görünürlüğü</h2><p class="admin-card-description">İstediğiniz bölümü silmeden yayından kaldırabilir, daha sonra tekrar açabilirsiniz.</p></div></div>
+                <div class="admin-toggle-grid" id="sectionVisibilityAdmin">
+                    <label class="admin-toggle"><input type="checkbox" data-section-toggle="featuredArtists"><span><strong>Öne Çıkan Sanatçılar</strong><small>Ana sayfa bölümü</small></span></label>
+                    <label class="admin-toggle"><input type="checkbox" data-section-toggle="clipShootings"><span><strong>Klip Çekimleri</strong><small>Klip çekimleri sayfası ve menü bağlantısı</small></span></label>
+                    <label class="admin-toggle"><input type="checkbox" data-section-toggle="videoClips"><span><strong>Video Klipleri</strong><small>Video klipleri sayfası ve menü bağlantısı</small></span></label>
+                    <label class="admin-toggle"><input type="checkbox" data-section-toggle="graphicDesign"><span><strong>Grafik Tasarım</strong><small>Grafik tasarım sayfası ve menü bağlantısı</small></span></label>
+                    <label class="admin-toggle"><input type="checkbox" data-section-toggle="partnerLogos"><span><strong>Çalışılan Markalar</strong><small>Ana sayfadaki kayan logo bölümü</small></span></label>
+                </div>
+            </div>
+
             <div class="admin-card">
                 <div class="card-header">
                     <div>
-                        <h2>YouTube Çekimleri</h2>
-                        <p class="admin-card-description">Her kart için kapak görseli ve açılacak YouTube bağlantısını ekleyin.</p>
+                        <h2>Klip Çekimleri</h2>
+                        <p class="admin-card-description">Klip bağlantısını ekleyin; kapak görseli YouTube'dan otomatik alınır.</p>
                     </div>
                     <button class="btn btn-primary btn-sm" id="btnAddYoutubeProject" type="button">
                         <i class="fas fa-plus"></i> Yeni Çekim Ekle
                     </button>
                 </div>
                 <div id="youtubeProjectsAdmin"></div>
+            </div>
+
+            <div class="admin-card">
+                <div class="card-header">
+                    <div><h2>Video Klipleri</h2><p class="admin-card-description">YouTube bağlantısı girildiğinde kapak görseli otomatik alınır.</p></div>
+                    <button class="btn btn-primary btn-sm" id="btnAddVideoClip" type="button"><i class="fas fa-plus"></i> Yeni Video Klip Ekle</button>
+                </div>
+                <div id="videoClipsAdmin"></div>
+            </div>
+
+            <div class="admin-card">
+                <div class="card-header">
+                    <div><h2>Grafik Tasarım</h2><p class="admin-card-description">Afiş, kapak ve diğer tasarım projelerini istediğiniz kadar ekleyebilirsiniz.</p></div>
+                    <button class="btn btn-primary btn-sm" id="btnAddGraphicProject" type="button"><i class="fas fa-plus"></i> Yeni Tasarım Ekle</button>
+                </div>
+                <div id="graphicProjectsAdmin"></div>
             </div>
 
             <div class="admin-card">
@@ -331,6 +358,11 @@
                     <img id="artistCoverPreview" class="image-preview" alt="Kapak Önizleme">
                 </div>
 
+                <div class="admin-toggle-grid compact">
+                    <label class="admin-toggle"><input type="checkbox" id="artistVisible" checked><span><strong>Sitede Göster</strong><small>Kapatılırsa sanatçı listelerden kaldırılır.</small></span></label>
+                    <label class="admin-toggle"><input type="checkbox" id="artistFeatured" checked><span><strong>Ana Sayfada Öne Çıkar</strong><small>Öne çıkan sanatçılar bölümünde gösterilir.</small></span></label>
+                </div>
+
                 <div class="modal-actions">
                     <button type="button" class="btn btn-secondary" id="btnCancelArtistModal">İptal</button>
                     <button type="submit" class="btn btn-primary" id="btnSaveArtistModal">Sanatçıyı Kaydet</button>
@@ -428,8 +460,8 @@
     <!-- Toast Notifications Container -->
     <div class="toast-container" id="toastContainer"></div>
 
-    <script src="data/data.js?v=20260915-youtube-logos"></script>
-    <script src="js/data-utils.js"></script>
-    <script src="js/admin.js?v=20260915-youtube-logos"></script>
+    <script src="data/data.js?v=20260918-portfolio-pages"></script>
+    <script src="js/data-utils.js?v=20260918-portfolio-pages"></script>
+    <script src="js/admin.js?v=20260918-portfolio-pages"></script>
 </body>
 </html>

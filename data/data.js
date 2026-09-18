@@ -17,6 +17,8 @@ const siteData = {
       "id": 1,
       "slug": "mert-demir",
       "name": "Mert Demir",
+      "visible": true,
+      "featured": true,
       "bio": "Mert Demir konserlerinden sahne enerjisini, ışığı ve performans anlarını öne çıkaran çekimler.",
       "cover": "Görsel/Mert Demir.PNG",
       "concerts": [
@@ -39,6 +41,8 @@ const siteData = {
       "id": 2,
       "slug": "tugba-yurt",
       "name": "Tuğba Yurt",
+      "visible": true,
+      "featured": true,
       "bio": "Tuğba Yurt'un canlı performanslarından konser atmosferini ve sahne detaylarını yansıtan kareler.",
       "cover": "Görsel/Tuğba Yurt.PNG",
       "concerts": [
@@ -60,6 +64,8 @@ const siteData = {
       "id": 3,
       "slug": "zeynep-bastik",
       "name": "Zeynep Bastık",
+      "visible": true,
+      "featured": true,
       "bio": "Zeynep Bastık konserlerinden performans, seyirci ve sahne ışıklarını bir araya getiren çekimler.",
       "cover": "Görsel/Zeynep bastık 4.PNG",
       "concerts": [
@@ -83,6 +89,8 @@ const siteData = {
       "id": 4,
       "slug": "emre-fel",
       "name": "Emre Fel",
+      "visible": true,
+      "featured": true,
       "bio": "Emre Fel'in sahne performanslarından sinematik açıları ve konserin ruhunu öne çıkaran çalışmalar.",
       "cover": "Görsel/Emre fel.PNG",
       "concerts": [
@@ -104,6 +112,8 @@ const siteData = {
       "id": 5,
       "slug": "tugba-ozerk",
       "name": "Tuğba Özerk",
+      "visible": true,
+      "featured": true,
       "bio": "Tuğba Özerk'in özel etkinlik ve sahne performanslarından seçilmiş fotoğraf ve video çalışmaları.",
       "cover": "Görsel/tUĞBA ÖZERK.PNG",
       "concerts": [
@@ -125,6 +135,8 @@ const siteData = {
       "id": 6,
       "slug": "dedub-luman",
       "name": "Dedub Lüman",
+      "visible": true,
+      "featured": true,
       "bio": "Dedub Lüman performanslarından grubun sahne atmosferini ve güçlü ışık dünyasını yansıtan çekimler.",
       "cover": "Görsel/Dedub lüman.PNG",
       "concerts": [
@@ -142,9 +154,7 @@ const siteData = {
       ]
     }
   ],
-  // ANASAYFA KARIŞIK GALERİSİ
-  // Görselleri Görsel klasörüne yükleyip aşağıdaki listeye istediğiniz kadar ekleyebilirsiniz.
-  // En iyi sonuç için dosyaları 1080 x 1350 piksel hazırlayın.
+  // Eski sürümdeki ana sayfa galeri verileri, mevcut tarayıcı kayıtlarıyla uyumluluk için korunuyor.
   "homeGallery": [
     { "id": 1, "src": "Görsel/Mert Demir.PNG", "title": "Mert Demir", "desc": "Canlı Konser Performansı" },
     { "id": 2, "src": "Görsel/Tuğba Yurt1.PNG", "title": "Tuğba Yurt", "desc": "Sahne Performansı" },
@@ -155,15 +165,35 @@ const siteData = {
     { "id": 7, "src": "Görsel/Mert Demir2.PNG", "title": "Mert Demir", "desc": "Sahne Işıkları" },
     { "id": 8, "src": "Görsel/Zeynep bastık2.PNG", "title": "Zeynep Bastık", "desc": "Konser Detayı" }
   ],
+  "sectionVisibility": {
+    "featuredArtists": true,
+    "clipShootings": true,
+    "graphicDesign": true,
+    "videoClips": true,
+    "partnerLogos": true
+  },
   "youtubeProjects": [
     {
       "id": 1,
-      "title": "Afyonkarahisar Belediyesi",
-      "year": "2026",
-      "category": "YouTube Çekimi",
-      "thumbnail": "assets/logos/afyonkarahisar-belediyesi.webp",
-      "thumbnailFit": "contain",
-      "url": "https://www.youtube.com/c/AfyonkarahisarBelediyesi"
+      "title": "Kubilay Karça",
+      "year": "2023",
+      "category": "Klip Çekimi",
+      "thumbnail": "",
+      "thumbnailFit": "cover",
+      "url": "https://www.youtube.com/watch?v=D-grpeAMf34",
+      "enabled": true
+    }
+  ],
+  "graphicProjects": [],
+  "videoClips": [
+    {
+      "id": 1,
+      "title": "Kubilay Karça",
+      "year": "2023",
+      "category": "Video Klip",
+      "image": "",
+      "url": "https://www.youtube.com/watch?v=D-grpeAMf34",
+      "enabled": true
     }
   ],
   "partners": [
@@ -171,7 +201,8 @@ const siteData = {
       "id": 1,
       "name": "Afyonkarahisar Belediyesi",
       "logo": "assets/logos/afyonkarahisar-belediyesi.webp",
-      "url": "https://www.afyon.bel.tr/"
+      "url": "https://www.afyon.bel.tr/",
+      "enabled": true
     }
   ],
   "about": {

@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="description" content="Songül Bayramcı konser çekimleri, fotoğraf galerileri ve video bağlantıları.">
-    <title>Sanatçı Konserleri | Songül Bayramcı</title>
+    <meta name="description" content="Songül Bayramcı klip çekimleri ve video prodüksiyonları.">
+    <title>Klip Çekimleri | Songül Bayramcı</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,58 +12,38 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/styles.css?v=20260918-portfolio-pages">
 </head>
-<body class="artist-page">
+<body class="youtube-page" data-page-section="clipShootings">
     <div class="cursor-dot"></div>
     <div class="cursor-outline"></div>
     <div class="scroll-progress" id="scrollProgress"></div>
 
-    <nav class="main-nav scrolled" id="mainNav">
+    <nav class="main-nav" id="mainNav">
         <div class="nav-container">
             <a href="index.html#home" class="nav-logo" aria-label="Les Mejor Creative ana sayfa"><img src="assets/images/les-mejor-logo-white.png" alt="Les Mejor Creative"></a>
             <div class="nav-links" id="mainMenu">
                 <a href="index.html#home" class="nav-link">ANA SAYFA</a>
-                <a href="calismalarim.html" class="nav-link active">ÇALIŞMALARIM</a>
-                <a href="klip-cekimleri.html" class="nav-link" data-nav-section="clipShootings">KLİP ÇEKİMLERİ</a>
+                <a href="calismalarim.html" class="nav-link">ÇALIŞMALARIM</a>
+                <a href="klip-cekimleri.html" class="nav-link active" data-nav-section="clipShootings" aria-current="page">KLİP ÇEKİMLERİ</a>
                 <a href="video-klipleri.html" class="nav-link" data-nav-section="videoClips">VİDEO KLİPLERİ</a>
                 <a href="grafik-tasarim.html" class="nav-link" data-nav-section="graphicDesign">GRAFİK TASARIM</a>
                 <a href="hakkimda.html" class="nav-link">HAKKIMDA</a>
                 <a href="iletisim.html" class="nav-link">İLETİŞİM</a>
             </div>
             <button class="nav-toggle" id="navToggle" type="button" aria-label="Menüyü aç" aria-expanded="false" aria-controls="mainMenu">
-                <span></span>
-                <span></span>
-                <span></span>
+                <span></span><span></span><span></span>
             </button>
         </div>
     </nav>
 
-    <main class="artist-detail-main" id="artistDetailRoot">
-        <section class="artist-detail-hero">
+    <main>
+        <section class="youtube-projects-section" data-section-key="clipShootings" aria-labelledby="youtubeProjectsTitle">
             <div class="container">
-                <a href="calismalarim.html" class="artist-back-link"><i class="fas fa-arrow-left"></i> Tüm sanatçılar</a>
-                <div class="artist-detail-hero-grid">
-                    <div class="artist-detail-cover-wrap reveal">
-                        <img id="artistDetailCover" class="artist-detail-cover" src="" alt="">
-                    </div>
-                    <div class="artist-detail-heading reveal">
-                        <span class="section-tag" id="artistDetailTag">KONSER ARŞİVİ</span>
-                        <h1 id="artistDetailName">Sanatçı</h1>
-                        <div class="artist-detail-about">
-                            <span>HAKKINDA</span>
-                            <p id="artistDetailBio">Sanatçı bilgileri yükleniyor.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="artist-concerts-section">
-            <div class="container">
-                <div class="artist-concerts-list" id="artistConcertsList"></div>
-                <div class="artist-detail-empty" id="artistDetailEmpty" hidden>
-                    <span class="section-tag">ARŞİV</span>
-                    <h2>Henüz konser eklenmedi</h2>
-                    <p>Bu sanatçının yeni konser çekimleri eklendiğinde burada ayrı bölümler halinde görünecek.</p>
+                <header class="youtube-projects-header reveal active">
+                    <span class="section-tag">VİDEO PRODÜKSİYONLARI</span>
+                    <h1 class="section-title" id="youtubeProjectsTitle">KLİP ÇEKİMLERİ</h1>
+                </header>
+                <div class="youtube-projects-grid" id="youtubeProjectsGrid">
+                    <p class="youtube-projects-empty">Klip çekimleri yükleniyor...</p>
                 </div>
             </div>
         </section>
@@ -80,15 +60,6 @@
             </div>
         </div>
     </footer>
-
-    <div class="lightbox" id="lightbox">
-        <button class="lightbox-close" id="lightboxClose" type="button" aria-label="Fotoğrafı kapat">&times;</button>
-        <img src="" alt="" class="lightbox-image" id="lightboxImage">
-        <div class="lightbox-info">
-            <h3 id="lightboxTitle"></h3>
-            <p id="lightboxDesc"></p>
-        </div>
-    </div>
 
     <button class="scroll-to-top" id="scrollToTop" type="button" aria-label="Sayfanın başına dön">
         <i class="fas fa-arrow-up" aria-hidden="true"></i>

@@ -43,6 +43,8 @@
             name: artist?.name || `Sanatçı ${index + 1}`,
             bio: artist?.bio || '',
             cover: artist?.cover || '',
+            visible: artist?.visible !== false,
+            featured: artist?.featured !== false,
             concerts: []
         };
 

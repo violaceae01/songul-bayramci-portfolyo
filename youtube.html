@@ -3,27 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="description" content="Songül Bayramcı YouTube çekimleri ve video prodüksiyonları.">
-    <title>YouTube Çekimleri | Songül Bayramcı</title>
+    <meta http-equiv="refresh" content="0; url=klip-cekimleri.html">
+    <meta name="description" content="Songül Bayramcı klip çekimleri ve video prodüksiyonları.">
+    <title>Klip Çekimleri | Songül Bayramcı</title>
+    <link rel="canonical" href="klip-cekimleri.html">
+    <script>window.location.replace(`klip-cekimleri.html${window.location.search}${window.location.hash}`);</script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/styles.css?v=20260915-youtube-logos">
+    <link rel="stylesheet" href="css/styles.css?v=20260918-portfolio-pages">
 </head>
-<body class="youtube-page">
+<body class="youtube-page" data-page-section="clipShootings">
     <div class="cursor-dot"></div>
     <div class="cursor-outline"></div>
     <div class="scroll-progress" id="scrollProgress"></div>
 
     <nav class="main-nav" id="mainNav">
         <div class="nav-container">
-            <a href="index.html#home" class="nav-logo">SB</a>
+            <a href="index.html#home" class="nav-logo" aria-label="Les Mejor Creative ana sayfa"><img src="assets/images/les-mejor-logo-white.png" alt="Les Mejor Creative"></a>
             <div class="nav-links" id="mainMenu">
                 <a href="index.html#home" class="nav-link">ANA SAYFA</a>
                 <a href="calismalarim.html" class="nav-link">ÇALIŞMALARIM</a>
-                <a href="youtube.html" class="nav-link active" aria-current="page">YOUTUBE</a>
+                <a href="klip-cekimleri.html" class="nav-link active" data-nav-section="clipShootings" aria-current="page">KLİP ÇEKİMLERİ</a>
+                <a href="video-klipleri.html" class="nav-link" data-nav-section="videoClips">VİDEO KLİPLERİ</a>
+                <a href="grafik-tasarim.html" class="nav-link" data-nav-section="graphicDesign">GRAFİK TASARIM</a>
                 <a href="hakkimda.html" class="nav-link">HAKKIMDA</a>
                 <a href="iletisim.html" class="nav-link">İLETİŞİM</a>
             </div>
@@ -38,10 +43,10 @@
             <div class="container">
                 <header class="youtube-projects-header reveal active">
                     <span class="section-tag">VİDEO PRODÜKSİYONLARI</span>
-                    <h1 class="section-title" id="youtubeProjectsTitle">YOUTUBE ÇEKİMLERİ</h1>
+                    <h1 class="section-title" id="youtubeProjectsTitle">KLİP ÇEKİMLERİ</h1>
                 </header>
                 <div class="youtube-projects-grid" id="youtubeProjectsGrid">
-                    <p class="youtube-projects-empty">YouTube çekimleri yükleniyor...</p>
+                    <p class="youtube-projects-empty">Klip çekimleri yükleniyor...</p>
                 </div>
             </div>
         </section>
@@ -63,8 +68,8 @@
         <i class="fas fa-arrow-up" aria-hidden="true"></i>
     </button>
 
-    <script src="data/data.js?v=20260915-youtube-logos"></script>
-    <script src="js/data-utils.js"></script>
-    <script src="js/script.js?v=20260915-youtube-logos"></script>
+    <script src="data/data.js?v=20260918-portfolio-pages"></script>
+    <script src="js/data-utils.js?v=20260918-portfolio-pages"></script>
+    <script src="js/script.js?v=20260918-portfolio-pages"></script>
 </body>
 </html>
