@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Songül Bayramcı | Konser & Etkinlik Çekimi</title>
+    <title>Les Mejor Creative | Creative Production Studio</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/styles.css?v=20260918-portfolio-pages">
+    <link rel="stylesheet" href="css/styles.css?v=20260919-brand">
 </head>
 <body>
     <!-- Cursor -->
@@ -25,12 +25,13 @@
             <a href="#home" class="nav-logo" aria-label="Les Mejor Creative ana sayfa"><img src="assets/images/les-mejor-logo-white.png" alt="Les Mejor Creative"></a>
             <div class="nav-links" id="mainMenu">
                 <a href="#home" class="nav-link active">ANA SAYFA</a>
-                <a href="calismalarim.html" class="nav-link">ÇALIŞMALARIM</a>
+                <a href="calismalarim.html" class="nav-link" data-nav-section="worksPage">ÇALIŞMALARIM</a>
+                <a href="referanslar.html" class="nav-link" data-nav-section="referencesPage">REFERANSLARIMIZ</a>
                 <a href="klip-cekimleri.html" class="nav-link" data-nav-section="clipShootings">KLİP ÇEKİMLERİ</a>
                 <a href="video-klipleri.html" class="nav-link" data-nav-section="videoClips">VİDEO KLİPLERİ</a>
                 <a href="grafik-tasarim.html" class="nav-link" data-nav-section="graphicDesign">GRAFİK TASARIM</a>
-                <a href="hakkimda.html" class="nav-link">HAKKIMDA</a>
-                <a href="iletisim.html" class="nav-link">İLETİŞİM</a>
+                <a href="hakkimda.html" class="nav-link" data-nav-section="aboutPage">HAKKIMIZDA</a>
+                <a href="iletisim.html" class="nav-link" data-nav-section="contactPage">İLETİŞİM</a>
             </div>
             <button class="nav-toggle" id="navToggle" type="button" aria-label="Menüyü aç" aria-expanded="false" aria-controls="mainMenu">
                 <span></span>
@@ -41,7 +42,7 @@
     </nav>
 
     <!-- Hero Section -->
-    <section id="home" class="hero-section">
+    <section id="home" class="hero-section" data-section-key="homeHero">
         <div class="hero-bg">
             <video class="hero-video" autoplay muted loop playsinline preload="auto">
                 <source src="assets/hero_bg.mp4" type="video/mp4">
@@ -68,7 +69,7 @@
     </section>
 
     <!-- Stats Section -->
-    <section class="stats-section">
+    <section class="stats-section" data-section-key="homeStats">
         <div class="container">
             <div class="stats-grid">
                 <div class="stat-item reveal">
@@ -92,7 +93,7 @@
     </section>
 
     <!-- Video Section -->
-    <section class="portfolio-section">
+    <section class="portfolio-section" data-section-key="homeServices">
         <div class="container">
             <div class="video-showcase reveal">
                 <div class="section-header">
@@ -135,18 +136,6 @@
         </div>
     </section>
 
-    <!-- Partner Logo Marquee -->
-    <section class="brand-marquee-section" data-section-key="partnerLogos" aria-labelledby="brandMarqueeTitle">
-        <div class="brand-marquee-heading reveal">
-            <span class="section-tag" id="brandMarqueeTitle">ÇALIŞTIĞIM MARKALAR</span>
-        </div>
-        <div class="brand-marquee" aria-label="Çalışılan kurumlar">
-            <div class="brand-marquee-track" id="partnerLogoTrack">
-                <!-- Partner logos are loaded dynamically -->
-            </div>
-        </div>
-    </section>
-
     <!-- Featured Artists -->
     <section class="portfolio-section featured-artists-section" id="featuredArtistsSection" data-section-key="featuredArtists" aria-labelledby="featuredArtistsTitle">
         <div class="container">
@@ -165,43 +154,48 @@
         </div>
     </section>
 
+    <!-- Reference Logo Marquee -->
+    <section class="brand-marquee-section" data-section-key="partnerLogos" aria-labelledby="brandMarqueeTitle">
+        <div class="brand-marquee-heading reveal">
+            <span class="section-tag">BİRLİKTE ÜRETTİKLERİMİZ</span>
+            <h2 class="brand-marquee-section-title" id="brandMarqueeTitle">REFERANSLARIMIZ</h2>
+        </div>
+        <div class="brand-marquee" aria-label="Referans markalar">
+            <div class="brand-marquee-track" id="partnerLogoTrack">
+                <!-- Reference logos are loaded dynamically -->
+            </div>
+        </div>
+        <div class="brand-marquee-actions">
+            <a class="btn btn-outline" href="referanslar.html">Tüm Referansları Gör <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+        </div>
+    </section>
+
     <!-- About -->
-    <section id="home-about" class="about-section home-about-section">
+    <section id="home-about" class="about-section home-about-section home-about-centered" data-section-key="homeAbout">
         <div class="container">
             <div class="about-grid">
-                <div class="about-image reveal-left">
-                    <div class="image-frame">
-                        <img src="Görsel/Zeynep bastık 4.PNG" alt="Songül Bayramcı">
-                    </div>
-                </div>
-                <div class="about-content reveal-right">
-                    <span class="section-tag">HAKKIMDA</span>
-                    <h2>Songül Bayramcı</h2>
-                    <p class="lead">Konser ve etkinlik görüntüleme alanında tutkulu bir profesyonelim.</p>
-                    <p>Kamera arkasında geçen her an, hikayeyi anlatmak için bir fırsat. Işık, gölge, hareket - bunların hepsini ustalıkla birleştirerek unutulmaz anları ölümsüzleştiriyorum.</p>
-                    <p>Her çekim, bir hikaye anlatma süreci. Sahnenin enerjisini, sanatçının ifadesini ve izleyicinin kalbine dokunan anları yakalamak için buradayım.</p>
-                    <div class="skills-grid">
-                        <div class="skill-item"><i class="fas fa-video"></i><span>Video Çekimi</span></div>
-                        <div class="skill-item"><i class="fas fa-camera"></i><span>Fotoğrafçılık</span></div>
-                        <div class="skill-item"><i class="fas fa-cut"></i><span>Kurgu &amp; Montaj</span></div>
-                        <div class="skill-item"><i class="fas fa-lightbulb"></i><span>Işık Yönetimi</span></div>
-                    </div>
+                <div class="about-content reveal">
+                    <span class="section-tag">HAKKIMIZDA</span>
+                    <h2>Les Mejor Creative</h2>
+                    <p class="lead">Müzik, etkinlik ve markalar için yaratıcı görsel hikâyeler üreten bir prodüksiyon stüdyosuyuz.</p>
+                    <p class="about-copy">Kamera arkasındaki her anı güçlü bir hikâyeye dönüştürüyor; ışık, gölge ve hareketi özgün bir görsel dille bir araya getiriyoruz.</p>
+                    <p class="about-copy">Sahnenin enerjisini, sanatçının ifadesini ve izleyicinin kalbine dokunan anları yüksek prodüksiyon kalitesiyle ölümsüzleştiriyoruz.</p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Testimonials -->
-    <section class="testimonials-section">
+    <section class="testimonials-section" data-section-key="testimonials">
         <div class="container">
             <div class="section-header reveal">
-                <span class="section-tag">REFERANSLARIM</span>
+                <span class="section-tag">MÜŞTERİ YORUMLARI</span>
                 <h2 class="section-title">NE DİYORLAR?</h2>
             </div>
             <div class="testimonials-grid">
                 <div class="testimonial-card reveal">
                     <div class="quote-icon"><i class="fas fa-quote-left"></i></div>
-                    <p class="testimonial-text">Songül hanım, konser çekimlerimizde profesyonellik ve yaratıcılığı bir arada sundu. Görüntüler tam istediğimiz gibiydi!</p>
+                    <p class="testimonial-text">Les Mejor Creative ekibi, konser çekimlerimizde profesyonellik ve yaratıcılığı bir arada sundu. Görüntüler tam istediğimiz gibiydi!</p>
                     <div class="testimonial-author">
                         <span class="author-name">Zeynep Bastık</span>
                         <span class="author-title">Sanatçı</span>
@@ -228,7 +222,7 @@
     </section>
 
     <!-- Contact -->
-    <section id="home-contact" class="contact-section home-contact-section">
+    <section id="home-contact" class="contact-section home-contact-section" data-section-key="homeContact">
         <div class="container">
             <div class="section-header reveal">
                 <span class="section-tag">İLETİŞİM</span>
@@ -241,7 +235,7 @@
                     <div class="contact-item"><i class="fas fa-phone"></i><div><h4>Telefon</h4><p>+90 555 123 45 67</p></div></div>
                     <div class="contact-item"><i class="fas fa-map-marker-alt"></i><div><h4>Konum</h4><p>İstanbul, Türkiye</p></div></div>
                     <div class="social-links">
-                        <a href="https://www.instagram.com/violaceae.01/" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="https://www.instagram.com/lesmejorcreative.eu/" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
                         <a href="#" class="social-link" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
                         <a href="#" class="social-link" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
                         <a href="#" class="social-link" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
@@ -279,7 +273,7 @@
     </section>
 
     <!-- Signature Artwork -->
-    <section class="home-signature-section" aria-hidden="true">
+    <section class="home-signature-section" data-section-key="homeSignature" aria-hidden="true">
         <div class="home-signature-artwork">
             <img src="assets/images/songul-signature-transparent.png" alt="">
             <div class="signature-paint-drips">
@@ -292,8 +286,8 @@
     <footer class="footer">
         <div class="container">
             <div class="footer-content">
-                <div class="footer-logo">SONGÜL BAYRAMCI</div>
-                <p>Konser & Etkinlik Görüntüleme</p>
+                <div class="footer-logo">LES MEJOR CREATIVE</div>
+                <p>Creative Production Studio</p>
                 <div class="footer-divider"></div>
                 <p class="copyright">&copy; 2026 Tüm Hakları Saklıdır.</p>
                 <p class="footer-signature">Cooked by <span>Songül Bayramcı</span></p>
@@ -314,8 +308,9 @@
         <i class="fas fa-arrow-up" aria-hidden="true"></i>
     </button>
 
-    <script src="data/data.js?v=20260918-portfolio-pages"></script>
-    <script src="js/data-utils.js?v=20260918-portfolio-pages"></script>
-    <script src="js/script.js?v=20260918-portfolio-pages"></script>
+    <script src="data/data.js?v=20260919-brand"></script>
+    <script src="js/data-utils.js?v=20260919-brand"></script>
+    <script src="js/media-store.js?v=20260919-brand"></script>
+    <script src="js/script.js?v=20260919-brand"></script>
 </body>
 </html>

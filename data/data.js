@@ -1,5 +1,5 @@
 const siteData = {
-  "contentVersion": 2,
+  "contentVersion": 3,
   "hero": {
     "tag": "KONSER & ETKİNLİK ÇEKİMİ",
     "titleLine1": "HER ANI",
@@ -167,11 +167,22 @@ const siteData = {
     { "id": 8, "src": "Görsel/Zeynep bastık2.PNG", "title": "Zeynep Bastık", "desc": "Konser Detayı" }
   ],
   "sectionVisibility": {
+    "homeHero": true,
+    "homeStats": true,
+    "homeServices": true,
     "featuredArtists": true,
+    "partnerLogos": true,
+    "homeAbout": true,
+    "testimonials": true,
+    "homeContact": true,
+    "homeSignature": true,
+    "worksPage": true,
+    "referencesPage": true,
     "clipShootings": true,
     "graphicDesign": true,
     "videoClips": true,
-    "partnerLogos": true
+    "aboutPage": true,
+    "contactPage": true
   },
   "youtubeProjects": [
     {
@@ -226,12 +237,15 @@ const siteData = {
     }
   ],
   "about": {
-    "tag": "HAKKIMDA",
-    "name": "Songül Bayramcı",
+    "tag": "HAKKIMIZDA",
+    "name": "Les Mejor Creative",
+    "owner": "Les Mejor Marka Sahibi Furkan Tepeyurt",
     "image": "Görsel/Zeynep bastık 4.PNG",
-    "lead": "Konser ve etkinlik görüntüleme alanında tutkulu bir profesyonelim.",
-    "p1": "Kamera arkasında geçen her an, hikayeyi anlatmak için bir fırsat. Işık, gölge, hareket - bunların hepsini ustalıkla birleştirerek unutulmaz anları ölümsüzleştiriyorum.",
-    "p2": "Her çekim, bir hikaye anlatma süreci. Sahnenin enerjisini, sanatçının ifadesini ve izleyicinin kalbine dokunan anları yakalamak için buradayım.",
+    "lead": "Müzik, etkinlik ve markalar için yaratıcı görsel hikâyeler üreten bir prodüksiyon stüdyosuyuz.",
+    "p1": "Kamera arkasındaki her anı güçlü bir hikâyeye dönüştürüyor; ışık, gölge ve hareketi özgün bir görsel dille bir araya getiriyoruz.",
+    "p2": "Sahnenin enerjisini, sanatçının ifadesini ve izleyicinin kalbine dokunan anları yüksek prodüksiyon kalitesiyle ölümsüzleştiriyoruz.",
+    "vision": "Yaratıcı anlatım, güçlü estetik ve yenilikçi prodüksiyon yaklaşımıyla müzik ve etkinlik dünyasında iz bırakan uluslararası bir yaratıcı stüdyo olmak.",
+    "mission": "Sanatçıların ve markaların hikâyelerini doğru strateji, özgün görsel dil ve yüksek teknik kaliteyle görünür kılmak.",
     "skills": [
       { "id": 1, "icon": "fas fa-video", "label": "Video Çekimi" },
       { "id": 2, "icon": "fas fa-camera", "label": "Fotoğrafçılık" },
@@ -244,7 +258,7 @@ const siteData = {
       "id": 1,
       "name": "Zeynep Bastık",
       "title": "Sanatçı",
-      "text": "Songül hanım, konser çekimlerimizde profesyonellik ve yaratıcılığı bir arada sundu. Görüntüler tam istediğimiz gibiydi!"
+      "text": "Les Mejor Creative ekibi, konser çekimlerimizde profesyonellik ve yaratıcılığı bir arada sundu. Görüntüler tam istediğimiz gibiydi!"
     },
     {
       "id": 2,
@@ -263,7 +277,7 @@ const siteData = {
     "email": "songul@ornek.com",
     "phone": "+90 555 123 45 67",
     "location": "İstanbul, Türkiye",
-    "instagram": "https://www.instagram.com/violaceae.01/",
+    "instagram": "https://www.instagram.com/lesmejorcreative.eu/",
     "youtube": "https://youtube.com/",
     "twitter": "https://twitter.com/",
     "linkedin": "https://linkedin.com/"

@@ -1214,8 +1214,13 @@ a.creative-project-card:focus-visible {
 
 body[data-page-section="graphicDesign"] .creative-projects-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    max-width: 1040px;
+    max-width: 640px;
     margin: 0 auto;
+    gap: 20px;
+}
+
+body[data-page-section="graphicDesign"] .creative-project-card {
+    padding: 14px;
 }
 
 body[data-page-section="graphicDesign"] .creative-project-media {
@@ -1317,10 +1322,20 @@ a.creative-project-card:hover img {
         grid-template-columns: 1fr;
     }
 
-    .featured-artist-card,
-    .creative-project-card {
-        width: min(100%, 440px);
+    .featured-artist-card {
+        width: min(100%, 300px);
         margin: 0 auto;
+        padding: 14px;
+    }
+
+    .creative-project-card {
+        width: min(100%, 380px);
+        margin: 0 auto;
+    }
+
+    body[data-page-section="graphicDesign"] .creative-project-card {
+        width: min(100%, 280px);
+        padding: 12px;
     }
 
     .creative-projects-section {
@@ -1335,7 +1350,15 @@ a.creative-project-card:hover img {
 
     .featured-artist-card,
     .creative-project-card {
-        padding: 16px;
+        padding: 12px;
+    }
+
+    .featured-artist-card {
+        width: min(100%, 260px);
+    }
+
+    body[data-page-section="graphicDesign"] .creative-project-card {
+        width: min(100%, 250px);
     }
 
     .creative-projects-header {
@@ -1513,7 +1536,18 @@ a.creative-project-card:hover img {
 }
 
 .brand-marquee-heading .section-tag {
-    margin-bottom: 0;
+    margin-bottom: 12px;
+}
+
+.brand-marquee-section-title {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 4.5vw, 4rem);
+    line-height: 1;
+}
+
+.brand-marquee-actions {
+    margin-top: 34px;
+    text-align: center;
 }
 
 .brand-marquee {
@@ -1650,6 +1684,83 @@ a.creative-project-card:hover img {
     width: 100%;
     color: var(--text-secondary);
     text-align: center;
+}
+
+/* References Page */
+.references-section {
+    min-height: 100vh;
+    padding: 170px 0 120px;
+    background: linear-gradient(180deg, rgba(230, 57, 70, 0.04), transparent 34%);
+}
+
+.references-header {
+    max-width: 780px;
+    margin-bottom: 56px;
+}
+
+.references-header .section-tag,
+.references-header .section-title {
+    text-align: left;
+}
+
+.references-header p {
+    color: var(--text-secondary);
+    line-height: 1.75;
+}
+
+.references-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 28px;
+}
+
+.reference-logo-card {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    padding: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(5, 5, 5, 0.78);
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition);
+}
+
+a.reference-logo-card:hover,
+a.reference-logo-card:focus-visible {
+    transform: translateY(-7px);
+    border-color: rgba(230, 57, 70, 0.76);
+    box-shadow: 0 22px 55px rgba(0, 0, 0, 0.45);
+    outline: none;
+}
+
+.reference-logo-card img {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    padding: clamp(26px, 4vw, 54px);
+    object-fit: contain;
+    background: #0a0a0a;
+    filter: grayscale(1) brightness(1.22);
+}
+
+.reference-logo-card strong {
+    display: block;
+    padding: 18px 4px 5px;
+    font-size: 0.98rem;
+    line-height: 1.35;
+    text-align: center;
+}
+
+.reference-logo-card:not(:has(img))::before {
+    content: 'LM';
+    display: grid;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    place-items: center;
+    background: #0a0a0a;
+    color: var(--accent);
+    font-family: var(--font-display);
+    font-size: 2.5rem;
 }
 
 /* Clip Projects */
@@ -2001,6 +2112,107 @@ a.youtube-project-link:hover .youtube-project-media img {
 .contact-section {
     padding: 120px 0;
     background: transparent;
+}
+
+.home-about-centered .about-grid {
+    display: block;
+    max-width: 920px;
+    margin: 0 auto;
+}
+
+.home-about-centered .about-content,
+.home-about-centered .about-content .section-tag {
+    text-align: center;
+}
+
+.home-about-centered .skills-grid {
+    max-width: 760px;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+.home-about-centered .skill-item {
+    justify-content: center;
+}
+
+.about-owner {
+    display: inline-flex;
+    margin: -8px 0 22px;
+    padding: 8px 13px;
+    border: 1px solid rgba(230, 57, 70, 0.35);
+    color: var(--accent-light) !important;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.7px;
+    text-transform: uppercase;
+}
+
+.vision-mission-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 28px;
+    margin-top: 70px;
+}
+
+.vision-mission-card {
+    padding: 34px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--bg-card);
+}
+
+.vision-mission-card > i {
+    display: block;
+    margin-bottom: 22px;
+    color: var(--accent);
+    font-size: 2rem;
+}
+
+.vision-mission-card .section-tag {
+    margin-bottom: 16px;
+    text-align: left;
+}
+
+.vision-mission-card p {
+    color: var(--text-secondary);
+    line-height: 1.8;
+}
+
+.disabled-page-message {
+    display: grid;
+    min-height: 78vh;
+    padding: 170px 24px 100px;
+    place-content: center;
+    justify-items: center;
+    gap: 24px;
+    text-align: center;
+}
+
+.disabled-page-message h1 {
+    max-width: 850px;
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 4.5rem);
+}
+
+@media (max-width: 1050px) {
+    .references-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 700px) {
+    .references-section {
+        padding: 135px 0 85px;
+    }
+
+    .references-grid,
+    .vision-mission-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .reference-logo-card {
+        width: min(100%, 420px);
+        margin: 0 auto;
+    }
 }
 
 .contact-page .contact-section {

@@ -237,6 +237,27 @@ document.addEventListener('DOMContentLoaded', () => {
                             .filter(item => !existingGraphicIds.has(String(item.id)))
                             .map(item => JSON.parse(JSON.stringify(item)));
                         parsed.graphicProjects = [...(parsed.graphicProjects || []), ...missingGraphicProjects];
+                        parsed.about = {
+                            ...(siteData.about || {}),
+                            ...(parsed.about || {}),
+                            tag: siteData.about?.tag || parsed.about?.tag,
+                            name: siteData.about?.name || parsed.about?.name,
+                            owner: siteData.about?.owner || parsed.about?.owner,
+                            lead: siteData.about?.lead || parsed.about?.lead,
+                            p1: siteData.about?.p1 || parsed.about?.p1,
+                            p2: siteData.about?.p2 || parsed.about?.p2,
+                            vision: siteData.about?.vision || parsed.about?.vision,
+                            mission: siteData.about?.mission || parsed.about?.mission
+                        };
+                        parsed.contact = {
+                            ...(siteData.contact || {}),
+                            ...(parsed.contact || {}),
+                            instagram: siteData.contact?.instagram || parsed.contact?.instagram
+                        };
+                        parsed.testimonials = (parsed.testimonials || siteData.testimonials || []).map(testimonial => {
+                            if (!String(testimonial?.text || '').startsWith('Songül hanım')) return testimonial;
+                            return { ...testimonial, text: String(testimonial.text).replace('Songül hanım', 'Les Mejor Creative ekibi') };
+                        });
                         parsed.contentVersion = currentContentVersion;
                         updated = true;
                     } else if (!parsed.graphicProjects && siteData.graphicProjects) {
@@ -278,6 +299,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const currentSiteData = getSiteData();
     const dataUtils = window.SiteDataUtils;
+    const resolveMediaUrl = async value => {
+        const reference = String(value || '');
+        if (!window.SiteMediaStore?.isStored(reference)) return reference;
+        try {
+            return await window.SiteMediaStore.resolve(reference);
+        } catch (error) {
+            console.error('Medya dosyası yüklenemedi:', error);
+            return '';
+        }
+    };
     let artistsList = dataUtils
         ? dataUtils.normalizeArtists(currentSiteData.artists || (typeof siteData !== 'undefined' ? siteData.artists : []))
         : (currentSiteData.artists || (typeof siteData !== 'undefined' ? siteData.artists : []));
@@ -291,7 +322,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Hydrate Hero & About & Contact
-    function hydrateStaticContent(data) {
+    async function hydrateStaticContent(data) {
         if (!data) return;
 
         // Hero
@@ -310,7 +341,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const heroVideo = document.querySelector('.hero-video');
             const heroVideoSource = heroVideo?.querySelector('source');
-            const heroVideoUrl = data.hero.bgVideo || (typeof siteData !== 'undefined' ? siteData.hero?.bgVideo : '');
+            const heroVideoReference = data.hero.bgVideo || (typeof siteData !== 'undefined' ? siteData.hero?.bgVideo : '');
+            const heroVideoUrl = await resolveMediaUrl(heroVideoReference);
             if (heroVideo && heroVideoSource && heroVideoUrl && heroVideoSource.getAttribute('src') !== heroVideoUrl) {
                 const normalizedVideoUrl = heroVideoUrl.split('?')[0].toLowerCase();
                 heroVideoSource.src = heroVideoUrl;
@@ -342,12 +374,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const aboutName = document.querySelector('.about-content h1, .about-content h2');
             if (aboutName && data.about.name) aboutName.textContent = data.about.name;
 
+            const aboutOwner = document.getElementById('aboutOwner');
+            if (aboutOwner && data.about.owner) aboutOwner.textContent = data.about.owner;
+
             const aboutLead = document.querySelector('.about-content .lead');
             if (aboutLead && data.about.lead) aboutLead.textContent = data.about.lead;
 
-            const pElements = document.querySelectorAll('.about-content p:not(.lead)');
+            const pElements = document.querySelectorAll('.about-content .about-copy');
             if (pElements[0] && data.about.p1) pElements[0].textContent = data.about.p1;
             if (pElements[1] && data.about.p2) pElements[1].textContent = data.about.p2;
+
+            const aboutVision = document.getElementById('aboutVision');
+            const aboutMission = document.getElementById('aboutMission');
+            if (aboutVision && data.about.vision) aboutVision.textContent = data.about.vision;
+            if (aboutMission && data.about.mission) aboutMission.textContent = data.about.mission;
         }
 
         // Testimonials
@@ -630,7 +670,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const artist = artistsList.find(item => item.visible !== false && (item.slug === artistParam || String(item.id) === String(artistParam)));
 
         if (!artist) {
-            document.title = 'Sanatçı Bulunamadı | Songül Bayramcı';
+            document.title = 'Sanatçı Bulunamadı | Les Mejor Creative';
             artistDetailRoot.innerHTML = `
                 <section class="artist-not-found"><div class="container">
                     <span class="section-tag">404</span><h1>Sanatçı bulunamadı</h1>
@@ -640,7 +680,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        document.title = `${artist.name} Konserleri | Songül Bayramcı`;
+        document.title = `${artist.name} Konserleri | Les Mejor Creative`;
         if (artistDetailCover) {
             artistDetailCover.src = artist.cover;
             artistDetailCover.alt = artist.name;
@@ -725,12 +765,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const card = document.createElement('a');
             card.className = 'featured-artist-card';
             card.href = `sanatci.html?artist=${encodeURIComponent(artist.slug)}`;
-            card.dataset.featuredExtra = index >= 4 ? 'true' : 'false';
-            card.hidden = index >= 4;
+            card.dataset.featuredExtra = index >= 8 ? 'true' : 'false';
+            card.hidden = index >= 8;
             card.setAttribute('aria-label', `${artist.name} sanatçı sayfasını aç`);
             card.innerHTML = `
                 <span class="featured-artist-media">
-                    <img src="${escapeHtml(artist.cover)}" alt="${escapeHtml(artist.name)}" loading="${index < 4 ? 'eager' : 'lazy'}" decoding="async">
+                    <img src="${escapeHtml(artist.cover)}" alt="${escapeHtml(artist.name)}" loading="${index < 8 ? 'eager' : 'lazy'}" decoding="async">
                     <small>SANATÇI</small>
                 </span>
                 <span class="featured-artist-info">
@@ -740,7 +780,7 @@ document.addEventListener('DOMContentLoaded', () => {
             featuredArtistsGrid.appendChild(card);
         });
 
-        if (featuredArtistsActions) featuredArtistsActions.hidden = featuredArtists.length <= 4;
+        if (featuredArtistsActions) featuredArtistsActions.hidden = featuredArtists.length <= 8;
         if (featuredArtistsMore) {
             featuredArtistsMore.setAttribute('aria-expanded', 'false');
             featuredArtistsMore.innerHTML = 'Daha Fazla <i class="fas fa-arrow-down" aria-hidden="true"></i>';
@@ -764,11 +804,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const sectionVisibility = {
+        homeHero: true,
+        homeStats: true,
+        homeServices: true,
         featuredArtists: true,
+        partnerLogos: true,
+        homeAbout: true,
+        testimonials: true,
+        homeContact: true,
+        homeSignature: true,
+        worksPage: true,
+        referencesPage: true,
         clipShootings: true,
         graphicDesign: true,
         videoClips: true,
-        partnerLogos: true,
+        aboutPage: true,
+        contactPage: true,
         ...(currentSiteData.sectionVisibility || {})
     };
 
@@ -782,9 +833,20 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         const activePageSection = document.body.dataset.pageSection || '';
+        if (activePageSection && !isSectionVisible(activePageSection)) {
+            const main = document.querySelector('main');
+            if (main) {
+                main.innerHTML = `
+                    <section class="disabled-page-message">
+                        <span class="section-tag">LES MEJOR CREATIVE</span>
+                        <h1>BU BÖLÜM ŞU ANDA YAYINDA DEĞİL</h1>
+                        <a class="btn btn-outline" href="index.html">Ana Sayfaya Dön</a>
+                    </section>`;
+            }
+        }
         document.querySelectorAll('[data-section-key]').forEach(section => {
             const key = section.dataset.sectionKey;
-            if (key !== activePageSection) section.hidden = !isSectionVisible(key);
+            section.hidden = !isSectionVisible(key);
         });
     }
 
@@ -931,12 +993,52 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    async function setStoredImageSource(image, reference) {
+        const source = await resolveMediaUrl(reference);
+        if (!source) {
+            image.remove();
+            return;
+        }
+        image.src = source;
+    }
+
+    function createPartnerCard(partner, options = {}) {
+        const partnerUrl = safeExternalUrl(partner.url);
+        const element = document.createElement(partnerUrl ? 'a' : 'span');
+        element.className = options.grid ? 'reference-logo-card' : 'partner-logo-card';
+        if (partnerUrl) {
+            element.href = partnerUrl;
+            element.target = '_blank';
+            element.rel = 'noopener noreferrer';
+            element.setAttribute('aria-label', `${partner.name || 'Kurum'} web sitesini aç`);
+        }
+
+        if (partner.logo) {
+            const image = document.createElement('img');
+            image.alt = options.duplicate ? '' : `${partner.name || 'Kurum'} logosu`;
+            image.loading = options.duplicate ? 'lazy' : 'eager';
+            image.decoding = 'async';
+            image.addEventListener('error', () => image.remove());
+            setStoredImageSource(image, partner.logo);
+            element.appendChild(image);
+        }
+
+        const name = document.createElement('strong');
+        name.textContent = partner.name || 'Kurum';
+        element.appendChild(name);
+        return element;
+    }
+
+    function activePartners() {
+        return (currentSiteData.partners || (typeof siteData !== 'undefined' ? siteData.partners : []) || [])
+            .filter(partner => partner && partner.enabled !== false && (partner.logo || partner.name));
+    }
+
     function loadPartnerLogos() {
         const track = document.getElementById('partnerLogoTrack');
         if (!track) return;
 
-        const partners = (currentSiteData.partners || (typeof siteData !== 'undefined' ? siteData.partners : []) || [])
-            .filter(partner => partner && partner.enabled !== false && (partner.logo || partner.name));
+        const partners = activePartners();
         track.innerHTML = '';
 
         if (!partners.length) {
@@ -959,26 +1061,24 @@ document.addEventListener('DOMContentLoaded', () => {
             if (isDuplicate) group.setAttribute('aria-hidden', 'true');
 
             repeatedPartners.forEach(partner => {
-                const partnerUrl = safeExternalUrl(partner.url);
-                const element = document.createElement(partnerUrl ? 'a' : 'span');
-                element.className = 'partner-logo-card';
-                if (partnerUrl) {
-                    element.href = partnerUrl;
-                    element.target = '_blank';
-                    element.rel = 'noopener noreferrer';
-                    element.setAttribute('aria-label', `${partner.name || 'Kurum'} web sitesini aç`);
-                }
-                element.innerHTML = `
-                    ${partner.logo ? `<img src="${escapeHtml(partner.logo)}" alt="${isDuplicate ? '' : escapeHtml(partner.name || 'Kurum logosu')}" loading="${isDuplicate ? 'lazy' : 'eager'}" decoding="async">` : ''}
-                    <strong>${escapeHtml(partner.name || 'Kurum')}</strong>
-                `;
-                element.querySelector('img')?.addEventListener('error', event => event.currentTarget.remove());
-                group.appendChild(element);
+                group.appendChild(createPartnerCard(partner, { duplicate: isDuplicate }));
             });
             return group;
         };
 
         track.append(createGroup(), createGroup(true));
+    }
+
+    function loadReferences() {
+        const grid = document.getElementById('referencesGrid');
+        if (!grid) return;
+        const partners = activePartners();
+        grid.innerHTML = '';
+        if (!partners.length) {
+            grid.innerHTML = '<p class="partner-logo-empty">Henüz referans eklenmedi.</p>';
+            return;
+        }
+        partners.forEach(partner => grid.appendChild(createPartnerCard(partner, { grid: true })));
     }
 
     applySectionVisibility();
@@ -989,6 +1089,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadCreativeProjects('graphicDesignGrid', 'graphicProjects', 'graphicDesign', 'Grafik tasarım çalışmaları', 'Grafik Tasarım');
     loadCreativeProjects('videoClipsGrid', 'videoClips', 'videoClips', 'Video klipleri', 'Video Klip', true);
     loadPartnerLogos();
+    loadReferences();
 
     // ============================================
     // LIGHTBOX

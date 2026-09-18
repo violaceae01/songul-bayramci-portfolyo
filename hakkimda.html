@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="description" content="Konser ve etkinlik görüntüleme alanında çalışan Songül Bayramcı hakkında.">
-    <title>Hakkımda | Songül Bayramcı</title>
+    <meta name="description" content="Les Mejor Creative, marka sahibi Furkan Tepeyurt, vizyonumuz ve misyonumuz.">
+    <title>Hakkımızda | Les Mejor Creative</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/styles.css?v=20260918-portfolio-pages">
+    <link rel="stylesheet" href="css/styles.css?v=20260919-brand">
 </head>
-<body class="about-page">
+<body class="about-page" data-page-section="aboutPage">
     <div class="cursor-dot"></div>
     <div class="cursor-outline"></div>
     <div class="scroll-progress" id="scrollProgress"></div>
@@ -22,12 +22,13 @@
             <a href="index.html#home" class="nav-logo" aria-label="Les Mejor Creative ana sayfa"><img src="assets/images/les-mejor-logo-white.png" alt="Les Mejor Creative"></a>
             <div class="nav-links" id="mainMenu">
                 <a href="index.html#home" class="nav-link">ANA SAYFA</a>
-                <a href="calismalarim.html" class="nav-link">ÇALIŞMALARIM</a>
+                <a href="calismalarim.html" class="nav-link" data-nav-section="worksPage">ÇALIŞMALARIM</a>
+                <a href="referanslar.html" class="nav-link" data-nav-section="referencesPage">REFERANSLARIMIZ</a>
                 <a href="klip-cekimleri.html" class="nav-link" data-nav-section="clipShootings">KLİP ÇEKİMLERİ</a>
                 <a href="video-klipleri.html" class="nav-link" data-nav-section="videoClips">VİDEO KLİPLERİ</a>
                 <a href="grafik-tasarim.html" class="nav-link" data-nav-section="graphicDesign">GRAFİK TASARIM</a>
-                <a href="hakkimda.html" class="nav-link active" aria-current="page">HAKKIMDA</a>
-                <a href="iletisim.html" class="nav-link">İLETİŞİM</a>
+                <a href="hakkimda.html" class="nav-link active" data-nav-section="aboutPage" aria-current="page">HAKKIMIZDA</a>
+                <a href="iletisim.html" class="nav-link" data-nav-section="contactPage">İLETİŞİM</a>
             </div>
             <button class="nav-toggle" id="navToggle" type="button" aria-label="Menüyü aç" aria-expanded="false" aria-controls="mainMenu">
                 <span></span>
@@ -38,40 +39,35 @@
     </nav>
 
     <main>
-        <section id="hakkimda" class="about-section">
+        <section id="hakkimda" class="about-section" data-section-key="aboutPage">
             <div class="container">
                 <div class="about-grid">
                     <div class="about-image reveal-left">
                         <div class="image-frame">
-                            <img src="Görsel/Zeynep bastık 4.PNG" alt="Songül Bayramcı">
+                            <img src="Görsel/Zeynep bastık 4.PNG" alt="Les Mejor Creative">
                         </div>
                     </div>
                     <div class="about-content reveal-right">
-                        <span class="section-tag">HAKKIMDA</span>
-                        <h1>Songül Bayramcı</h1>
-                        <p class="lead">Konser ve etkinlik görüntüleme alanında tutkulu bir profesyonelim.</p>
-                        <p>Kamera arkasında geçen her an, hikayeyi anlatmak için bir fırsat. Işık, gölge, hareket - bunların hepsini ustalıkla birleştirerek unutulmaz anları ölümsüzleştiriyorum.</p>
-                        <p>Her çekim, bir hikaye anlatma süreci. Sahnenin enerjisini, sanatçının ifadesini ve izleyicinin kalbine dokunan anları yakalamak için buradayım.</p>
+                        <span class="section-tag">HAKKIMIZDA</span>
+                        <h1>Les Mejor Creative</h1>
+                        <p class="about-owner" id="aboutOwner">Les Mejor Marka Sahibi Furkan Tepeyurt</p>
+                        <p class="lead">Müzik, etkinlik ve markalar için yaratıcı görsel hikâyeler üreten bir prodüksiyon stüdyosuyuz.</p>
+                        <p class="about-copy">Kamera arkasındaki her anı güçlü bir hikâyeye dönüştürüyor; ışık, gölge ve hareketi özgün bir görsel dille bir araya getiriyoruz.</p>
+                        <p class="about-copy">Sahnenin enerjisini, sanatçının ifadesini ve izleyicinin kalbine dokunan anları yüksek prodüksiyon kalitesiyle ölümsüzleştiriyoruz.</p>
 
-                        <div class="skills-grid">
-                            <div class="skill-item">
-                                <i class="fas fa-video"></i>
-                                <span>Video Çekimi</span>
-                            </div>
-                            <div class="skill-item">
-                                <i class="fas fa-camera"></i>
-                                <span>Fotoğrafçılık</span>
-                            </div>
-                            <div class="skill-item">
-                                <i class="fas fa-cut"></i>
-                                <span>Kurgu &amp; Montaj</span>
-                            </div>
-                            <div class="skill-item">
-                                <i class="fas fa-lightbulb"></i>
-                                <span>Işık Yönetimi</span>
-                            </div>
-                        </div>
                     </div>
+                </div>
+                <div class="vision-mission-grid">
+                    <article class="vision-mission-card reveal">
+                        <i class="fas fa-eye" aria-hidden="true"></i>
+                        <span class="section-tag">VİZYONUMUZ</span>
+                        <p id="aboutVision">Yaratıcı anlatım, güçlü estetik ve yenilikçi prodüksiyon yaklaşımıyla müzik ve etkinlik dünyasında iz bırakan uluslararası bir yaratıcı stüdyo olmak.</p>
+                    </article>
+                    <article class="vision-mission-card reveal delay-1">
+                        <i class="fas fa-bullseye" aria-hidden="true"></i>
+                        <span class="section-tag">MİSYONUMUZ</span>
+                        <p id="aboutMission">Sanatçıların ve markaların hikâyelerini doğru strateji, özgün görsel dil ve yüksek teknik kaliteyle görünür kılmak.</p>
+                    </article>
                 </div>
             </div>
         </section>
@@ -80,8 +76,8 @@
     <footer class="footer">
         <div class="container">
             <div class="footer-content">
-                <div class="footer-logo">SONGÜL BAYRAMCI</div>
-                <p>Konser &amp; Etkinlik Görüntüleme</p>
+                <div class="footer-logo">LES MEJOR CREATIVE</div>
+                <p>Creative Production Studio</p>
                 <div class="footer-divider"></div>
                 <p class="copyright">&copy; 2026 Tüm Hakları Saklıdır.</p>
                 <p class="footer-signature">Cooked by <span>Songül Bayramcı</span></p>
@@ -93,8 +89,8 @@
         <i class="fas fa-arrow-up" aria-hidden="true"></i>
     </button>
 
-    <script src="data/data.js?v=20260918-portfolio-pages"></script>
-    <script src="js/data-utils.js?v=20260918-portfolio-pages"></script>
-    <script src="js/script.js?v=20260918-portfolio-pages"></script>
+    <script src="data/data.js?v=20260919-brand"></script>
+    <script src="js/data-utils.js?v=20260919-brand"></script>
+    <script src="js/script.js?v=20260919-brand"></script>
 </body>
 </html>

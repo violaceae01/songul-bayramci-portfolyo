@@ -4,6 +4,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const clone = value => JSON.parse(JSON.stringify(value));
     const escapeHtml = value => utils ? utils.escapeHtml(value) : String(value || '');
     const findById = (list, id) => (list || []).find(item => String(item.id) === String(id));
+    const resolveAdminMedia = async reference => {
+        const value = String(reference || '');
+        if (!window.SiteMediaStore?.isStored(value)) return value;
+        return window.SiteMediaStore.resolve(value);
+    };
 
     let appData = loadData();
 
@@ -25,6 +30,27 @@ document.addEventListener('DOMContentLoaded', () => {
                     .filter(item => !existingGraphicIds.has(String(item.id)))
                     .map(clone);
                 merged.graphicProjects = [...(parsed.graphicProjects || []), ...missingGraphicProjects];
+                merged.about = {
+                    ...(defaults.about || {}),
+                    ...(parsed.about || {}),
+                    tag: defaults.about?.tag || parsed.about?.tag,
+                    name: defaults.about?.name || parsed.about?.name,
+                    owner: defaults.about?.owner || parsed.about?.owner,
+                    lead: defaults.about?.lead || parsed.about?.lead,
+                    p1: defaults.about?.p1 || parsed.about?.p1,
+                    p2: defaults.about?.p2 || parsed.about?.p2,
+                    vision: defaults.about?.vision || parsed.about?.vision,
+                    mission: defaults.about?.mission || parsed.about?.mission
+                };
+                merged.contact = {
+                    ...(defaults.contact || {}),
+                    ...(parsed.contact || {}),
+                    instagram: defaults.contact?.instagram || parsed.contact?.instagram
+                };
+                merged.testimonials = (parsed.testimonials || defaults.testimonials || []).map(testimonial => {
+                    if (!String(testimonial?.text || '').startsWith('Songül hanım')) return testimonial;
+                    return { ...testimonial, text: String(testimonial.text).replace('Songül hanım', 'Les Mejor Creative ekibi') };
+                });
                 merged.contentVersion = currentContentVersion;
             }
             if (!merged.hero.bgVideo && defaults.hero?.bgVideo) merged.hero.bgVideo = defaults.hero.bgVideo;
@@ -59,7 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (notify) showToast('Tüm değişiklikler başarıyla kaydedildi!', 'success');
         } catch (error) {
             console.error('Kaydetme hatası:', error);
-            showToast('Veri boyutu tarayıcı sınırını aştı. Büyük görselleri dosya yolu olarak ekleyin.', 'error');
+            showToast('Metin verisi tarayıcı sınırını aştı. Görsel ve videoları dosya yükleme alanlarından seçin.', 'error');
         }
     }
 
@@ -83,7 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
         'tab-hero': { title: 'Hero & Başlıklar', desc: 'Ana sayfa giriş alanındaki başlıkları, alt başlığı ve arka plan videosunu güncelleyin.' },
         'tab-youtube': { title: 'Projeler & Görünürlük', desc: 'Klip, grafik tasarım, video projeleri ve ana sayfa bölümlerini yönetin.' },
         'tab-stats': { title: 'İstatistik Sayaçları', desc: 'Sitede yer alan deneyim ve istatistik sayılarını düzenleyin.' },
-        'tab-about': { title: 'Hakkımda Bölümü', desc: 'Biyografi metinlerini ve profil fotoğrafını yönetin.' },
+        'tab-about': { title: 'Hakkımızda Bölümü', desc: 'Marka, vizyon, misyon ve hakkımızda metinlerini yönetin.' },
         'tab-testimonials': { title: 'Referanslar & Yorumlar', desc: 'Sanatçı ve müşteri referanslarını düzenleyin.' },
         'tab-contact': { title: 'İletişim & Sosyal Medya', desc: 'İletişim bilgilerini ve sosyal medya bağlantılarını güncelleyin.' },
         'tab-backup': { title: 'Yedekleme & Dışa Aktar', desc: 'Verilerinizi kalıcı dosya olarak indirin veya varsayılanlara sıfırlayın.' }
@@ -323,9 +349,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const heroTag = document.getElementById('heroTag'); const heroSubtitle = document.getElementById('heroSubtitle');
     const heroTitleLine1 = document.getElementById('heroTitleLine1'); const heroTitleLine2 = document.getElementById('heroTitleLine2');
     const heroBgVideo = document.getElementById('heroBgVideo'); const heroVideoPreview = document.getElementById('heroVideoPreview');
-    function updateHeroVideoPreview() {
+    const heroVideoFile = document.getElementById('heroVideoFile');
+    async function updateHeroVideoPreview() {
         if (!heroVideoPreview) return;
-        const videoUrl = heroBgVideo?.value.trim() || '';
+        const videoUrl = await resolveAdminMedia(heroBgVideo?.value.trim() || '');
         if (!videoUrl) {
             heroVideoPreview.removeAttribute('src');
             heroVideoPreview.style.display = 'none';
@@ -357,6 +384,25 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
     heroBgVideo?.addEventListener('input', updateHeroVideoPreview);
+    heroVideoFile?.addEventListener('change', async event => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+        if (!file.type.startsWith('video/')) {
+            showToast('Lütfen MP4 veya WebM video dosyası seçin.', 'error');
+            event.target.value = '';
+            return;
+        }
+        try {
+            const previousReference = heroBgVideo.value.trim();
+            heroBgVideo.value = await window.SiteMediaStore.save(file, 'hero-video');
+            if (window.SiteMediaStore.isStored(previousReference)) await window.SiteMediaStore.remove(previousReference);
+            await updateHeroVideoPreview();
+            showToast('Banner videosu bilgisayardan yüklendi. Kaydetmeyi unutmayın.');
+        } catch (error) {
+            console.error('Video yükleme hatası:', error);
+            showToast('Video yüklenemedi. Tarayıcı depolama alanını kontrol edin.', 'error');
+        }
+    });
 
     const sectionVisibilityAdmin = document.getElementById('sectionVisibilityAdmin');
     function populateSectionVisibilityForm() {
@@ -546,9 +592,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     <label class="admin-toggle form-full"><input type="checkbox" class="partner-enabled" ${partner.enabled !== false ? 'checked' : ''}><span><strong>Yayında</strong><small>Kapatılırsa logo ana sayfada görünmez.</small></span></label>
                     <div class="form-group"><label>Kurum Adı</label><input type="text" class="form-control partner-name" value="${escapeHtml(partner.name)}" placeholder="Afyonkarahisar Belediyesi"></div>
                     <div class="form-group"><label>Kurum Web Sitesi</label><input type="url" class="form-control partner-url" value="${escapeHtml(partner.url)}" placeholder="https://..."></div>
-                    <div class="form-group form-full"><label>Logo Yolu / URL</label><input type="text" class="form-control partner-logo" value="${escapeHtml(partner.logo)}" placeholder="assets/logos/kurum-logo.png"></div>
+                    <div class="form-group form-full">
+                        <label>Logo Dosyası</label>
+                        <input type="file" class="form-control partner-file" accept="image/png,image/jpeg,image/webp,image/svg+xml">
+                        <input type="hidden" class="partner-logo" value="${escapeHtml(partner.logo)}">
+                        <p class="form-help">PNG, JPG, WebP veya SVG dosyasını bilgisayarınızdan seçin.</p>
+                        <div class="partner-file-preview"><img alt="${escapeHtml(partner.name || 'Kurum')} logo önizlemesi"></div>
+                    </div>
                 </div>`;
             partnersAdmin.appendChild(card);
+            const preview = card.querySelector('.partner-file-preview img');
+            resolveAdminMedia(partner.logo).then(source => {
+                if (source && preview) preview.src = source;
+                card.querySelector('.partner-file-preview')?.classList.toggle('is-empty', !source);
+            });
         });
     }
 
@@ -573,12 +630,40 @@ document.addEventListener('DOMContentLoaded', () => {
     partnersAdmin?.addEventListener('click', event => {
         const button = event.target.closest('[data-delete-partner]');
         if (!button || !confirm('Bu kurum logosu silinsin mi?')) return;
-        readPartnersForm();
         const card = button.closest('[data-partner]');
+        const storedLogo = card?.querySelector('.partner-logo')?.value.trim() || '';
+        readPartnersForm();
         appData.partners = appData.partners.filter(partner => String(partner.id) !== card?.dataset.partner);
+        if (window.SiteMediaStore?.isStored(storedLogo)) window.SiteMediaStore.remove(storedLogo).catch(() => {});
         saveData(false);
         renderPartnersForm();
         showToast('Kurum logosu silindi.');
+    });
+
+    partnersAdmin?.addEventListener('change', async event => {
+        const input = event.target.closest('.partner-file');
+        if (!input) return;
+        const file = input.files?.[0];
+        const card = input.closest('[data-partner]');
+        if (!file || !card) return;
+        if (!file.type.startsWith('image/')) {
+            showToast('Lütfen bir görsel dosyası seçin.', 'error');
+            input.value = '';
+            return;
+        }
+        try {
+            const logoInput = card.querySelector('.partner-logo');
+            const previousReference = logoInput.value.trim();
+            logoInput.value = await window.SiteMediaStore.save(file, 'reference-logo');
+            if (window.SiteMediaStore.isStored(previousReference)) await window.SiteMediaStore.remove(previousReference);
+            const preview = card.querySelector('.partner-file-preview img');
+            if (preview) preview.src = await resolveAdminMedia(logoInput.value);
+            card.querySelector('.partner-file-preview')?.classList.remove('is-empty');
+            showToast('Logo dosyası yüklendi. Kaydetmeyi unutmayın.');
+        } catch (error) {
+            console.error('Logo yükleme hatası:', error);
+            showToast('Logo yüklenemedi. Tarayıcı depolama alanını kontrol edin.', 'error');
+        }
     });
 
     const statsContainer = document.getElementById('statsInputsContainer');
@@ -593,9 +678,10 @@ document.addEventListener('DOMContentLoaded', () => {
     function readStatsForm() { const nums = document.querySelectorAll('.stat-num-input'); const labels = document.querySelectorAll('.stat-lbl-input'); appData.stats = [...nums].map((input, index) => ({ id: index + 1, number: input.value.trim(), label: labels[index]?.value.trim() || '' })); }
 
     const aboutName = document.getElementById('aboutName'); const aboutImage = document.getElementById('aboutImage');
+    const aboutOwner = document.getElementById('aboutOwner'); const aboutVision = document.getElementById('aboutVision'); const aboutMission = document.getElementById('aboutMission');
     const aboutLead = document.getElementById('aboutLead'); const aboutP1 = document.getElementById('aboutP1'); const aboutP2 = document.getElementById('aboutP2');
-    function populateAboutForm() { if (!appData.about) return; aboutName.value = appData.about.name || ''; aboutImage.value = appData.about.image || ''; aboutLead.value = appData.about.lead || ''; aboutP1.value = appData.about.p1 || ''; aboutP2.value = appData.about.p2 || ''; }
-    function readAboutForm() { appData.about = { ...appData.about, name: aboutName.value.trim(), image: aboutImage.value.trim(), lead: aboutLead.value.trim(), p1: aboutP1.value.trim(), p2: aboutP2.value.trim() }; }
+    function populateAboutForm() { if (!appData.about) return; aboutName.value = appData.about.name || ''; aboutImage.value = appData.about.image || ''; aboutOwner.value = appData.about.owner || ''; aboutLead.value = appData.about.lead || ''; aboutP1.value = appData.about.p1 || ''; aboutP2.value = appData.about.p2 || ''; aboutVision.value = appData.about.vision || ''; aboutMission.value = appData.about.mission || ''; }
+    function readAboutForm() { appData.about = { ...appData.about, name: aboutName.value.trim(), image: aboutImage.value.trim(), owner: aboutOwner.value.trim(), lead: aboutLead.value.trim(), p1: aboutP1.value.trim(), p2: aboutP2.value.trim(), vision: aboutVision.value.trim(), mission: aboutMission.value.trim() }; }
 
     const testimonialsContainer = document.getElementById('testimonialsContainer');
     function renderTestimonialsForm() {

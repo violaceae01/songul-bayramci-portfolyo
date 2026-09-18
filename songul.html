@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Yönetim Paneli | Songül Bayramcı</title>
+    <title>Yönetim Paneli | Les Mejor Creative</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/admin.css?v=20260918-posters">
+    <link rel="stylesheet" href="css/admin.css?v=20260919-brand">
 </head>
 <body>
 
@@ -18,7 +18,7 @@
         <div class="sidebar-header">
             <div class="sidebar-logo">
                 <i class="fas fa-camera-retro"></i>
-                <span>SB <span>ADMIN</span></span>
+                    <span>LES MEJOR <span>ADMIN</span></span>
             </div>
         </div>
 
@@ -38,7 +38,7 @@
             <li class="sidebar-item">
                 <a href="#youtube" class="sidebar-link" data-tab="tab-youtube">
                     <i class="fab fa-youtube"></i>
-                    <span>Projeler & Logolar</span>
+                    <span>Projeler & Referanslar</span>
                 </a>
             </li>
             <li class="sidebar-item">
@@ -50,13 +50,13 @@
             <li class="sidebar-item">
                 <a href="#about" class="sidebar-link" data-tab="tab-about">
                     <i class="fas fa-user"></i>
-                    <span>Hakkımda</span>
+                    <span>Hakkımızda</span>
                 </a>
             </li>
             <li class="sidebar-item">
                 <a href="#testimonials" class="sidebar-link" data-tab="tab-testimonials">
                     <i class="fas fa-comments"></i>
-                    <span>Referanslar</span>
+                    <span>Yorumlar</span>
                 </a>
             </li>
             <li class="sidebar-item">
@@ -119,11 +119,22 @@
             <div class="admin-card">
                 <div class="card-header"><div><h2>Sayfa ve Bölüm Görünürlüğü</h2><p class="admin-card-description">İstediğiniz bölümü silmeden yayından kaldırabilir, daha sonra tekrar açabilirsiniz.</p></div></div>
                 <div class="admin-toggle-grid" id="sectionVisibilityAdmin">
+                    <label class="admin-toggle"><input type="checkbox" data-section-toggle="homeHero"><span><strong>Ana Banner</strong><small>Ana sayfa video ve başlık alanı</small></span></label>
+                    <label class="admin-toggle"><input type="checkbox" data-section-toggle="homeStats"><span><strong>İstatistikler</strong><small>Ana sayfa sayaç alanı</small></span></label>
+                    <label class="admin-toggle"><input type="checkbox" data-section-toggle="homeServices"><span><strong>Çekim Stili</strong><small>Ana sayfa hizmet kartları</small></span></label>
                     <label class="admin-toggle"><input type="checkbox" data-section-toggle="featuredArtists"><span><strong>Öne Çıkan Sanatçılar</strong><small>Ana sayfa bölümü</small></span></label>
+                    <label class="admin-toggle"><input type="checkbox" data-section-toggle="partnerLogos"><span><strong>Referans Logo Şeridi</strong><small>Ana sayfadaki kayan logolar</small></span></label>
+                    <label class="admin-toggle"><input type="checkbox" data-section-toggle="homeAbout"><span><strong>Ana Sayfa Hakkımızda</strong><small>Ortalanmış tanıtım metni</small></span></label>
+                    <label class="admin-toggle"><input type="checkbox" data-section-toggle="testimonials"><span><strong>Müşteri Yorumları</strong><small>Ana sayfadaki yorum kartları</small></span></label>
+                    <label class="admin-toggle"><input type="checkbox" data-section-toggle="homeContact"><span><strong>Ana Sayfa İletişim</strong><small>İletişim formu ve bilgileri</small></span></label>
+                    <label class="admin-toggle"><input type="checkbox" data-section-toggle="homeSignature"><span><strong>İmza Görseli</strong><small>Ana sayfa altındaki hareketli imza</small></span></label>
+                    <label class="admin-toggle"><input type="checkbox" data-section-toggle="worksPage"><span><strong>Çalışmalarımız</strong><small>Sanatçı ve konser sayfaları</small></span></label>
+                    <label class="admin-toggle"><input type="checkbox" data-section-toggle="referencesPage"><span><strong>Referanslarımız</strong><small>Marka logoları sayfası</small></span></label>
                     <label class="admin-toggle"><input type="checkbox" data-section-toggle="clipShootings"><span><strong>Klip Çekimleri</strong><small>Klip çekimleri sayfası ve menü bağlantısı</small></span></label>
                     <label class="admin-toggle"><input type="checkbox" data-section-toggle="videoClips"><span><strong>Video Klipleri</strong><small>Video klipleri sayfası ve menü bağlantısı</small></span></label>
                     <label class="admin-toggle"><input type="checkbox" data-section-toggle="graphicDesign"><span><strong>Grafik Tasarım</strong><small>Grafik tasarım sayfası ve menü bağlantısı</small></span></label>
-                    <label class="admin-toggle"><input type="checkbox" data-section-toggle="partnerLogos"><span><strong>Çalışılan Markalar</strong><small>Ana sayfadaki kayan logo bölümü</small></span></label>
+                    <label class="admin-toggle"><input type="checkbox" data-section-toggle="aboutPage"><span><strong>Hakkımızda Sayfası</strong><small>Vizyon ve misyon dahil</small></span></label>
+                    <label class="admin-toggle"><input type="checkbox" data-section-toggle="contactPage"><span><strong>İletişim Sayfası</strong><small>Ayrı iletişim sayfası</small></span></label>
                 </div>
             </div>
 
@@ -159,8 +170,8 @@
             <div class="admin-card">
                 <div class="card-header">
                     <div>
-                        <h2>Çalışılan Kurum Logoları</h2>
-                        <p class="admin-card-description">Bu logolar ana sayfadaki kayan bölümde otomatik olarak döner.</p>
+                        <h2>Referans Logoları</h2>
+                        <p class="admin-card-description">Logoları bilgisayarınızdan yükleyin. Ana sayfada kayar, Referanslarımız sayfasında kare kartlar halinde görünür.</p>
                     </div>
                     <button class="btn btn-primary btn-sm" id="btnAddPartner" type="button">
                         <i class="fas fa-plus"></i> Yeni Logo Ekle
@@ -195,9 +206,10 @@
                             <input type="text" id="heroTitleLine2" class="form-control" placeholder="Örn: YAKALA">
                         </div>
                         <div class="form-group form-full">
-                            <label for="heroBgVideo">Arka Plan Videosu Yolu / Doğrudan URL</label>
-                            <input type="text" id="heroBgVideo" class="form-control" placeholder="Örn: assets/hero_bg.mp4 veya https://.../video.mp4">
-                            <p class="form-help">Doğrudan MP4 veya WebM video bağlantısı kullanın. YouTube sayfa bağlantıları bu alanda çalışmaz.</p>
+                            <label for="heroVideoFile">Banner Videosunu Bilgisayardan Yükle</label>
+                            <input type="file" id="heroVideoFile" class="form-control" accept="video/mp4,video/webm,video/quicktime">
+                            <input type="hidden" id="heroBgVideo">
+                            <p class="form-help">MP4 veya WebM önerilir. Video tarayıcının medya deposunda saklanır; bağlantı yapıştırmanız gerekmez.</p>
                             <video id="heroVideoPreview" class="video-preview" controls muted playsinline preload="metadata"></video>
                         </div>
                     </div>
@@ -223,17 +235,21 @@
         <section id="tab-about" class="tab-panel">
             <div class="admin-card">
                 <div class="card-header">
-                    <h2>Hakkımda Bölümü İçerikleri</h2>
+                    <h2>Hakkımızda Bölümü İçerikleri</h2>
                 </div>
                 <form id="aboutForm">
                     <div class="form-grid">
                         <div class="form-group">
                             <label>İsim / Başlık</label>
-                            <input type="text" id="aboutName" class="form-control" placeholder="Songül Bayramcı">
+                            <input type="text" id="aboutName" class="form-control" placeholder="Les Mejor Creative">
                         </div>
                         <div class="form-group">
                             <label>Profil / Sahne Görseli Yolu</label>
                             <input type="text" id="aboutImage" class="form-control" placeholder="Görsel/Zeynep bastık 4.PNG">
+                        </div>
+                        <div class="form-group form-full">
+                            <label>Marka Sahibi</label>
+                            <input type="text" id="aboutOwner" class="form-control" placeholder="Les Mejor Marka Sahibi Furkan Tepeyurt">
                         </div>
                         <div class="form-group form-full">
                             <label>Giriş Vurgulu Metin (Lead)</label>
@@ -246,6 +262,14 @@
                         <div class="form-group form-full">
                             <label>2. Paragraf</label>
                             <textarea id="aboutP2" class="form-control" rows="3"></textarea>
+                        </div>
+                        <div class="form-group form-full">
+                            <label>Vizyon</label>
+                            <textarea id="aboutVision" class="form-control" rows="3"></textarea>
+                        </div>
+                        <div class="form-group form-full">
+                            <label>Misyon</label>
+                            <textarea id="aboutMission" class="form-control" rows="3"></textarea>
                         </div>
                     </div>
                 </form>
@@ -286,7 +310,7 @@
                         </div>
                         <div class="form-group">
                             <label><i class="fab fa-instagram" style="color:#e63946;"></i> Instagram Profili URL</label>
-                            <input type="url" id="contactInstagram" class="form-control" placeholder="https://www.instagram.com/violaceae.01/">
+                            <input type="url" id="contactInstagram" class="form-control" placeholder="https://www.instagram.com/lesmejorcreative.eu/">
                         </div>
                         <div class="form-group">
                             <label><i class="fab fa-youtube"></i> YouTube Kanalı URL</label>
@@ -314,6 +338,7 @@
                 <p style="color: var(--text-secondary); margin-bottom: 20px;">
                     Panel üzerinden yaptığınız tüm güncellemeler tarayıcınızın belleğinde (localStorage) tutulur. Kalıcı dosya yedeği almak veya başka cihazlara aktarmak için aşağıdaki seçenekleri kullanabilirsiniz.
                 </p>
+                <p class="form-help" style="margin-bottom: 20px;">Bilgisayardan yüklenen logo ve videolar tarayıcının medya deposunda saklanır. GitHub Pages statik olduğu için bu dosyaların tüm ziyaretçilere ulaşması ayrıca yayımlama işlemi gerektirir.</p>
                 <div class="backup-actions">
                     <button class="btn btn-primary" id="btnDownloadDataJs">
                         <i class="fas fa-download"></i> data.js Dosyası Olarak İndir
@@ -460,8 +485,9 @@
     <!-- Toast Notifications Container -->
     <div class="toast-container" id="toastContainer"></div>
 
-    <script src="data/data.js?v=20260918-posters"></script>
-    <script src="js/data-utils.js?v=20260918-portfolio-pages"></script>
-    <script src="js/admin.js?v=20260918-posters"></script>
+    <script src="data/data.js?v=20260919-brand"></script>
+    <script src="js/data-utils.js?v=20260919-brand"></script>
+    <script src="js/media-store.js?v=20260919-brand"></script>
+    <script src="js/admin.js?v=20260919-brand"></script>
 </body>
 </html>
