@@ -19,6 +19,7 @@ const staticFiles = [
   "sanatci.html",
   "songul.html",
   "video-klipleri.html",
+  "yorumlar.html",
   "youtube.html",
 ];
 
