@@ -135,6 +135,12 @@
                     <label class="admin-toggle"><input type="checkbox" data-section-toggle="graphicDesign"><span><strong>Grafik Tasarım</strong><small>Grafik tasarım sayfası ve menü bağlantısı</small></span></label>
                     <label class="admin-toggle"><input type="checkbox" data-section-toggle="aboutPage"><span><strong>Hakkımızda Sayfası</strong><small>Vizyon ve misyon dahil</small></span></label>
                     <label class="admin-toggle"><input type="checkbox" data-section-toggle="contactPage"><span><strong>İletişim Sayfası</strong><small>Ayrı iletişim sayfası</small></span></label>
+                    <label class="admin-toggle"><input type="checkbox" data-section-toggle="aboutOwner"><span><strong>Marka Sahibi Bilgisi</strong><small>Hakkımızda sayfasındaki sahip bilgisi</small></span></label>
+                    <label class="admin-toggle"><input type="checkbox" data-section-toggle="aboutVisionMission"><span><strong>Vizyon ve Misyon</strong><small>Hakkımızda sayfasındaki kurumsal kartlar</small></span></label>
+                    <label class="admin-toggle"><input type="checkbox" data-section-toggle="contactDetails"><span><strong>İletişim Bilgileri</strong><small>E-posta, telefon, konum ve sosyal medya</small></span></label>
+                    <label class="admin-toggle"><input type="checkbox" data-section-toggle="contactForm"><span><strong>İletişim Formu</strong><small>WhatsApp'a yönlendiren proje formu</small></span></label>
+                    <label class="admin-toggle"><input type="checkbox" data-section-toggle="siteFooter"><span><strong>Alt Bilgi Alanı</strong><small>Tüm sayfalardaki footer</small></span></label>
+                    <label class="admin-toggle"><input type="checkbox" data-section-toggle="scrollTop"><span><strong>Yukarı Çık Butonu</strong><small>Sayfa aşağı kaydırıldığında görünen buton</small></span></label>
                 </div>
             </div>
 
@@ -304,6 +310,11 @@
                             <label>Telefon Numarası</label>
                             <input type="text" id="contactPhone" class="form-control">
                         </div>
+                        <div class="form-group">
+                            <label><i class="fab fa-whatsapp" style="color:#25d366;"></i> WhatsApp Numarası</label>
+                            <input type="text" id="contactWhatsapp" class="form-control" placeholder="+90 5xx xxx xx xx">
+                            <p class="form-help">“Projemiz Var” formu bu numaraya WhatsApp mesajı hazırlar.</p>
+                        </div>
                         <div class="form-group form-full">
                             <label>Konum / Şehir</label>
                             <input type="text" id="contactLocation" class="form-control">
@@ -432,6 +443,11 @@
                     <label>Video / Çekim Bağlantısı</label>
                     <input type="url" id="concertVideoUrl" class="form-control" placeholder="https://youtube.com/... veya https://instagram.com/...">
                 </div>
+
+                <label class="admin-toggle">
+                    <input type="checkbox" id="concertVideoEnabled" checked>
+                    <span><strong>Klibe Git Butonunu Göster</strong><small>Kapatılırsa bağlantı kayıtlı kalır ancak sanatçı sayfasında görünmez.</small></span>
+                </label>
 
                 <div class="modal-actions">
                     <button type="button" class="btn btn-secondary" id="btnCancelConcertModal">İptal</button>

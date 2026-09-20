@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const parsed = saved ? JSON.parse(saved) : {};
             const merged = { ...defaults, ...parsed };
             merged.hero = { ...(defaults.hero || {}), ...(parsed.hero || {}) };
+            merged.contact = { ...(defaults.contact || {}), ...(parsed.contact || {}) };
             merged.sectionVisibility = { ...(defaults.sectionVisibility || {}), ...(parsed.sectionVisibility || {}) };
             const savedContentVersion = Number(parsed.contentVersion || 0);
             const currentContentVersion = Number(defaults.contentVersion || 0);
@@ -151,6 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const concertVenue = document.getElementById('concertVenue');
     const concertVideoLabel = document.getElementById('concertVideoLabel');
     const concertVideoUrl = document.getElementById('concertVideoUrl');
+    const concertVideoEnabled = document.getElementById('concertVideoEnabled');
 
     const photoModal = document.getElementById('photoModal');
     const photoForm = document.getElementById('photoForm');
@@ -216,7 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <button class="btn btn-danger btn-sm" data-action="delete-concert" data-artist-id="${artist.id}" data-concert-id="${concert.id}" aria-label="Konseri sil"><i class="fas fa-trash-alt"></i></button>
                     </div>
                 </div>
-                ${concert.videoUrl ? `<a class="admin-video-link" href="${escapeHtml(concert.videoUrl)}" target="_blank" rel="noopener noreferrer"><i class="fas fa-play"></i>${escapeHtml(concert.videoLabel || 'Konser Çekimine Git')}</a>` : '<span class="admin-video-missing"><i class="fas fa-video-slash"></i> Video bağlantısı eklenmedi</span>'}
+                ${concert.videoUrl && concert.videoEnabled !== false ? `<a class="admin-video-link" href="${escapeHtml(concert.videoUrl)}" target="_blank" rel="noopener noreferrer"><i class="fas fa-play"></i>${escapeHtml(concert.videoLabel || 'Konser Çekimine Git')}</a>` : concert.videoUrl ? '<span class="admin-video-missing"><i class="fas fa-eye-slash"></i> Video butonu sitede kapalı</span>' : '<span class="admin-video-missing"><i class="fas fa-video-slash"></i> Video bağlantısı eklenmedi</span>'}
                 <div class="artist-subphotos-grid">${photos || '<span class="admin-photo-empty">Henüz fotoğraf eklenmedi.</span>'}</div>
             </section>`;
     }
@@ -291,6 +293,7 @@ document.addEventListener('DOMContentLoaded', () => {
         concertName.value = concert?.name || ''; concertDate.value = concert?.date || '';
         concertVenue.value = concert?.venue || ''; concertVideoLabel.value = concert?.videoLabel || 'Konser Çekimine Git';
         concertVideoUrl.value = concert?.videoUrl || '';
+        concertVideoEnabled.checked = concert?.videoEnabled !== false;
         concertModal.classList.add('active');
     }
     const closeConcertModal = () => concertModal.classList.remove('active');
@@ -302,7 +305,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const artist = findById(appData.artists, targetConcertArtistId.value);
         if (!artist) return;
         const existing = findById(artist.concerts, editConcertId.value);
-        const values = { name: concertName.value.trim(), date: concertDate.value, venue: concertVenue.value.trim(), videoLabel: concertVideoLabel.value.trim(), videoUrl: concertVideoUrl.value.trim() };
+        const values = { name: concertName.value.trim(), date: concertDate.value, venue: concertVenue.value.trim(), videoLabel: concertVideoLabel.value.trim(), videoUrl: concertVideoUrl.value.trim(), videoEnabled: concertVideoEnabled.checked };
         if (existing) { Object.assign(existing, values); showToast('Konser güncellendi.'); }
         else { artist.concerts.push({ id: Date.now(), ...values, cover: '', images: [] }); showToast('Yeni konser eklendi.'); }
         saveData(false); renderArtistsList(); closeConcertModal();
@@ -688,13 +691,13 @@ document.addEventListener('DOMContentLoaded', () => {
         testimonialsContainer.innerHTML = '';
         (appData.testimonials || []).forEach(item => {
             const card = document.createElement('div'); card.className = 'admin-form-card';
-            card.innerHTML = `<div class="form-grid"><div class="form-group"><label>Sanatçı / Müşteri Adı</label><input type="text" class="form-control test-name" value="${escapeHtml(item.name)}"></div><div class="form-group"><label>Ünvan</label><input type="text" class="form-control test-title" value="${escapeHtml(item.title)}"></div><div class="form-group form-full"><label>Yorum Metni</label><textarea class="form-control test-text" rows="2">${escapeHtml(item.text)}</textarea></div></div>`;
+            card.innerHTML = `<div class="form-grid"><label class="admin-toggle form-full"><input type="checkbox" class="test-enabled" ${item.enabled !== false ? 'checked' : ''}><span><strong>Yorumu Göster</strong><small>Kapatılırsa yorum ana sayfada görünmez.</small></span></label><div class="form-group"><label>Sanatçı / Müşteri Adı</label><input type="text" class="form-control test-name" value="${escapeHtml(item.name)}"></div><div class="form-group"><label>Ünvan</label><input type="text" class="form-control test-title" value="${escapeHtml(item.title)}"></div><div class="form-group form-full"><label>Yorum Metni</label><textarea class="form-control test-text" rows="2">${escapeHtml(item.text)}</textarea></div></div>`;
             testimonialsContainer.appendChild(card);
         });
     }
-    function readTestimonialsForm() { const names = document.querySelectorAll('.test-name'); const titles = document.querySelectorAll('.test-title'); const texts = document.querySelectorAll('.test-text'); appData.testimonials = [...names].map((input, index) => ({ id: index + 1, name: input.value.trim(), title: titles[index]?.value.trim() || '', text: texts[index]?.value.trim() || '' })); }
+    function readTestimonialsForm() { const names = document.querySelectorAll('.test-name'); const titles = document.querySelectorAll('.test-title'); const texts = document.querySelectorAll('.test-text'); const enabled = document.querySelectorAll('.test-enabled'); appData.testimonials = [...names].map((input, index) => ({ id: index + 1, name: input.value.trim(), title: titles[index]?.value.trim() || '', text: texts[index]?.value.trim() || '', enabled: enabled[index]?.checked !== false })); }
 
-    const contactFields = { email: document.getElementById('contactEmail'), phone: document.getElementById('contactPhone'), location: document.getElementById('contactLocation'), instagram: document.getElementById('contactInstagram'), youtube: document.getElementById('contactYoutube'), twitter: document.getElementById('contactTwitter'), linkedin: document.getElementById('contactLinkedin') };
+    const contactFields = { email: document.getElementById('contactEmail'), phone: document.getElementById('contactPhone'), whatsapp: document.getElementById('contactWhatsapp'), location: document.getElementById('contactLocation'), instagram: document.getElementById('contactInstagram'), youtube: document.getElementById('contactYoutube'), twitter: document.getElementById('contactTwitter'), linkedin: document.getElementById('contactLinkedin') };
     function populateContactForm() { Object.entries(contactFields).forEach(([key, input]) => { input.value = appData.contact?.[key] || ''; }); }
     function readContactForm() { appData.contact = Object.fromEntries(Object.entries(contactFields).map(([key, input]) => [key, input.value.trim()])); }
 

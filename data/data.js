@@ -182,7 +182,13 @@ const siteData = {
     "graphicDesign": true,
     "videoClips": true,
     "aboutPage": true,
-    "contactPage": true
+    "contactPage": true,
+    "aboutOwner": true,
+    "aboutVisionMission": true,
+    "contactDetails": true,
+    "contactForm": true,
+    "siteFooter": true,
+    "scrollTop": true
   },
   "youtubeProjects": [
     {
@@ -258,24 +264,28 @@ const siteData = {
       "id": 1,
       "name": "Zeynep Bastık",
       "title": "Sanatçı",
-      "text": "Les Mejor Creative ekibi, konser çekimlerimizde profesyonellik ve yaratıcılığı bir arada sundu. Görüntüler tam istediğimiz gibiydi!"
+      "text": "Les Mejor Creative ekibi, konser çekimlerimizde profesyonellik ve yaratıcılığı bir arada sundu. Görüntüler tam istediğimiz gibiydi!",
+      "enabled": true
     },
     {
       "id": 2,
       "name": "Emre Fel",
       "title": "Şarkıcı",
-      "text": "Etkinlik videomuz sosyal medyada binlerce görüntülenme aldı. Çekim kalitesi gerçekten üst düzey."
+      "text": "Etkinlik videomuz sosyal medyada binlerce görüntülenme aldı. Çekim kalitesi gerçekten üst düzey.",
+      "enabled": true
     },
     {
       "id": 3,
       "name": "Dedub Lüman",
       "title": "Müzik Grubu",
-      "text": "Klip çekiminde bize eşlik etti. Işık ve kamera açılarıyla muhteşem bir atmosfer yarattı."
+      "text": "Klip çekiminde bize eşlik etti. Işık ve kamera açılarıyla muhteşem bir atmosfer yarattı.",
+      "enabled": true
     }
   ],
   "contact": {
     "email": "songul@ornek.com",
     "phone": "+90 555 123 45 67",
+    "whatsapp": "+90 555 123 45 67",
     "location": "İstanbul, Türkiye",
     "instagram": "https://www.instagram.com/lesmejorcreative.eu/",
     "youtube": "https://youtube.com/",

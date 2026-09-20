@@ -32,6 +32,7 @@
             cover: concert?.cover || images[0]?.src || artist.cover || '',
             videoLabel: concert?.videoLabel || concert?.actionText || 'Konser Çekimine Git',
             videoUrl: concert?.videoUrl || concert?.actionUrl || '',
+            videoEnabled: concert?.videoEnabled !== false,
             images: images.map((image, imageIndex) => normalizeImage(image, imageIndex, artist.name))
         };
     }

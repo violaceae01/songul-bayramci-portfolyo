@@ -229,6 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const defaultVisibility = siteData.sectionVisibility || {};
                     const savedVisibility = parsed.sectionVisibility || {};
                     parsed.sectionVisibility = { ...defaultVisibility, ...savedVisibility };
+                    parsed.contact = { ...(siteData.contact || {}), ...(parsed.contact || {}) };
                     const savedContentVersion = Number(parsed.contentVersion || 0);
                     const currentContentVersion = Number(siteData.contentVersion || 0);
                     if (savedContentVersion < currentContentVersion && Array.isArray(siteData.graphicProjects)) {
@@ -395,13 +396,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const testimonialCards = document.querySelectorAll('.testimonial-card');
             data.testimonials.forEach((tm, idx) => {
                 if (testimonialCards[idx]) {
+                    testimonialCards[idx].hidden = tm.enabled === false;
                     const txt = testimonialCards[idx].querySelector('.testimonial-text');
-                    const auth = testimonialCards[idx].querySelector('.author-info h4');
-                    const role = testimonialCards[idx].querySelector('.author-info span');
-                    if (txt) txt.textContent = `"${tm.text}"`;
+                    const auth = testimonialCards[idx].querySelector('.author-name');
+                    const role = testimonialCards[idx].querySelector('.author-title');
+                    if (txt) txt.textContent = tm.text;
                     if (auth) auth.textContent = tm.name;
                     if (role) role.textContent = tm.title;
                 }
+            });
+            testimonialCards.forEach((card, idx) => {
+                if (!data.testimonials[idx]) card.hidden = true;
             });
         }
 
@@ -425,6 +430,17 @@ document.addEventListener('DOMContentLoaded', () => {
             if (instaLink && data.contact.instagram) {
                 instaLink.href = data.contact.instagram;
             }
+            const socialLinks = document.querySelectorAll('.social-links a');
+            const socialUrls = [data.contact.instagram, data.contact.youtube, data.contact.twitter, data.contact.linkedin];
+            socialLinks.forEach((link, index) => {
+                const url = safeExternalUrl(socialUrls[index]);
+                link.hidden = !url;
+                if (url) {
+                    link.href = url;
+                    link.target = '_blank';
+                    link.rel = 'noopener noreferrer';
+                }
+            });
         }
     }
 
@@ -499,6 +515,54 @@ document.addEventListener('DOMContentLoaded', () => {
     // ============================================
     // NAVIGATION & MOBILE DRAWER
     // ============================================
+    function setupCorporateNavigation() {
+        const menu = document.getElementById('mainMenu');
+        if (!menu || menu.querySelector('.nav-dropdown')) return;
+
+        const corporateLinks = ['referencesPage', 'aboutPage', 'contactPage']
+            .map(key => menu.querySelector(`[data-nav-section="${key}"]`))
+            .filter(Boolean);
+        if (!corporateLinks.length) return;
+
+        const dropdown = document.createElement('div');
+        dropdown.className = 'nav-dropdown';
+        const toggle = document.createElement('button');
+        toggle.className = 'nav-link nav-dropdown-toggle';
+        toggle.type = 'button';
+        toggle.setAttribute('aria-expanded', 'false');
+        toggle.innerHTML = 'KURUMSAL <i class="fas fa-chevron-down" aria-hidden="true"></i>';
+
+        const panel = document.createElement('div');
+        panel.className = 'nav-dropdown-menu';
+        panel.setAttribute('aria-label', 'Kurumsal sayfalar');
+        corporateLinks.forEach(link => {
+            link.classList.add('nav-dropdown-link');
+            panel.appendChild(link);
+        });
+        if (corporateLinks.some(link => link.classList.contains('active'))) toggle.classList.add('active');
+        dropdown.append(toggle, panel);
+        menu.appendChild(dropdown);
+
+        const setOpen = open => {
+            dropdown.classList.toggle('is-open', open);
+            toggle.setAttribute('aria-expanded', String(open));
+        };
+        toggle.addEventListener('click', event => {
+            event.stopPropagation();
+            setOpen(!dropdown.classList.contains('is-open'));
+        });
+        document.addEventListener('click', event => {
+            if (!dropdown.contains(event.target)) setOpen(false);
+        });
+        document.addEventListener('keydown', event => {
+            if (event.key === 'Escape' && dropdown.classList.contains('is-open')) {
+                setOpen(false);
+                toggle.focus();
+            }
+        });
+    }
+
+    setupCorporateNavigation();
     const nav = document.getElementById('mainNav');
     const navToggle = document.getElementById('navToggle');
     const navLinksContainer = document.querySelector('.nav-links');
@@ -539,6 +603,11 @@ document.addEventListener('DOMContentLoaded', () => {
             navToggle.setAttribute('aria-expanded', String(isOpen));
             navToggle.setAttribute('aria-label', isOpen ? 'Menüyü kapat' : 'Menüyü aç');
             document.body.classList.toggle('menu-open', isOpen);
+            if (!isOpen) {
+                const corporateDropdown = navLinksContainer.querySelector('.nav-dropdown');
+                corporateDropdown?.classList.remove('is-open');
+                corporateDropdown?.querySelector('.nav-dropdown-toggle')?.setAttribute('aria-expanded', 'false');
+            }
         };
 
         navToggle.addEventListener('click', () => {
@@ -546,6 +615,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         navLinks.forEach(link => {
+            if (link.classList.contains('nav-dropdown-toggle')) return;
             link.addEventListener('click', () => {
                 setMobileMenuState(false);
             });
@@ -713,7 +783,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <h2>${escapeHtml(concert.name)}</h2>
                         <p>${gallery.length} fotoğraf çekimi</p>
                     </div>
-                    ${concert.videoUrl ? `
+                    ${concert.videoUrl && concert.videoEnabled !== false ? `
                         <div class="concert-video-panel">
                             <span><i class="fas fa-play"></i> VİDEO BAĞLANTISI</span>
                             <a href="${escapeHtml(concert.videoUrl)}" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
@@ -820,6 +890,12 @@ document.addEventListener('DOMContentLoaded', () => {
         videoClips: true,
         aboutPage: true,
         contactPage: true,
+        aboutOwner: true,
+        aboutVisionMission: true,
+        contactDetails: true,
+        contactForm: true,
+        siteFooter: true,
+        scrollTop: true,
         ...(currentSiteData.sectionVisibility || {})
     };
 
@@ -830,6 +906,10 @@ document.addEventListener('DOMContentLoaded', () => {
     function applySectionVisibility() {
         document.querySelectorAll('[data-nav-section]').forEach(link => {
             link.hidden = !isSectionVisible(link.dataset.navSection);
+        });
+        document.querySelectorAll('.nav-dropdown').forEach(dropdown => {
+            const visibleLinks = [...dropdown.querySelectorAll('[data-nav-section]')].some(link => !link.hidden);
+            dropdown.hidden = !visibleLinks;
         });
 
         const activePageSection = document.body.dataset.pageSection || '';
@@ -848,6 +928,22 @@ document.addEventListener('DOMContentLoaded', () => {
             const key = section.dataset.sectionKey;
             section.hidden = !isSectionVisible(key);
         });
+        document.querySelectorAll('.about-owner').forEach(element => {
+            element.hidden = !isSectionVisible('aboutOwner');
+        });
+        document.querySelectorAll('.vision-mission-grid').forEach(element => {
+            element.hidden = !isSectionVisible('aboutVisionMission');
+        });
+        document.querySelectorAll('.contact-info').forEach(element => {
+            element.hidden = !isSectionVisible('contactDetails');
+        });
+        document.querySelectorAll('.contact-form').forEach(element => {
+            element.hidden = !isSectionVisible('contactForm');
+        });
+        document.querySelectorAll('.footer').forEach(element => {
+            element.hidden = !isSectionVisible('siteFooter');
+        });
+        if (scrollToTopButton) scrollToTopButton.hidden = !isSectionVisible('scrollTop');
     }
 
     function extractYouTubeVideoId(value) {
@@ -880,6 +976,36 @@ document.addEventListener('DOMContentLoaded', () => {
         return videoId ? `https://img.youtube.com/vi/${videoId}/${quality}.jpg` : '';
     }
 
+    function openYouTubeModal(videoId, title = '') {
+        const modal = document.getElementById('youtubeVideoModal');
+        const frame = document.getElementById('youtubeVideoFrame');
+        const heading = document.getElementById('youtubeVideoTitle');
+        if (!modal || !frame || !videoId) return;
+        frame.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(videoId)}?autoplay=1&rel=0`;
+        frame.title = title || 'YouTube videosu';
+        if (heading) heading.textContent = title || 'Klip Çekimi';
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+        modal.querySelector('.youtube-video-modal-close')?.focus();
+    }
+
+    function closeYouTubeModal() {
+        const modal = document.getElementById('youtubeVideoModal');
+        const frame = document.getElementById('youtubeVideoFrame');
+        if (!modal || !frame) return;
+        modal.classList.remove('active');
+        modal.setAttribute('aria-hidden', 'true');
+        frame.src = '';
+        document.body.style.overflow = '';
+    }
+
+    const youtubeVideoModal = document.getElementById('youtubeVideoModal');
+    youtubeVideoModal?.querySelector('.youtube-video-modal-close')?.addEventListener('click', closeYouTubeModal);
+    youtubeVideoModal?.addEventListener('click', event => {
+        if (event.target === youtubeVideoModal) closeYouTubeModal();
+    });
+
     function loadYoutubeProjects() {
         const grid = document.getElementById('youtubeProjectsGrid');
         if (!grid) return;
@@ -905,8 +1031,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const videoId = extractYouTubeVideoId(projectUrl);
             const usesAutomaticThumbnail = !project.thumbnail && Boolean(videoId);
             const thumbnail = project.thumbnail || youtubeThumbnail(videoId);
-            const cardTag = projectUrl ? 'a' : 'div';
-            const linkAttributes = projectUrl ? `href="${escapeHtml(projectUrl)}" target="_blank" rel="noopener noreferrer" aria-label="${escapeHtml(project.title)} klip çekimini aç"` : '';
+            const cardTag = videoId ? 'button' : projectUrl ? 'a' : 'div';
+            const linkAttributes = videoId
+                ? `type="button" aria-label="${escapeHtml(project.title)} klibini sitede izle"`
+                : projectUrl ? `href="${escapeHtml(projectUrl)}" target="_blank" rel="noopener noreferrer" aria-label="${escapeHtml(project.title)} klip çekimini aç"` : '';
             article.innerHTML = `
                 <${cardTag} class="youtube-project-link" ${linkAttributes}>
                     <span class="youtube-project-media ${project.thumbnailFit === 'contain' && !usesAutomaticThumbnail ? 'is-contain' : ''} ${thumbnail ? '' : 'is-missing'}">
@@ -917,12 +1045,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     </span>
                     <span class="youtube-project-info">
                         <strong>${escapeHtml(project.title)}</strong>
-                        <span><small>${escapeHtml(project.year || '')}</small><small>${projectUrl ? 'Videoyu izle' : 'Yakında'}</small></span>
+                        <span><small>${escapeHtml(project.year || '')}</small><small>${videoId ? 'Sitede İzle' : projectUrl ? 'Videoyu Aç' : 'Yakında'}</small></span>
                     </span>
                 </${cardTag}>
             `;
             const media = article.querySelector('.youtube-project-media');
             const image = article.querySelector('img');
+            if (videoId) {
+                article.querySelector('.youtube-project-link')?.addEventListener('click', () => openYouTubeModal(videoId, project.title));
+            }
             image?.addEventListener('error', () => {
                 const automaticVideoId = image.dataset.youtubeVideoId;
                 if (automaticVideoId && image.dataset.thumbnailFallback !== 'true') {
@@ -959,9 +1090,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const videoId = isVideo ? extractYouTubeVideoId(projectUrl) : '';
             const automaticThumbnail = isVideo && !item.image && Boolean(videoId);
             const imageUrl = item.image || youtubeThumbnail(videoId);
-            const card = document.createElement(projectUrl ? 'a' : 'article');
+            const card = document.createElement(isVideo && projectUrl ? 'a' : isVideo ? 'article' : 'button');
             card.className = 'creative-project-card reveal active';
-            if (projectUrl) {
+            if (!isVideo) {
+                card.type = 'button';
+                card.setAttribute('aria-label', `${item.title} görselini büyüt`);
+            } else if (projectUrl) {
                 card.href = projectUrl;
                 card.target = '_blank';
                 card.rel = 'noopener noreferrer';
@@ -975,7 +1109,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </span>
                 <span class="creative-project-info">
                     <strong>${escapeHtml(item.title)}</strong>
-                    <span><small>${escapeHtml(item.year || '')}</small><small>${projectUrl ? 'Projeyi Aç' : ''}</small></span>
+                    <span><small>${escapeHtml(item.year || '')}</small><small>${!isVideo && imageUrl ? 'Büyüt' : projectUrl ? 'Projeyi Aç' : ''}</small></span>
                 </span>`;
 
             const media = card.querySelector('.creative-project-media');
@@ -989,6 +1123,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 media?.classList.add('is-missing');
             });
+            if (!isVideo && imageUrl) {
+                card.addEventListener('click', () => openLightbox({
+                    src: imageUrl,
+                    title: item.title,
+                    desc: [item.category || fallbackCategory, item.year].filter(Boolean).join(' · ')
+                }));
+            }
             grid.appendChild(card);
         });
     }
@@ -1100,10 +1241,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const lightboxDesc = document.getElementById('lightboxDesc');
     const lightboxClose = document.getElementById('lightboxClose');
 
-    function openLightbox(item) {
+    async function openLightbox(item) {
         if (!lightbox || !lightboxImage) return;
 
-        lightboxImage.src = item.src;
+        const source = await resolveMediaUrl(item.src || item.image || '');
+        if (!source) return;
+        lightboxImage.src = source;
         lightboxImage.alt = item.title || '';
         if (lightboxTitle) lightboxTitle.textContent = item.title || '';
         if (lightboxDesc) lightboxDesc.textContent = item.desc || '';
@@ -1134,6 +1277,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (lightbox && lightbox.classList.contains('active')) {
                 closeLightbox();
             }
+            if (youtubeVideoModal?.classList.contains('active')) {
+                closeYouTubeModal();
+            }
         }
     });
 
@@ -1147,21 +1293,33 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const btn = contactForm.querySelector('button');
             const originalText = btn.innerHTML;
+            let phoneDigits = String(currentSiteData.contact?.whatsapp || currentSiteData.contact?.phone || '').replace(/\D/g, '').replace(/^0+/, '');
+            if (phoneDigits.length === 10) phoneDigits = `90${phoneDigits}`;
+            if (phoneDigits.length < 10) {
+                window.alert('WhatsApp telefon numarası henüz ayarlanmamış.');
+                return;
+            }
 
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Gönderiliyor...';
-            btn.disabled = true;
-
+            const formData = new FormData(contactForm);
+            const projectSelect = contactForm.querySelector('[name="projectType"]');
+            const projectLabel = projectSelect?.selectedOptions?.[0]?.textContent?.trim() || 'Belirtilmedi';
+            const message = [
+                'Merhaba Les Mejor Creative,',
+                '',
+                'Yeni proje talebi:',
+                `Ad Soyad: ${formData.get('name') || ''}`,
+                `E-posta: ${formData.get('email') || ''}`,
+                `Proje Türü: ${projectLabel}`,
+                `Proje Detayı: ${formData.get('message') || ''}`
+            ].join('\n');
+            window.open(`https://wa.me/${phoneDigits}?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer');
+            btn.innerHTML = '<i class="fab fa-whatsapp"></i> WhatsApp Açıldı';
+            btn.style.background = '#25d366';
+            contactForm.reset();
             setTimeout(() => {
-                btn.innerHTML = '<i class="fas fa-check"></i> Gönderildi!';
-                btn.style.background = '#28a745';
-                contactForm.reset();
-
-                setTimeout(() => {
-                    btn.innerHTML = originalText;
-                    btn.style.background = '';
-                    btn.disabled = false;
-                }, 3000);
-            }, 1500);
+                btn.innerHTML = originalText;
+                btn.style.background = '';
+            }, 2600);
         });
     }
 
