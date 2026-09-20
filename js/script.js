@@ -1101,7 +1101,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span class="youtube-project-media ${project.thumbnailFit === 'contain' && !usesAutomaticThumbnail ? 'is-contain' : ''} ${thumbnail ? '' : 'is-missing'}">
                         ${thumbnail ? `<img src="${escapeHtml(thumbnail)}" alt="${escapeHtml(project.title)}" loading="lazy" decoding="async"${usesAutomaticThumbnail ? ` data-youtube-video-id="${escapeHtml(videoId)}"` : ''}>` : ''}
                         <span class="youtube-project-placeholder"><i class="fab fa-youtube" aria-hidden="true"></i><small>${escapeHtml(project.title)}</small></span>
-                        <span class="youtube-project-type">${escapeHtml(project.category || 'KLİP ÇEKİMİ')}</span>
+                        ${String(project.category || '').trim() ? `<span class="youtube-project-type">${escapeHtml(project.category)}</span>` : ''}
                         ${projectUrl ? '<span class="youtube-project-play"><i class="fas fa-play" aria-hidden="true"></i></span>' : ''}
                     </span>
                     <span class="youtube-project-info">
@@ -1173,7 +1173,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <span class="creative-project-media ${imageUrl ? '' : 'is-missing'}">
                     ${imageUrl ? `<img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(item.title)}" loading="${index < 4 ? 'eager' : 'lazy'}" decoding="async"${automaticThumbnail ? ` data-youtube-video-id="${escapeHtml(videoId)}"` : ''}>` : ''}
                     <span class="creative-project-placeholder"><i class="fas ${isVideo ? 'fa-play' : 'fa-pen-ruler'}" aria-hidden="true"></i></span>
-                    ${isVideo && (item.category || fallbackCategory) ? `<small class="creative-project-badge">${escapeHtml(item.category || fallbackCategory)}</small>` : ''}
+                    ${isVideo && String(item.category || '').trim() ? `<small class="creative-project-badge">${escapeHtml(item.category)}</small>` : ''}
                 </span>
                 <span class="creative-project-info">
                     <strong>${escapeHtml(item.title)}</strong>
@@ -1300,7 +1300,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadFeaturedArtists();
     loadYoutubeProjects();
     loadCreativeProjects('graphicDesignGrid', 'graphicProjects', 'graphicDesign', 'Grafik tasarım çalışmaları', 'Grafik Tasarım');
-    loadCreativeProjects('videoClipsGrid', 'videoClips', 'videoClips', 'Video klipleri', 'Video Klip', true);
+    loadCreativeProjects('videoClipsGrid', 'videoClips', 'videoClips', 'Video klipleri', '', true);
     loadPartnerLogos();
     loadReferences();
 

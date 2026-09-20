@@ -481,7 +481,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <label class="admin-toggle form-full"><input type="checkbox" class="creative-enabled" ${project.enabled !== false ? 'checked' : ''}><span><strong>Yayında</strong><small>Kapatılırsa kart sayfada görünmez.</small></span></label>
                     <div class="form-group"><label>Proje / Sanatçı Adı</label><input type="text" class="form-control creative-title" value="${escapeHtml(project.title)}" placeholder="${escapeHtml(options.titlePlaceholder)}"></div>
                     <div class="form-group"><label>Yıl</label><input type="text" class="form-control creative-year" value="${escapeHtml(project.year)}" placeholder="2026"></div>
-                    ${options.showCategory ? `<div class="form-group form-full"><label>Etiket</label><input type="text" class="form-control creative-category" value="${escapeHtml(project.category || options.defaultCategory)}" placeholder="${escapeHtml(options.defaultCategory)}"></div>` : ''}
+                    ${options.showCategory ? `<div class="form-group form-full"><label>Etiket (isteğe bağlı)</label><input type="text" class="form-control creative-category" value="${escapeHtml(project.category ?? '')}" placeholder="Boş bırakırsanız sitede gösterilmez"></div>` : ''}
                     <div class="form-group form-full"><label>${options.isVideo ? 'Özel Kapak Görseli (isteğe bağlı)' : 'Proje Görseli'}</label><input type="file" class="form-control creative-image-file" accept="image/*"><input type="hidden" class="creative-image" value="${escapeHtml(project.image)}"><p class="form-help">${options.isVideo ? 'Görsel yüklemezseniz YouTube kapağı otomatik kullanılır.' : 'Görseli doğrudan bilgisayarınızdan seçin.'}</p></div>
                     ${options.isVideo ? `<div class="form-group form-full"><label>Video Dosyası (isteğe bağlı)</label><input type="file" class="form-control creative-video-file" accept="video/mp4,video/webm,video/quicktime"><input type="hidden" class="creative-video" value="${escapeHtml(project.videoFile || '')}"><p class="form-help">Bilgisayardan video yüklerseniz sitede doğrudan oynatılır.</p></div><div class="form-group form-full"><label>YouTube Video Bağlantısı (isteğe bağlı)</label><input type="url" class="form-control creative-url" value="${escapeHtml(project.url)}" placeholder="https://www.youtube.com/watch?v=..."></div>` : '<input type="hidden" class="creative-url" value="">'}
                 </div>`;
@@ -505,7 +505,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderVideoClipsForm() {
         renderCreativeProjectsForm(videoClipsAdmin, appData.videoClips || [], {
-            itemLabel: 'Video Klip', emptyLabel: 'video klip', titlePlaceholder: 'Kubilay Karça', defaultCategory: 'Video Klip', isVideo: true, showCategory: false
+            itemLabel: 'Video Klip', emptyLabel: 'video klip', titlePlaceholder: 'Kubilay Karça', defaultCategory: '', isVideo: true, showCategory: true
         });
     }
 
@@ -516,7 +516,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     document.getElementById('btnAddVideoClip')?.addEventListener('click', () => {
-        appData.videoClips = readCreativeProjectsForm(videoClipsAdmin, 'Video Klip');
+        appData.videoClips = readCreativeProjectsForm(videoClipsAdmin, '');
         appData.videoClips.push({ id: Date.now(), title: '', year: String(new Date().getFullYear()), category: '', image: '', videoFile: '', url: '', enabled: true });
         renderVideoClipsForm();
         videoClipsAdmin.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -589,7 +589,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <label class="admin-toggle form-full"><input type="checkbox" class="youtube-enabled" ${project.enabled !== false ? 'checked' : ''}><span><strong>Yayında</strong><small>Kapatılırsa bu kart klip çekimleri sayfasında görünmez.</small></span></label>
                     <div class="form-group"><label>Sanatçı / Klip Adı</label><input type="text" class="form-control youtube-title" value="${escapeHtml(project.title)}" placeholder="Kubilay Karça"></div>
                     <div class="form-group"><label>Yıl</label><input type="text" class="form-control youtube-year" value="${escapeHtml(project.year)}" placeholder="2026"></div>
-                    <div class="form-group"><label>Etiket</label><input type="text" class="form-control youtube-category" value="${escapeHtml(project.category || 'Klip Çekimi')}" placeholder="Klip Çekimi"></div>
+                    <div class="form-group"><label>Etiket (isteğe bağlı)</label><input type="text" class="form-control youtube-category" value="${escapeHtml(project.category ?? '')}" placeholder="Boş bırakırsanız sitede gösterilmez"></div>
                     <div class="form-group"><label>Kapak Yerleşimi</label><select class="form-control youtube-fit"><option value="cover" ${project.thumbnailFit !== 'contain' ? 'selected' : ''}>Görseli kapla</option><option value="contain" ${project.thumbnailFit === 'contain' ? 'selected' : ''}>Logoyu sığdır</option></select></div>
                     <div class="form-group form-full"><label>Özel Kapak Görseli (isteğe bağlı)</label><input type="file" class="form-control youtube-thumbnail-file" accept="image/*"><input type="hidden" class="youtube-thumbnail" value="${escapeHtml(project.thumbnail)}"><p class="form-help">Yüklemezseniz YouTube kapağı otomatik alınır.</p></div>
                     <div class="form-group form-full"><label>Video Dosyası (isteğe bağlı)</label><input type="file" class="form-control youtube-video-file" accept="video/mp4,video/webm,video/quicktime"><input type="hidden" class="youtube-video" value="${escapeHtml(project.videoFile || '')}"><p class="form-help">Bilgisayardan yüklenen video sitede doğrudan oynatılır.</p></div>
@@ -605,7 +605,7 @@ document.addEventListener('DOMContentLoaded', () => {
             id: Number(card.dataset.youtubeProject) || Date.now(),
             title: card.querySelector('.youtube-title')?.value.trim() || '',
             year: card.querySelector('.youtube-year')?.value.trim() || '',
-            category: card.querySelector('.youtube-category')?.value.trim() || 'Klip Çekimi',
+            category: card.querySelector('.youtube-category')?.value.trim() || '',
             thumbnail: card.querySelector('.youtube-thumbnail')?.value.trim() || '',
             videoFile: card.querySelector('.youtube-video')?.value.trim() || '',
             thumbnailFit: card.querySelector('.youtube-fit')?.value || 'cover',
@@ -616,7 +616,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('btnAddYoutubeProject')?.addEventListener('click', () => {
         readYoutubeProjectsForm();
-        appData.youtubeProjects.push({ id: Date.now(), title: '', year: String(new Date().getFullYear()), category: 'Klip Çekimi', thumbnail: '', thumbnailFit: 'cover', videoFile: '', url: '', enabled: true });
+        appData.youtubeProjects.push({ id: Date.now(), title: '', year: String(new Date().getFullYear()), category: '', thumbnail: '', thumbnailFit: 'cover', videoFile: '', url: '', enabled: true });
         renderYoutubeProjectsForm();
         youtubeProjectsAdmin.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     });

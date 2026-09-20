@@ -564,6 +564,16 @@ footer {
     margin: 0 auto;
 }
 
+.contact-section .section-desc {
+    max-width: 820px;
+}
+
+@media (min-width: 801px) {
+    .contact-section .section-desc {
+        white-space: nowrap;
+    }
+}
+
 /* Portfolio Section */
 .portfolio-section {
     padding: 120px 0;
@@ -764,7 +774,7 @@ footer {
     height: 50%;
     z-index: -1;
     border-radius: 0 0 18px 18px;
-    background: linear-gradient(135deg, var(--accent), var(--gold));
+    background: var(--accent);
 }
 
 .artist-detail-cover {
@@ -1281,8 +1291,8 @@ button.creative-project-card:focus-visible {
 }
 
 body[data-page-section="graphicDesign"] .creative-projects-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    max-width: 640px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    max-width: 1180px;
     margin: 0 auto;
     gap: 20px;
 }
@@ -1395,7 +1405,8 @@ button.creative-project-card:hover img {
     }
 
     body[data-page-section="graphicDesign"] .creative-projects-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
     }
 
     .featured-artist-card {
@@ -1410,7 +1421,7 @@ button.creative-project-card:hover img {
     }
 
     body[data-page-section="graphicDesign"] .creative-project-card {
-        width: min(100%, 280px);
+        width: 100%;
         padding: 12px;
     }
 
@@ -1434,7 +1445,25 @@ button.creative-project-card:hover img {
     }
 
     body[data-page-section="graphicDesign"] .creative-project-card {
-        width: min(100%, 250px);
+        width: 100%;
+        padding: 8px;
+    }
+
+    body[data-page-section="graphicDesign"] .creative-projects-grid {
+        gap: 10px;
+    }
+
+    body[data-page-section="graphicDesign"] .creative-project-info {
+        padding-top: 10px;
+    }
+
+    body[data-page-section="graphicDesign"] .creative-project-info strong {
+        margin-bottom: 5px;
+        font-size: 0.82rem;
+    }
+
+    body[data-page-section="graphicDesign"] .creative-project-info small {
+        font-size: 0.68rem;
     }
 
     .creative-projects-header {
