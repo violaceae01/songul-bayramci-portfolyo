@@ -1,5 +1,5 @@
 const siteData = {
-  "contentVersion": 3,
+  "contentVersion": 4,
   "hero": {
     "tag": "KONSER & ETKİNLİK ÇEKİMİ",
     "titleLine1": "HER ANI",
@@ -20,6 +20,7 @@ const siteData = {
       "name": "Mert Demir",
       "visible": true,
       "featured": true,
+      "featuredOrder": 0,
       "bio": "Mert Demir konserlerinden sahne enerjisini, ışığı ve performans anlarını öne çıkaran çekimler.",
       "cover": "Görsel/Mert Demir.PNG",
       "concerts": [
@@ -44,6 +45,7 @@ const siteData = {
       "name": "Tuğba Yurt",
       "visible": true,
       "featured": true,
+      "featuredOrder": 1,
       "bio": "Tuğba Yurt'un canlı performanslarından konser atmosferini ve sahne detaylarını yansıtan kareler.",
       "cover": "Görsel/Tuğba Yurt.PNG",
       "concerts": [
@@ -67,6 +69,7 @@ const siteData = {
       "name": "Zeynep Bastık",
       "visible": true,
       "featured": true,
+      "featuredOrder": 2,
       "bio": "Zeynep Bastık konserlerinden performans, seyirci ve sahne ışıklarını bir araya getiren çekimler.",
       "cover": "Görsel/Zeynep bastık 4.PNG",
       "concerts": [
@@ -92,6 +95,7 @@ const siteData = {
       "name": "Emre Fel",
       "visible": true,
       "featured": true,
+      "featuredOrder": 3,
       "bio": "Emre Fel'in sahne performanslarından sinematik açıları ve konserin ruhunu öne çıkaran çalışmalar.",
       "cover": "Görsel/Emre fel.PNG",
       "concerts": [
@@ -115,6 +119,7 @@ const siteData = {
       "name": "Tuğba Özerk",
       "visible": true,
       "featured": true,
+      "featuredOrder": 4,
       "bio": "Tuğba Özerk'in özel etkinlik ve sahne performanslarından seçilmiş fotoğraf ve video çalışmaları.",
       "cover": "Görsel/tUĞBA ÖZERK.PNG",
       "concerts": [
@@ -138,6 +143,7 @@ const siteData = {
       "name": "Dedub Lüman",
       "visible": true,
       "featured": true,
+      "featuredOrder": 5,
       "bio": "Dedub Lüman performanslarından grubun sahne atmosferini ve güçlü ışık dünyasını yansıtan çekimler.",
       "cover": "Görsel/Dedub lüman.PNG",
       "concerts": [
@@ -174,6 +180,7 @@ const siteData = {
     "partnerLogos": true,
     "homeAbout": true,
     "testimonials": true,
+    "testimonialsPage": true,
     "homeContact": true,
     "homeSignature": true,
     "worksPage": true,
@@ -183,7 +190,7 @@ const siteData = {
     "videoClips": true,
     "aboutPage": true,
     "contactPage": true,
-    "aboutOwner": true,
+    "aboutOwner": false,
     "aboutVisionMission": true,
     "contactDetails": true,
     "contactForm": true,
@@ -198,6 +205,7 @@ const siteData = {
       "category": "Klip Çekimi",
       "thumbnail": "",
       "thumbnailFit": "cover",
+      "videoFile": "",
       "url": "https://www.youtube.com/watch?v=D-grpeAMf34",
       "enabled": true
     }
@@ -229,6 +237,7 @@ const siteData = {
       "year": "2023",
       "category": "Video Klip",
       "image": "",
+      "videoFile": "",
       "url": "https://www.youtube.com/watch?v=D-grpeAMf34",
       "enabled": true
     }
@@ -245,7 +254,7 @@ const siteData = {
   "about": {
     "tag": "HAKKIMIZDA",
     "name": "Les Mejor Creative",
-    "owner": "Les Mejor Marka Sahibi Furkan Tepeyurt",
+    "owner": "",
     "image": "Görsel/Zeynep bastık 4.PNG",
     "lead": "Müzik, etkinlik ve markalar için yaratıcı görsel hikâyeler üreten bir prodüksiyon stüdyosuyuz.",
     "p1": "Kamera arkasındaki her anı güçlü bir hikâyeye dönüştürüyor; ışık, gölge ve hareketi özgün bir görsel dille bir araya getiriyoruz.",
@@ -282,6 +291,42 @@ const siteData = {
       "enabled": true
     }
   ],
+  "typography": {
+    "bodyWeight": "400",
+    "headingWeight": "700",
+    "navWeight": "600",
+    "buttonWeight": "600"
+  },
+  "siteText": {
+    "navHome": "ANA SAYFA",
+    "navWorks": "ÇALIŞMALARIM",
+    "navClip": "KLİP ÇEKİMLERİ",
+    "navVideo": "VİDEO KLİPLERİ",
+    "navGraphic": "GRAFİK TASARIM",
+    "navCorporate": "KURUMSAL",
+    "navReferences": "REFERANSLARIMIZ",
+    "navAbout": "HAKKIMIZDA",
+    "navTestimonials": "NE DİYORLAR",
+    "navContact": "İLETİŞİM",
+    "featuredTag": "PORTFÖY",
+    "featuredTitle": "ÖNE ÇIKAN SANATÇILAR",
+    "featuredMore": "Daha Fazla",
+    "testimonialsTag": "NE DİYORLAR",
+    "testimonialsTitle": "MÜŞTERİ YORUMLARI",
+    "graphicTag": "TASARIM PORTFÖYÜ",
+    "graphicTitle": "GRAFİK TASARIM",
+    "clipTag": "VİDEO PRODÜKSİYONLARI",
+    "clipTitle": "KLİP ÇEKİMLERİ",
+    "videoTag": "YÖNETİLEN PROJELER",
+    "videoTitle": "VİDEO KLİPLERİ",
+    "referencesTag": "ÇALIŞTIĞIMIZ MARKALAR",
+    "referencesTitle": "REFERANSLARIMIZ",
+    "aboutTag": "HAKKIMIZDA",
+    "contactTag": "İLETİŞİM",
+    "contactTitle": "PROJEMİZ VAR!",
+    "footerStudio": "Creative Production Studio",
+    "footerCopyright": "© 2026 Tüm Hakları Saklıdır."
+  },
   "contact": {
     "email": "songul@ornek.com",
     "phone": "+90 555 123 45 67",

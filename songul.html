@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/admin.css?v=20260919-brand">
+    <link rel="stylesheet" href="css/admin.css?v=20260921-admin">
 </head>
 <body>
 
@@ -36,11 +36,15 @@
                 </a>
             </li>
             <li class="sidebar-item">
-                <a href="#youtube" class="sidebar-link" data-tab="tab-youtube">
-                    <i class="fab fa-youtube"></i>
-                    <span>Projeler & Referanslar</span>
+                <a href="#visibility" class="sidebar-link" data-tab="tab-visibility">
+                    <i class="fas fa-eye"></i>
+                    <span>Görünürlük</span>
                 </a>
             </li>
+            <li class="sidebar-item"><a href="#clips" class="sidebar-link" data-tab="tab-clips"><i class="fab fa-youtube"></i><span>Klip Çekimleri</span></a></li>
+            <li class="sidebar-item"><a href="#video-clips" class="sidebar-link" data-tab="tab-video-clips"><i class="fas fa-film"></i><span>Video Klipleri</span></a></li>
+            <li class="sidebar-item"><a href="#graphics" class="sidebar-link" data-tab="tab-graphics"><i class="fas fa-pen-ruler"></i><span>Grafik Tasarım</span></a></li>
+            <li class="sidebar-item"><a href="#references" class="sidebar-link" data-tab="tab-references"><i class="fas fa-building"></i><span>Referanslarımız</span></a></li>
             <li class="sidebar-item">
                 <a href="#stats" class="sidebar-link" data-tab="tab-stats">
                     <i class="fas fa-chart-line"></i>
@@ -65,6 +69,7 @@
                     <span>İletişim & Sosyal</span>
                 </a>
             </li>
+            <li class="sidebar-item"><a href="#texts" class="sidebar-link" data-tab="tab-texts"><i class="fas fa-font"></i><span>Metinler & Tipografi</span></a></li>
             <li class="sidebar-item">
                 <a href="#backup" class="sidebar-link" data-tab="tab-backup">
                     <i class="fas fa-database"></i>
@@ -115,7 +120,7 @@
         </section>
 
         <!-- CLIP PROJECTS & PARTNER LOGOS -->
-        <section id="tab-youtube" class="tab-panel">
+        <section id="tab-visibility" class="tab-panel">
             <div class="admin-card">
                 <div class="card-header"><div><h2>Sayfa ve Bölüm Görünürlüğü</h2><p class="admin-card-description">İstediğiniz bölümü silmeden yayından kaldırabilir, daha sonra tekrar açabilirsiniz.</p></div></div>
                 <div class="admin-toggle-grid" id="sectionVisibilityAdmin">
@@ -126,6 +131,7 @@
                     <label class="admin-toggle"><input type="checkbox" data-section-toggle="partnerLogos"><span><strong>Referans Logo Şeridi</strong><small>Ana sayfadaki kayan logolar</small></span></label>
                     <label class="admin-toggle"><input type="checkbox" data-section-toggle="homeAbout"><span><strong>Ana Sayfa Hakkımızda</strong><small>Ortalanmış tanıtım metni</small></span></label>
                     <label class="admin-toggle"><input type="checkbox" data-section-toggle="testimonials"><span><strong>Müşteri Yorumları</strong><small>Ana sayfadaki yorum kartları</small></span></label>
+                    <label class="admin-toggle"><input type="checkbox" data-section-toggle="testimonialsPage"><span><strong>Ne Diyorlar Sayfası</strong><small>Kurumsal menüsündeki ayrı yorumlar sayfası</small></span></label>
                     <label class="admin-toggle"><input type="checkbox" data-section-toggle="homeContact"><span><strong>Ana Sayfa İletişim</strong><small>İletişim formu ve bilgileri</small></span></label>
                     <label class="admin-toggle"><input type="checkbox" data-section-toggle="homeSignature"><span><strong>İmza Görseli</strong><small>Ana sayfa altındaki hareketli imza</small></span></label>
                     <label class="admin-toggle"><input type="checkbox" data-section-toggle="worksPage"><span><strong>Çalışmalarımız</strong><small>Sanatçı ve konser sayfaları</small></span></label>
@@ -135,7 +141,6 @@
                     <label class="admin-toggle"><input type="checkbox" data-section-toggle="graphicDesign"><span><strong>Grafik Tasarım</strong><small>Grafik tasarım sayfası ve menü bağlantısı</small></span></label>
                     <label class="admin-toggle"><input type="checkbox" data-section-toggle="aboutPage"><span><strong>Hakkımızda Sayfası</strong><small>Vizyon ve misyon dahil</small></span></label>
                     <label class="admin-toggle"><input type="checkbox" data-section-toggle="contactPage"><span><strong>İletişim Sayfası</strong><small>Ayrı iletişim sayfası</small></span></label>
-                    <label class="admin-toggle"><input type="checkbox" data-section-toggle="aboutOwner"><span><strong>Marka Sahibi Bilgisi</strong><small>Hakkımızda sayfasındaki sahip bilgisi</small></span></label>
                     <label class="admin-toggle"><input type="checkbox" data-section-toggle="aboutVisionMission"><span><strong>Vizyon ve Misyon</strong><small>Hakkımızda sayfasındaki kurumsal kartlar</small></span></label>
                     <label class="admin-toggle"><input type="checkbox" data-section-toggle="contactDetails"><span><strong>İletişim Bilgileri</strong><small>E-posta, telefon, konum ve sosyal medya</small></span></label>
                     <label class="admin-toggle"><input type="checkbox" data-section-toggle="contactForm"><span><strong>İletişim Formu</strong><small>WhatsApp'a yönlendiren proje formu</small></span></label>
@@ -143,7 +148,9 @@
                     <label class="admin-toggle"><input type="checkbox" data-section-toggle="scrollTop"><span><strong>Yukarı Çık Butonu</strong><small>Sayfa aşağı kaydırıldığında görünen buton</small></span></label>
                 </div>
             </div>
+        </section>
 
+        <section id="tab-clips" class="tab-panel">
             <div class="admin-card">
                 <div class="card-header">
                     <div>
@@ -156,7 +163,9 @@
                 </div>
                 <div id="youtubeProjectsAdmin"></div>
             </div>
+        </section>
 
+        <section id="tab-video-clips" class="tab-panel">
             <div class="admin-card">
                 <div class="card-header">
                     <div><h2>Video Klipleri</h2><p class="admin-card-description">YouTube bağlantısı girildiğinde kapak görseli otomatik alınır.</p></div>
@@ -164,7 +173,9 @@
                 </div>
                 <div id="videoClipsAdmin"></div>
             </div>
+        </section>
 
+        <section id="tab-graphics" class="tab-panel">
             <div class="admin-card">
                 <div class="card-header">
                     <div><h2>Grafik Tasarım</h2><p class="admin-card-description">Afiş, kapak ve diğer tasarım projelerini istediğiniz kadar ekleyebilirsiniz.</p></div>
@@ -172,7 +183,9 @@
                 </div>
                 <div id="graphicProjectsAdmin"></div>
             </div>
+        </section>
 
+        <section id="tab-references" class="tab-panel">
             <div class="admin-card">
                 <div class="card-header">
                     <div>
@@ -250,12 +263,10 @@
                             <input type="text" id="aboutName" class="form-control" placeholder="Les Mejor Creative">
                         </div>
                         <div class="form-group">
-                            <label>Profil / Sahne Görseli Yolu</label>
-                            <input type="text" id="aboutImage" class="form-control" placeholder="Görsel/Zeynep bastık 4.PNG">
-                        </div>
-                        <div class="form-group form-full">
-                            <label>Marka Sahibi</label>
-                            <input type="text" id="aboutOwner" class="form-control" placeholder="Les Mejor Marka Sahibi Furkan Tepeyurt">
+                            <label>Profil / Sahne Görseli</label>
+                            <input type="file" id="aboutImageFile" class="form-control" accept="image/*">
+                            <input type="hidden" id="aboutImage">
+                            <p class="form-help">Görseli doğrudan bilgisayarınızdan seçin.</p>
                         </div>
                         <div class="form-group form-full">
                             <label>Giriş Vurgulu Metin (Lead)</label>
@@ -286,11 +297,23 @@
         <section id="tab-testimonials" class="tab-panel">
             <div class="admin-card">
                 <div class="card-header">
-                    <h2>Müşteri & Sanatçı Referansları</h2>
+                    <div><h2>Müşteri & Sanatçı Yorumları</h2><p class="admin-card-description">En fazla 8 yorum ekleyebilir, sıralamayı oklarla değiştirebilirsiniz.</p></div>
+                    <button class="btn btn-primary btn-sm" id="btnAddTestimonial" type="button"><i class="fas fa-plus"></i> Yeni Yorum Ekle</button>
                 </div>
                 <div id="testimonialsContainer">
                     <!-- Loaded dynamically -->
                 </div>
+            </div>
+        </section>
+
+        <section id="tab-texts" class="tab-panel">
+            <div class="admin-card">
+                <div class="card-header"><div><h2>Sayfa Metinleri</h2><p class="admin-card-description">Sabit başlıkları, menü adlarını ve alt bilgi metinlerini buradan düzenleyin. Proje, sanatçı ve yorum metinleri kendi sayfalarında yönetilir.</p></div></div>
+                <div class="form-grid" id="siteTextAdmin"></div>
+            </div>
+            <div class="admin-card">
+                <div class="card-header"><div><h2>Yazı Kalınlıkları</h2><p class="admin-card-description">Tüm sayfalarda gövde, başlık, menü ve buton yazılarının kalınlığını belirleyin.</p></div></div>
+                <div class="form-grid" id="typographyAdmin"></div>
             </div>
         </section>
 
@@ -320,7 +343,7 @@
                             <input type="text" id="contactLocation" class="form-control">
                         </div>
                         <div class="form-group">
-                            <label><i class="fab fa-instagram" style="color:#e63946;"></i> Instagram Profili URL</label>
+                            <label><i class="fab fa-instagram" style="color:#C90B0E;"></i> Instagram Profili URL</label>
                             <input type="url" id="contactInstagram" class="form-control" placeholder="https://www.instagram.com/lesmejorcreative.eu/">
                         </div>
                         <div class="form-group">
@@ -501,9 +524,9 @@
     <!-- Toast Notifications Container -->
     <div class="toast-container" id="toastContainer"></div>
 
-    <script src="data/data.js?v=20260919-brand"></script>
-    <script src="js/data-utils.js?v=20260919-brand"></script>
-    <script src="js/media-store.js?v=20260919-brand"></script>
-    <script src="js/admin.js?v=20260919-brand"></script>
+    <script src="data/data.js?v=20260921-admin"></script>
+    <script src="js/data-utils.js?v=20260921-admin"></script>
+    <script src="js/media-store.js?v=20260921-admin"></script>
+    <script src="js/admin.js?v=20260921-admin"></script>
 </body>
 </html>

@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 speedX: (Math.random() - 0.5) * 0.5,
                 speedY: (Math.random() - 0.5) * 0.5,
                 opacity: 0.2 + Math.random() * 0.3,
-                color: Math.random() > 0.5 ? '#e63946' : '#ffffff',
+                color: Math.random() > 0.5 ? '#C90B0E' : '#ffffff',
                 pulse: Math.random() * Math.PI * 2,
                 pulseSpeed: 0.02 + Math.random() * 0.02
             };
@@ -164,7 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (dist < 120) {
                         const opacity = (1 - dist / 120) * 0.08;
                         this.ctx.beginPath();
-                        this.ctx.strokeStyle = `rgba(230, 57, 70, ${opacity})`;
+                        this.ctx.strokeStyle = `rgba(201, 11, 14, ${opacity})`;
                         this.ctx.lineWidth = 0.5;
                         this.ctx.moveTo(p1.x, p1.y);
                         this.ctx.lineTo(p2.x, p2.y);
@@ -230,6 +230,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     const savedVisibility = parsed.sectionVisibility || {};
                     parsed.sectionVisibility = { ...defaultVisibility, ...savedVisibility };
                     parsed.contact = { ...(siteData.contact || {}), ...(parsed.contact || {}) };
+                    parsed.siteText = { ...(siteData.siteText || {}), ...(parsed.siteText || {}) };
+                    parsed.typography = { ...(siteData.typography || {}), ...(parsed.typography || {}) };
                     const savedContentVersion = Number(parsed.contentVersion || 0);
                     const currentContentVersion = Number(siteData.contentVersion || 0);
                     if (savedContentVersion < currentContentVersion && Array.isArray(siteData.graphicProjects)) {
@@ -300,6 +302,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const currentSiteData = getSiteData();
     const dataUtils = window.SiteDataUtils;
+    const escapeHtml = value => dataUtils ? dataUtils.escapeHtml(value) : String(value || '');
     const resolveMediaUrl = async value => {
         const reference = String(value || '');
         if (!window.SiteMediaStore?.isStored(reference)) return reference;
@@ -370,7 +373,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // About
         if (data.about) {
             const aboutImg = document.querySelector('.about-image img');
-            if (aboutImg && data.about.image) aboutImg.src = data.about.image;
+            if (aboutImg && data.about.image) setStoredImageSource(aboutImg, data.about.image);
 
             const aboutName = document.querySelector('.about-content h1, .about-content h2');
             if (aboutName && data.about.name) aboutName.textContent = data.about.name;
@@ -392,22 +395,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Testimonials
-        if (data.testimonials && data.testimonials.length) {
-            const testimonialCards = document.querySelectorAll('.testimonial-card');
-            data.testimonials.forEach((tm, idx) => {
-                if (testimonialCards[idx]) {
-                    testimonialCards[idx].hidden = tm.enabled === false;
-                    const txt = testimonialCards[idx].querySelector('.testimonial-text');
-                    const auth = testimonialCards[idx].querySelector('.author-name');
-                    const role = testimonialCards[idx].querySelector('.author-title');
-                    if (txt) txt.textContent = tm.text;
-                    if (auth) auth.textContent = tm.name;
-                    if (role) role.textContent = tm.title;
-                }
-            });
-            testimonialCards.forEach((card, idx) => {
-                if (!data.testimonials[idx]) card.hidden = true;
-            });
+        const testimonialsGrid = document.getElementById('testimonialsGrid');
+        if (testimonialsGrid) {
+            const testimonials = (data.testimonials || []).filter(item => item && item.enabled !== false).slice(0, 8);
+            testimonialsGrid.innerHTML = testimonials.length ? testimonials.map(tm => `<article class="testimonial-card reveal active"><i class="fas fa-quote-left quote-icon" aria-hidden="true"></i><p class="testimonial-text">${escapeHtml(tm.text || '')}</p><div class="testimonial-author"><span class="author-name">${escapeHtml(tm.name || '')}</span><span class="author-title">${escapeHtml(tm.title || '')}</span></div></article>`).join('') : '<p class="featured-artists-empty">Henüz yorum eklenmedi.</p>';
         }
 
         // Contact & Social Links
@@ -468,7 +459,7 @@ document.addEventListener('DOMContentLoaded', () => {
         hoverElements.forEach(el => {
             el.addEventListener('mouseenter', () => {
                 cursorOutline.style.transform = 'translate(-50%, -50%) scale(2)';
-                cursorOutline.style.backgroundColor = 'rgba(230, 57, 70, 0.2)';
+                cursorOutline.style.backgroundColor = 'rgba(201, 11, 14, 0.2)';
                 cursorOutline.style.borderWidth = '2px';
             });
             el.addEventListener('mouseleave', () => {
@@ -519,7 +510,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const menu = document.getElementById('mainMenu');
         if (!menu || menu.querySelector('.nav-dropdown')) return;
 
-        const corporateLinks = ['referencesPage', 'aboutPage', 'contactPage']
+        if (!menu.querySelector('[data-nav-section="testimonialsPage"]')) {
+            const testimonialLink = document.createElement('a');
+            testimonialLink.href = 'yorumlar.html';
+            testimonialLink.className = 'nav-link';
+            testimonialLink.dataset.navSection = 'testimonialsPage';
+            testimonialLink.textContent = 'NE DİYORLAR';
+            menu.appendChild(testimonialLink);
+        }
+        const corporateLinks = ['referencesPage', 'aboutPage', 'testimonialsPage', 'contactPage']
             .map(key => menu.querySelector(`[data-nav-section="${key}"]`))
             .filter(Boolean);
         if (!corporateLinks.length) return;
@@ -530,7 +529,7 @@ document.addEventListener('DOMContentLoaded', () => {
         toggle.className = 'nav-link nav-dropdown-toggle';
         toggle.type = 'button';
         toggle.setAttribute('aria-expanded', 'false');
-        toggle.innerHTML = 'KURUMSAL <i class="fas fa-chevron-down" aria-hidden="true"></i>';
+        toggle.innerHTML = `${escapeHtml(currentSiteData.siteText?.navCorporate || 'KURUMSAL')} <i class="fas fa-chevron-down" aria-hidden="true"></i>`;
 
         const panel = document.createElement('div');
         panel.className = 'nav-dropdown-menu';
@@ -563,6 +562,40 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     setupCorporateNavigation();
+    function applyEditableTextAndTypography() {
+        const text = currentSiteData.siteText || {};
+        const selectors = {
+            navHome: 'a.nav-link[href*="index.html#home"]', navWorks: '[data-nav-section="worksPage"]', navClip: '[data-nav-section="clipShootings"]', navVideo: '[data-nav-section="videoClips"]', navGraphic: '[data-nav-section="graphicDesign"]', navReferences: '[data-nav-section="referencesPage"]', navAbout: '[data-nav-section="aboutPage"]', navTestimonials: '[data-nav-section="testimonialsPage"]', navContact: '[data-nav-section="contactPage"]',
+            footerStudio: '.footer-content > p:not(.copyright):not(.footer-signature)', footerCopyright: '.footer .copyright'
+        };
+        Object.entries(selectors).forEach(([key, selector]) => {
+            if (!text[key]) return;
+            document.querySelectorAll(selector).forEach(element => { element.textContent = text[key]; });
+        });
+        const pageSection = document.body.dataset.pageSection || '';
+        const pageMap = {
+            graphicDesign: ['graphicTag', 'graphicTitle'], clipShootings: ['clipTag', 'clipTitle'], videoClips: ['videoTag', 'videoTitle'], referencesPage: ['referencesTag', 'referencesTitle'], testimonialsPage: ['testimonialsTag', 'testimonialsTitle']
+        };
+        const pageKeys = pageMap[pageSection];
+        if (pageKeys) {
+            const tag = document.querySelector('main .section-tag'); const title = document.querySelector('main .section-title');
+            if (tag && text[pageKeys[0]]) tag.textContent = text[pageKeys[0]];
+            if (title && text[pageKeys[1]]) title.textContent = text[pageKeys[1]];
+        }
+        if (document.body.classList.contains('home-page') || document.getElementById('featuredArtistsGrid')) {
+            const featured = document.querySelector('[data-section-key="featuredArtists"]');
+            if (featured) { const tag = featured.querySelector('.section-tag'); const title = featured.querySelector('.section-title'); if (tag && text.featuredTag) tag.textContent = text.featuredTag; if (title && text.featuredTitle) title.textContent = text.featuredTitle; }
+            const testimonialSection = document.querySelector('[data-section-key="testimonials"]');
+            if (testimonialSection) { const tag = testimonialSection.querySelector('.section-tag'); const title = testimonialSection.querySelector('.section-title'); if (tag && text.testimonialsTag) tag.textContent = text.testimonialsTag; if (title && text.testimonialsTitle) title.textContent = text.testimonialsTitle; }
+        }
+        const typography = currentSiteData.typography || {};
+        const root = document.documentElement;
+        root.style.setProperty('--body-weight', typography.bodyWeight || '400');
+        root.style.setProperty('--heading-weight', typography.headingWeight || '700');
+        root.style.setProperty('--nav-weight', typography.navWeight || '600');
+        root.style.setProperty('--button-weight', typography.buttonWeight || '600');
+    }
+    applyEditableTextAndTypography();
     const nav = document.getElementById('mainNav');
     const navToggle = document.getElementById('navToggle');
     const navLinksContainer = document.querySelector('.nav-links');
@@ -689,8 +722,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const featuredArtistsActions = document.getElementById('featuredArtistsActions');
     const featuredArtistsMore = document.getElementById('featuredArtistsMore');
 
-    const escapeHtml = value => dataUtils ? dataUtils.escapeHtml(value) : String(value || '');
-
     function loadArtistDirectory() {
         if (!artistDirectory) return;
         artistDirectory.innerHTML = '';
@@ -721,6 +752,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 </span>
             `;
             grid.appendChild(link);
+            const cover = link.querySelector('img');
+            if (cover && window.SiteMediaStore?.isStored(artist.cover)) setStoredImageSource(cover, artist.cover);
         });
 
         artistDirectory.appendChild(grid);
@@ -752,7 +785,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.title = `${artist.name} Konserleri | Les Mejor Creative`;
         if (artistDetailCover) {
-            artistDetailCover.src = artist.cover;
+            setStoredImageSource(artistDetailCover, artist.cover);
             artistDetailCover.alt = artist.name;
         }
         if (artistDetailName) artistDetailName.textContent = artist.name;
@@ -809,6 +842,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     `;
                     button.addEventListener('click', () => openLightbox(image));
                     photoGrid.appendChild(button);
+                    const photo = button.querySelector('img');
+                    if (photo && window.SiteMediaStore?.isStored(image.src)) setStoredImageSource(photo, image.src);
                 });
             }
 
@@ -821,8 +856,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!featuredArtistsGrid) return;
         featuredArtistsGrid.innerHTML = '';
 
-        const featuredArtists = (dataUtils ? dataUtils.sortArtists(artistsList) : [...artistsList])
-            .filter(artist => artist.visible !== false && artist.featured !== false && artist.cover);
+        const featuredArtists = [...artistsList]
+            .filter(artist => artist.visible !== false && artist.featured !== false && artist.cover)
+            .sort((a, b) => (Number(a.featuredOrder) || 0) - (Number(b.featuredOrder) || 0));
+        const initialLimit = window.matchMedia('(max-width: 600px)').matches ? 4 : 8;
 
         if (!featuredArtists.length) {
             featuredArtistsGrid.innerHTML = '<p class="featured-artists-empty">Henüz öne çıkan sanatçı seçilmedi.</p>';
@@ -835,8 +872,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const card = document.createElement('a');
             card.className = 'featured-artist-card';
             card.href = `sanatci.html?artist=${encodeURIComponent(artist.slug)}`;
-            card.dataset.featuredExtra = index >= 8 ? 'true' : 'false';
-            card.hidden = index >= 8;
+            card.dataset.featuredExtra = index >= initialLimit ? 'true' : 'false';
+            card.hidden = index >= initialLimit;
             card.setAttribute('aria-label', `${artist.name} sanatçı sayfasını aç`);
             card.innerHTML = `
                 <span class="featured-artist-media">
@@ -848,12 +885,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span><small>${artist.concerts.length} konser</small><small>${photoCount} kare</small></span>
                 </span>`;
             featuredArtistsGrid.appendChild(card);
+            const coverImage = card.querySelector('img');
+            if (coverImage && window.SiteMediaStore?.isStored(artist.cover)) setStoredImageSource(coverImage, artist.cover);
         });
 
-        if (featuredArtistsActions) featuredArtistsActions.hidden = featuredArtists.length <= 8;
+        if (featuredArtistsActions) featuredArtistsActions.hidden = featuredArtists.length <= initialLimit;
         if (featuredArtistsMore) {
             featuredArtistsMore.setAttribute('aria-expanded', 'false');
-            featuredArtistsMore.innerHTML = 'Daha Fazla <i class="fas fa-arrow-down" aria-hidden="true"></i>';
+            featuredArtistsMore.innerHTML = `${escapeHtml(currentSiteData.siteText?.featuredMore || 'Daha Fazla')} <i class="fas fa-arrow-down" aria-hidden="true"></i>`;
         }
     }
 
@@ -864,7 +903,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         featuredArtistsMore.setAttribute('aria-expanded', String(!expanded));
         featuredArtistsMore.innerHTML = expanded
-            ? 'Daha Fazla <i class="fas fa-arrow-down" aria-hidden="true"></i>'
+            ? `${escapeHtml(currentSiteData.siteText?.featuredMore || 'Daha Fazla')} <i class="fas fa-arrow-down" aria-hidden="true"></i>`
             : 'Daha Az <i class="fas fa-arrow-up" aria-hidden="true"></i>';
     });
 
@@ -981,6 +1020,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const frame = document.getElementById('youtubeVideoFrame');
         const heading = document.getElementById('youtubeVideoTitle');
         if (!modal || !frame || !videoId) return;
+        const player = document.getElementById('projectVideoPlayer');
+        if (player) { player.pause(); player.removeAttribute('src'); player.hidden = true; }
+        frame.hidden = false;
         frame.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(videoId)}?autoplay=1&rel=0`;
         frame.title = title || 'YouTube videosu';
         if (heading) heading.textContent = title || 'Klip Çekimi';
@@ -990,13 +1032,30 @@ document.addEventListener('DOMContentLoaded', () => {
         modal.querySelector('.youtube-video-modal-close')?.focus();
     }
 
+    async function openUploadedVideo(reference, title = '') {
+        const modal = document.getElementById('youtubeVideoModal');
+        const frame = document.getElementById('youtubeVideoFrame');
+        const player = document.getElementById('projectVideoPlayer');
+        const heading = document.getElementById('youtubeVideoTitle');
+        if (!modal || !player || !reference) return;
+        const source = await resolveMediaUrl(reference);
+        if (!source) return;
+        if (frame) { frame.src = ''; frame.hidden = true; }
+        player.src = source; player.hidden = false; player.load(); player.play().catch(() => {});
+        if (heading) heading.textContent = title || 'Video';
+        modal.classList.add('active'); modal.setAttribute('aria-hidden', 'false'); document.body.style.overflow = 'hidden';
+        modal.querySelector('.youtube-video-modal-close')?.focus();
+    }
+
     function closeYouTubeModal() {
         const modal = document.getElementById('youtubeVideoModal');
         const frame = document.getElementById('youtubeVideoFrame');
+        const player = document.getElementById('projectVideoPlayer');
         if (!modal || !frame) return;
         modal.classList.remove('active');
         modal.setAttribute('aria-hidden', 'true');
         frame.src = '';
+        if (player) { player.pause(); player.removeAttribute('src'); player.hidden = true; }
         document.body.style.overflow = '';
     }
 
@@ -1006,7 +1065,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (event.target === youtubeVideoModal) closeYouTubeModal();
     });
 
-    function loadYoutubeProjects() {
+    async function loadYoutubeProjects() {
         const grid = document.getElementById('youtubeProjectsGrid');
         if (!grid) return;
 
@@ -1024,15 +1083,17 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        projects.forEach(project => {
+        for (const project of projects) {
             const article = document.createElement('article');
             article.className = 'youtube-project-card reveal active';
             const projectUrl = safeExternalUrl(project.url);
             const videoId = extractYouTubeVideoId(projectUrl);
             const usesAutomaticThumbnail = !project.thumbnail && Boolean(videoId);
-            const thumbnail = project.thumbnail || youtubeThumbnail(videoId);
-            const cardTag = videoId ? 'button' : projectUrl ? 'a' : 'div';
-            const linkAttributes = videoId
+            const thumbnailReference = project.thumbnail || youtubeThumbnail(videoId);
+            const thumbnail = await resolveMediaUrl(thumbnailReference);
+            const hasPlayableMedia = Boolean(project.videoFile || videoId);
+            const cardTag = hasPlayableMedia ? 'button' : projectUrl ? 'a' : 'div';
+            const linkAttributes = hasPlayableMedia
                 ? `type="button" aria-label="${escapeHtml(project.title)} klibini sitede izle"`
                 : projectUrl ? `href="${escapeHtml(projectUrl)}" target="_blank" rel="noopener noreferrer" aria-label="${escapeHtml(project.title)} klip çekimini aç"` : '';
             article.innerHTML = `
@@ -1051,7 +1112,9 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
             const media = article.querySelector('.youtube-project-media');
             const image = article.querySelector('img');
-            if (videoId) {
+            if (project.videoFile) {
+                article.querySelector('.youtube-project-link')?.addEventListener('click', () => openUploadedVideo(project.videoFile, project.title));
+            } else if (videoId) {
                 article.querySelector('.youtube-project-link')?.addEventListener('click', () => openYouTubeModal(videoId, project.title));
             }
             image?.addEventListener('error', () => {
@@ -1064,10 +1127,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 media?.classList.add('is-missing');
             });
             grid.appendChild(article);
-        });
+        }
     }
 
-    function loadCreativeProjects(containerId, dataKey, sectionKey, emptyText, fallbackCategory, isVideo = false) {
+    async function loadCreativeProjects(containerId, dataKey, sectionKey, emptyText, fallbackCategory, isVideo = false) {
         const grid = document.getElementById(containerId);
         if (!grid) return;
 
@@ -1085,16 +1148,21 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        items.forEach((item, index) => {
+        for (const [index, item] of items.entries()) {
             const projectUrl = safeExternalUrl(item.url);
             const videoId = isVideo ? extractYouTubeVideoId(projectUrl) : '';
             const automaticThumbnail = isVideo && !item.image && Boolean(videoId);
-            const imageUrl = item.image || youtubeThumbnail(videoId);
-            const card = document.createElement(isVideo && projectUrl ? 'a' : isVideo ? 'article' : 'button');
+            const imageReference = item.image || youtubeThumbnail(videoId);
+            const imageUrl = await resolveMediaUrl(imageReference);
+            const hasPlayableMedia = isVideo && Boolean(item.videoFile || videoId);
+            const card = document.createElement(hasPlayableMedia ? 'button' : isVideo && projectUrl ? 'a' : isVideo ? 'article' : 'button');
             card.className = 'creative-project-card reveal active';
             if (!isVideo) {
                 card.type = 'button';
                 card.setAttribute('aria-label', `${item.title} görselini büyüt`);
+            } else if (hasPlayableMedia) {
+                card.type = 'button';
+                card.setAttribute('aria-label', `${item.title} videosunu sitede izle`);
             } else if (projectUrl) {
                 card.href = projectUrl;
                 card.target = '_blank';
@@ -1105,7 +1173,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <span class="creative-project-media ${imageUrl ? '' : 'is-missing'}">
                     ${imageUrl ? `<img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(item.title)}" loading="${index < 4 ? 'eager' : 'lazy'}" decoding="async"${automaticThumbnail ? ` data-youtube-video-id="${escapeHtml(videoId)}"` : ''}>` : ''}
                     <span class="creative-project-placeholder"><i class="fas ${isVideo ? 'fa-play' : 'fa-pen-ruler'}" aria-hidden="true"></i></span>
-                    <small class="creative-project-badge">${escapeHtml(item.category || fallbackCategory)}</small>
+                    ${isVideo && (item.category || fallbackCategory) ? `<small class="creative-project-badge">${escapeHtml(item.category || fallbackCategory)}</small>` : ''}
                 </span>
                 <span class="creative-project-info">
                     <strong>${escapeHtml(item.title)}</strong>
@@ -1127,11 +1195,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 card.addEventListener('click', () => openLightbox({
                     src: imageUrl,
                     title: item.title,
-                    desc: [item.category || fallbackCategory, item.year].filter(Boolean).join(' · ')
+                    desc: item.year || ''
                 }));
+            } else if (item.videoFile) {
+                card.addEventListener('click', () => openUploadedVideo(item.videoFile, item.title));
+            } else if (videoId) {
+                card.addEventListener('click', event => { event.preventDefault(); openYouTubeModal(videoId, item.title); });
             }
             grid.appendChild(card);
-        });
+        }
     }
 
     async function setStoredImageSource(image, reference) {

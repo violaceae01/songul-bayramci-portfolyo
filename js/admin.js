@@ -23,6 +23,8 @@ document.addEventListener('DOMContentLoaded', () => {
             merged.hero = { ...(defaults.hero || {}), ...(parsed.hero || {}) };
             merged.contact = { ...(defaults.contact || {}), ...(parsed.contact || {}) };
             merged.sectionVisibility = { ...(defaults.sectionVisibility || {}), ...(parsed.sectionVisibility || {}) };
+            merged.siteText = { ...(defaults.siteText || {}), ...(parsed.siteText || {}) };
+            merged.typography = { ...(defaults.typography || {}), ...(parsed.typography || {}) };
             const savedContentVersion = Number(parsed.contentVersion || 0);
             const currentContentVersion = Number(defaults.contentVersion || 0);
             if (savedContentVersion < currentContentVersion && Array.isArray(defaults.graphicProjects)) {
@@ -108,11 +110,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const tabDescriptions = {
         'tab-portfolio': { title: 'Sanatçı & Konser Yönetimi', desc: 'Sanatçıları, konserlerini, galerilerini ve video bağlantılarını yönetin.' },
         'tab-hero': { title: 'Hero & Başlıklar', desc: 'Ana sayfa giriş alanındaki başlıkları, alt başlığı ve arka plan videosunu güncelleyin.' },
-        'tab-youtube': { title: 'Projeler & Görünürlük', desc: 'Klip, grafik tasarım, video projeleri ve ana sayfa bölümlerini yönetin.' },
+        'tab-visibility': { title: 'Sayfa ve Bölüm Görünürlüğü', desc: 'Sitedeki her bölümü silmeden açın veya kapatın.' },
+        'tab-clips': { title: 'Klip Çekimleri', desc: 'Klipleri sıralayın, kapak ve video dosyalarını bilgisayarınızdan yükleyin.' },
+        'tab-video-clips': { title: 'Video Klipleri', desc: 'Video klipleri sıralayın ve medya dosyalarını yönetin.' },
+        'tab-graphics': { title: 'Grafik Tasarım', desc: 'Afiş ve tasarım çalışmalarını sıralayın ve doğrudan yükleyin.' },
+        'tab-references': { title: 'Referanslarımız', desc: 'Çalışılan markaları ve logo dosyalarını yönetin.' },
         'tab-stats': { title: 'İstatistik Sayaçları', desc: 'Sitede yer alan deneyim ve istatistik sayılarını düzenleyin.' },
         'tab-about': { title: 'Hakkımızda Bölümü', desc: 'Marka, vizyon, misyon ve hakkımızda metinlerini yönetin.' },
         'tab-testimonials': { title: 'Referanslar & Yorumlar', desc: 'Sanatçı ve müşteri referanslarını düzenleyin.' },
         'tab-contact': { title: 'İletişim & Sosyal Medya', desc: 'İletişim bilgilerini ve sosyal medya bağlantılarını güncelleyin.' },
+        'tab-texts': { title: 'Metinler & Tipografi', desc: 'Sayfa metinlerini ve yazı kalınlıklarını tek yerden yönetin.' },
         'tab-backup': { title: 'Yedekleme & Dışa Aktar', desc: 'Verilerinizi kalıcı dosya olarak indirin veya varsayılanlara sıfırlayın.' }
     };
 
@@ -168,6 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
         artistsListEl.innerHTML = '';
         appData.artists = utils ? utils.normalizeArtists(appData.artists) : (appData.artists || []);
         const artists = utils ? utils.sortArtists(appData.artists) : [...appData.artists];
+        const featuredArtists = [...appData.artists].filter(item => item.featured !== false).sort((a, b) => (Number(a.featuredOrder) || 0) - (Number(b.featuredOrder) || 0));
         if (artistsCount) artistsCount.textContent = artists.length;
 
         if (!artists.length) {
@@ -187,10 +195,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="artist-info-wrap">
                         <h3>${escapeHtml(artist.name)}</h3>
                         <p>${artist.concerts.length} konser · <a href="sanatci.html?artist=${encodeURIComponent(artist.slug)}" target="_blank">sanatçı sayfasını aç</a></p>
-                        <div class="admin-state-row"><span class="admin-state ${artist.visible !== false ? 'is-on' : 'is-off'}">${artist.visible !== false ? 'Sitede açık' : 'Sitede kapalı'}</span><span class="admin-state ${artist.featured !== false ? 'is-on' : 'is-off'}">${artist.featured !== false ? 'Öne çıkıyor' : 'Öne çıkarılmıyor'}</span></div>
+                        <div class="admin-state-row"><span class="admin-state ${artist.visible !== false ? 'is-on' : 'is-off'}">${artist.visible !== false ? 'Sitede açık' : 'Sitede kapalı'}</span><span class="admin-state ${artist.featured !== false ? 'is-on' : 'is-off'}">${artist.featured !== false ? `Öne çıkan sıra: ${featuredArtists.findIndex(item => String(item.id) === String(artist.id)) + 1}` : 'Öne çıkarılmıyor'}</span></div>
                         ${artist.bio ? `<p class="artist-bio-preview">${escapeHtml(artist.bio)}</p>` : ''}
                     </div>
                     <div class="artist-actions-wrap">
+                        ${artist.featured !== false ? `<button class="btn btn-secondary btn-sm" data-action="featured-up" data-artist-id="${artist.id}" title="Öne çıkanlarda yukarı taşı"><i class="fas fa-arrow-up"></i></button><button class="btn btn-secondary btn-sm" data-action="featured-down" data-artist-id="${artist.id}" title="Öne çıkanlarda aşağı taşı"><i class="fas fa-arrow-down"></i></button>` : ''}
                         <button class="btn btn-primary btn-sm" data-action="add-concert" data-artist-id="${artist.id}"><i class="fas fa-plus"></i> Yeni Konser</button>
                         <button class="btn btn-secondary btn-sm" data-action="edit-artist" data-artist-id="${artist.id}"><i class="fas fa-edit"></i> Sanatçı</button>
                         <button class="btn btn-danger btn-sm" data-action="delete-artist" data-artist-id="${artist.id}" aria-label="Sanatçıyı sil"><i class="fas fa-trash-alt"></i></button>
@@ -198,13 +207,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
                 <div class="artist-concerts-admin-list">${concertsHtml}</div>`;
             artistsListEl.appendChild(card);
+            const coverImage = card.querySelector('.artist-cover-thumb');
+            if (coverImage && window.SiteMediaStore?.isStored(artist.cover)) resolveAdminMedia(artist.cover).then(source => { if (source) coverImage.src = source; });
+            card.querySelectorAll('[data-media-reference]').forEach(image => {
+                const reference = image.dataset.mediaReference;
+                if (window.SiteMediaStore?.isStored(reference)) resolveAdminMedia(reference).then(source => { if (source) image.src = source; });
+            });
         });
     }
 
     function renderConcertAdminCard(artist, concert) {
         const photos = (concert.images || []).map(image => `
             <div class="artist-subphoto-item">
-                <img src="${escapeHtml(image.src)}" alt="${escapeHtml(image.title || artist.name)}">
+                <img src="${escapeHtml(image.src)}" data-media-reference="${escapeHtml(image.src)}" alt="${escapeHtml(image.title || artist.name)}">
                 <button class="btn-delete-subphoto" data-action="delete-photo" data-artist-id="${artist.id}" data-concert-id="${concert.id}" data-photo-id="${image.id}" title="Fotoğrafı Sil"><i class="fas fa-times"></i></button>
             </div>`).join('');
 
@@ -247,6 +262,16 @@ document.addEventListener('DOMContentLoaded', () => {
             concert.images = concert.images.filter(item => String(item.id) !== String(button.dataset.photoId));
             saveData(false); renderArtistsList(); showToast('Fotoğraf silindi.');
         }
+        if (action === 'featured-up' || action === 'featured-down') {
+            const ordered = [...appData.artists].filter(item => item.featured !== false).sort((a, b) => (Number(a.featuredOrder) || 0) - (Number(b.featuredOrder) || 0));
+            const currentIndex = ordered.findIndex(item => String(item.id) === String(artist.id));
+            const nextIndex = action === 'featured-up' ? currentIndex - 1 : currentIndex + 1;
+            if (nextIndex >= 0 && nextIndex < ordered.length) {
+                [ordered[currentIndex], ordered[nextIndex]] = [ordered[nextIndex], ordered[currentIndex]];
+                ordered.forEach((item, index) => { item.featuredOrder = index; });
+                saveData(false); renderArtistsList(); showToast('Öne çıkan sanatçı sırası güncellendi.');
+            }
+        }
     });
 
     function openArtistModal(artist = null) {
@@ -279,7 +304,8 @@ document.addEventListener('DOMContentLoaded', () => {
             existing.name = name; existing.bio = bio; existing.cover = cover; existing.visible = visible; existing.featured = featured; showToast('Sanatçı güncellendi.');
         } else {
             const id = Date.now();
-            appData.artists.push({ id, slug: utils ? utils.slugify(name) : String(id), name, bio, cover, visible, featured, concerts: [] });
+            const featuredOrder = Math.max(-1, ...appData.artists.map(item => Number(item.featuredOrder) || 0)) + 1;
+            appData.artists.push({ id, slug: utils ? utils.slugify(name) : String(id), name, bio, cover, visible, featured, featuredOrder, concerts: [] });
             showToast('Yeni sanatçı eklendi.');
         }
         saveData(false); renderArtistsList(); closeArtistModal();
@@ -333,11 +359,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const zone = document.getElementById(zoneId); const fileInput = document.getElementById(inputId);
         const pathInput = document.getElementById(pathInputId); const preview = document.getElementById(previewId);
         if (!zone || !fileInput || !pathInput || !preview) return;
-        const handleFile = file => {
+        const handleFile = async file => {
             if (!file) return;
-            const reader = new FileReader();
-            reader.onload = event => { pathInput.value = event.target.result; preview.src = event.target.result; preview.style.display = 'block'; };
-            reader.readAsDataURL(file);
+            try {
+                const previousReference = pathInput.value.trim();
+                pathInput.value = await window.SiteMediaStore.save(file, zoneId === 'artistDropZone' ? 'artist-cover' : 'concert-photo');
+                if (window.SiteMediaStore.isStored(previousReference)) await window.SiteMediaStore.remove(previousReference);
+                preview.src = await resolveAdminMedia(pathInput.value);
+                preview.style.display = 'block';
+                showToast('Görsel yüklendi. Kaydetmeyi unutmayın.');
+            } catch (error) {
+                console.error('Görsel yükleme hatası:', error);
+                showToast('Görsel yüklenemedi. Tarayıcı depolama alanını kontrol edin.', 'error');
+            }
         };
         zone.addEventListener('click', () => fileInput.click());
         fileInput.addEventListener('change', event => handleFile(event.target.files[0]));
@@ -441,15 +475,15 @@ document.addEventListener('DOMContentLoaded', () => {
             card.innerHTML = `
                 <div class="media-admin-card-header">
                     <strong>${escapeHtml(options.itemLabel)} ${index + 1}</strong>
-                    <button class="btn btn-danger btn-sm" type="button" data-delete-creative aria-label="${escapeHtml(options.itemLabel)} projesini sil"><i class="fas fa-trash-alt"></i></button>
+                    <span class="admin-order-actions"><button class="btn btn-secondary btn-sm" type="button" data-move-creative="up" aria-label="Yukarı taşı"><i class="fas fa-arrow-up"></i></button><button class="btn btn-secondary btn-sm" type="button" data-move-creative="down" aria-label="Aşağı taşı"><i class="fas fa-arrow-down"></i></button><button class="btn btn-danger btn-sm" type="button" data-delete-creative aria-label="${escapeHtml(options.itemLabel)} projesini sil"><i class="fas fa-trash-alt"></i></button></span>
                 </div>
                 <div class="form-grid">
                     <label class="admin-toggle form-full"><input type="checkbox" class="creative-enabled" ${project.enabled !== false ? 'checked' : ''}><span><strong>Yayında</strong><small>Kapatılırsa kart sayfada görünmez.</small></span></label>
                     <div class="form-group"><label>Proje / Sanatçı Adı</label><input type="text" class="form-control creative-title" value="${escapeHtml(project.title)}" placeholder="${escapeHtml(options.titlePlaceholder)}"></div>
                     <div class="form-group"><label>Yıl</label><input type="text" class="form-control creative-year" value="${escapeHtml(project.year)}" placeholder="2026"></div>
-                    <div class="form-group form-full"><label>Etiket</label><input type="text" class="form-control creative-category" value="${escapeHtml(project.category || options.defaultCategory)}" placeholder="${escapeHtml(options.defaultCategory)}"></div>
-                    <div class="form-group form-full"><label>${options.isVideo ? 'Özel Kapak Görseli (isteğe bağlı)' : 'Proje Görseli Yolu / URL'}</label><input type="text" class="form-control creative-image" value="${escapeHtml(project.image)}" placeholder="${options.isVideo ? 'Boş bırakırsanız YouTube kapağı otomatik alınır' : 'Görsel/tasarim.jpg'}"></div>
-                    <div class="form-group form-full"><label>${options.isVideo ? 'YouTube Video Bağlantısı' : 'Proje Bağlantısı (isteğe bağlı)'}</label><input type="url" class="form-control creative-url" value="${escapeHtml(project.url)}" placeholder="https://..."></div>
+                    ${options.showCategory ? `<div class="form-group form-full"><label>Etiket</label><input type="text" class="form-control creative-category" value="${escapeHtml(project.category || options.defaultCategory)}" placeholder="${escapeHtml(options.defaultCategory)}"></div>` : ''}
+                    <div class="form-group form-full"><label>${options.isVideo ? 'Özel Kapak Görseli (isteğe bağlı)' : 'Proje Görseli'}</label><input type="file" class="form-control creative-image-file" accept="image/*"><input type="hidden" class="creative-image" value="${escapeHtml(project.image)}"><p class="form-help">${options.isVideo ? 'Görsel yüklemezseniz YouTube kapağı otomatik kullanılır.' : 'Görseli doğrudan bilgisayarınızdan seçin.'}</p></div>
+                    ${options.isVideo ? `<div class="form-group form-full"><label>Video Dosyası (isteğe bağlı)</label><input type="file" class="form-control creative-video-file" accept="video/mp4,video/webm,video/quicktime"><input type="hidden" class="creative-video" value="${escapeHtml(project.videoFile || '')}"><p class="form-help">Bilgisayardan video yüklerseniz sitede doğrudan oynatılır.</p></div><div class="form-group form-full"><label>YouTube Video Bağlantısı (isteğe bağlı)</label><input type="url" class="form-control creative-url" value="${escapeHtml(project.url)}" placeholder="https://www.youtube.com/watch?v=..."></div>` : '<input type="hidden" class="creative-url" value="">'}
                 </div>`;
             container.appendChild(card);
         });
@@ -463,6 +497,7 @@ document.addEventListener('DOMContentLoaded', () => {
             year: card.querySelector('.creative-year')?.value.trim() || '',
             category: card.querySelector('.creative-category')?.value.trim() || defaultCategory,
             image: card.querySelector('.creative-image')?.value.trim() || '',
+            videoFile: card.querySelector('.creative-video')?.value.trim() || '',
             url: card.querySelector('.creative-url')?.value.trim() || '',
             enabled: card.querySelector('.creative-enabled')?.checked !== false
         }));
@@ -470,45 +505,67 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderVideoClipsForm() {
         renderCreativeProjectsForm(videoClipsAdmin, appData.videoClips || [], {
-            itemLabel: 'Video Klip', emptyLabel: 'video klip', titlePlaceholder: 'Kubilay Karça', defaultCategory: 'Video Klip', isVideo: true
+            itemLabel: 'Video Klip', emptyLabel: 'video klip', titlePlaceholder: 'Kubilay Karça', defaultCategory: 'Video Klip', isVideo: true, showCategory: false
         });
     }
 
     function renderGraphicProjectsForm() {
         renderCreativeProjectsForm(graphicProjectsAdmin, appData.graphicProjects || [], {
-            itemLabel: 'Grafik Tasarım', emptyLabel: 'grafik tasarım projesi', titlePlaceholder: 'Proje adı', defaultCategory: 'Grafik Tasarım', isVideo: false
+            itemLabel: 'Grafik Tasarım', emptyLabel: 'grafik tasarım projesi', titlePlaceholder: 'Proje adı', defaultCategory: '', isVideo: false, showCategory: false
         });
     }
 
     document.getElementById('btnAddVideoClip')?.addEventListener('click', () => {
         appData.videoClips = readCreativeProjectsForm(videoClipsAdmin, 'Video Klip');
-        appData.videoClips.push({ id: Date.now(), title: '', year: String(new Date().getFullYear()), category: 'Video Klip', image: '', url: '', enabled: true });
+        appData.videoClips.push({ id: Date.now(), title: '', year: String(new Date().getFullYear()), category: '', image: '', videoFile: '', url: '', enabled: true });
         renderVideoClipsForm();
         videoClipsAdmin.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     });
 
     document.getElementById('btnAddGraphicProject')?.addEventListener('click', () => {
-        appData.graphicProjects = readCreativeProjectsForm(graphicProjectsAdmin, 'Grafik Tasarım');
-        appData.graphicProjects.push({ id: Date.now(), title: '', year: String(new Date().getFullYear()), category: 'Grafik Tasarım', image: '', url: '', enabled: true });
+        appData.graphicProjects = readCreativeProjectsForm(graphicProjectsAdmin, '');
+        appData.graphicProjects.push({ id: Date.now(), title: '', year: String(new Date().getFullYear()), category: '', image: '', url: '', enabled: true });
         renderGraphicProjectsForm();
         graphicProjectsAdmin.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     });
 
-    function bindCreativeDelete(container, dataKey, defaultCategory, render, label) {
+    function bindCreativeActions(container, dataKey, defaultCategory, render, label) {
         container?.addEventListener('click', event => {
-            const button = event.target.closest('[data-delete-creative]');
-            if (!button || !confirm(`Bu ${label} projesi silinsin mi?`)) return;
+            const button = event.target.closest('[data-delete-creative], [data-move-creative]');
+            if (!button) return;
             appData[dataKey] = readCreativeProjectsForm(container, defaultCategory);
             const card = button.closest('[data-creative-project]');
-            appData[dataKey] = appData[dataKey].filter(project => String(project.id) !== card?.dataset.creativeProject);
+            const index = appData[dataKey].findIndex(project => String(project.id) === card?.dataset.creativeProject);
+            if (button.matches('[data-delete-creative]')) {
+                if (!confirm(`Bu ${label} projesi silinsin mi?`)) return;
+                appData[dataKey].splice(index, 1);
+            } else {
+                const nextIndex = button.dataset.moveCreative === 'up' ? index - 1 : index + 1;
+                if (index < 0 || nextIndex < 0 || nextIndex >= appData[dataKey].length) return;
+                [appData[dataKey][index], appData[dataKey][nextIndex]] = [appData[dataKey][nextIndex], appData[dataKey][index]];
+            }
             saveData(false);
             render();
-            showToast(`${label} projesi silindi.`);
+            showToast(button.matches('[data-delete-creative]') ? `${label} projesi silindi.` : 'Sıralama güncellendi.');
+        });
+        container?.addEventListener('change', async event => {
+            const fileInput = event.target.closest('.creative-image-file, .creative-video-file');
+            if (!fileInput?.files?.[0]) return;
+            const card = fileInput.closest('[data-creative-project]');
+            const isVideoFile = fileInput.classList.contains('creative-video-file');
+            const target = card?.querySelector(isVideoFile ? '.creative-video' : '.creative-image');
+            if (!target) return;
+            try {
+                const previous = target.value.trim();
+                target.value = await window.SiteMediaStore.save(fileInput.files[0], isVideoFile ? 'project-video' : 'project-image');
+                if (window.SiteMediaStore.isStored(previous)) await window.SiteMediaStore.remove(previous);
+                showToast(`${isVideoFile ? 'Video' : 'Görsel'} yüklendi. Kaydetmeyi unutmayın.`);
+            } catch (error) { console.error(error); showToast('Dosya yüklenemedi.', 'error'); }
         });
     }
 
-    bindCreativeDelete(videoClipsAdmin, 'videoClips', 'Video Klip', renderVideoClipsForm, 'video klip');
-    bindCreativeDelete(graphicProjectsAdmin, 'graphicProjects', 'Grafik Tasarım', renderGraphicProjectsForm, 'grafik tasarım');
+    bindCreativeActions(videoClipsAdmin, 'videoClips', '', renderVideoClipsForm, 'video klip');
+    bindCreativeActions(graphicProjectsAdmin, 'graphicProjects', '', renderGraphicProjectsForm, 'grafik tasarım');
 
     function renderYoutubeProjectsForm() {
         if (!youtubeProjectsAdmin) return;
@@ -526,7 +583,7 @@ document.addEventListener('DOMContentLoaded', () => {
             card.innerHTML = `
                 <div class="media-admin-card-header">
                     <strong>Klip Çekimi ${index + 1}</strong>
-                    <button class="btn btn-danger btn-sm" type="button" data-delete-youtube aria-label="Klip çekimini sil"><i class="fas fa-trash-alt"></i></button>
+                    <span class="admin-order-actions"><button class="btn btn-secondary btn-sm" type="button" data-move-youtube="up" aria-label="Yukarı taşı"><i class="fas fa-arrow-up"></i></button><button class="btn btn-secondary btn-sm" type="button" data-move-youtube="down" aria-label="Aşağı taşı"><i class="fas fa-arrow-down"></i></button><button class="btn btn-danger btn-sm" type="button" data-delete-youtube aria-label="Klip çekimini sil"><i class="fas fa-trash-alt"></i></button></span>
                 </div>
                 <div class="form-grid">
                     <label class="admin-toggle form-full"><input type="checkbox" class="youtube-enabled" ${project.enabled !== false ? 'checked' : ''}><span><strong>Yayında</strong><small>Kapatılırsa bu kart klip çekimleri sayfasında görünmez.</small></span></label>
@@ -534,8 +591,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="form-group"><label>Yıl</label><input type="text" class="form-control youtube-year" value="${escapeHtml(project.year)}" placeholder="2026"></div>
                     <div class="form-group"><label>Etiket</label><input type="text" class="form-control youtube-category" value="${escapeHtml(project.category || 'Klip Çekimi')}" placeholder="Klip Çekimi"></div>
                     <div class="form-group"><label>Kapak Yerleşimi</label><select class="form-control youtube-fit"><option value="cover" ${project.thumbnailFit !== 'contain' ? 'selected' : ''}>Görseli kapla</option><option value="contain" ${project.thumbnailFit === 'contain' ? 'selected' : ''}>Logoyu sığdır</option></select></div>
-                    <div class="form-group form-full"><label>Özel Kapak Görseli Yolu / URL (isteğe bağlı)</label><input type="text" class="form-control youtube-thumbnail" value="${escapeHtml(project.thumbnail)}" placeholder="Boş bırakırsanız klip kapağı otomatik alınır"></div>
-                    <div class="form-group form-full"><label>YouTube Klip Bağlantısı</label><input type="url" class="form-control youtube-url" value="${escapeHtml(project.url)}" placeholder="https://www.youtube.com/watch?v=..."><p class="form-help">Bağlantıdaki klibin kapak görseli otomatik olarak kullanılır.</p></div>
+                    <div class="form-group form-full"><label>Özel Kapak Görseli (isteğe bağlı)</label><input type="file" class="form-control youtube-thumbnail-file" accept="image/*"><input type="hidden" class="youtube-thumbnail" value="${escapeHtml(project.thumbnail)}"><p class="form-help">Yüklemezseniz YouTube kapağı otomatik alınır.</p></div>
+                    <div class="form-group form-full"><label>Video Dosyası (isteğe bağlı)</label><input type="file" class="form-control youtube-video-file" accept="video/mp4,video/webm,video/quicktime"><input type="hidden" class="youtube-video" value="${escapeHtml(project.videoFile || '')}"><p class="form-help">Bilgisayardan yüklenen video sitede doğrudan oynatılır.</p></div>
+                    <div class="form-group form-full"><label>YouTube Klip Bağlantısı (isteğe bağlı)</label><input type="url" class="form-control youtube-url" value="${escapeHtml(project.url)}" placeholder="https://www.youtube.com/watch?v=..."><p class="form-help">Video dosyası yoksa bu bağlantı kullanılır ve kapak otomatik alınır.</p></div>
                 </div>`;
             youtubeProjectsAdmin.appendChild(card);
         });
@@ -549,6 +607,7 @@ document.addEventListener('DOMContentLoaded', () => {
             year: card.querySelector('.youtube-year')?.value.trim() || '',
             category: card.querySelector('.youtube-category')?.value.trim() || 'Klip Çekimi',
             thumbnail: card.querySelector('.youtube-thumbnail')?.value.trim() || '',
+            videoFile: card.querySelector('.youtube-video')?.value.trim() || '',
             thumbnailFit: card.querySelector('.youtube-fit')?.value || 'cover',
             url: card.querySelector('.youtube-url')?.value.trim() || '',
             enabled: card.querySelector('.youtube-enabled')?.checked !== false
@@ -557,20 +616,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('btnAddYoutubeProject')?.addEventListener('click', () => {
         readYoutubeProjectsForm();
-        appData.youtubeProjects.push({ id: Date.now(), title: '', year: String(new Date().getFullYear()), category: 'Klip Çekimi', thumbnail: '', thumbnailFit: 'cover', url: '', enabled: true });
+        appData.youtubeProjects.push({ id: Date.now(), title: '', year: String(new Date().getFullYear()), category: 'Klip Çekimi', thumbnail: '', thumbnailFit: 'cover', videoFile: '', url: '', enabled: true });
         renderYoutubeProjectsForm();
         youtubeProjectsAdmin.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     });
 
     youtubeProjectsAdmin?.addEventListener('click', event => {
-        const button = event.target.closest('[data-delete-youtube]');
-        if (!button || !confirm('Bu klip çekimi silinsin mi?')) return;
+        const button = event.target.closest('[data-delete-youtube], [data-move-youtube]');
+        if (!button) return;
         readYoutubeProjectsForm();
         const card = button.closest('[data-youtube-project]');
-        appData.youtubeProjects = appData.youtubeProjects.filter(project => String(project.id) !== card?.dataset.youtubeProject);
+        const index = appData.youtubeProjects.findIndex(project => String(project.id) === card?.dataset.youtubeProject);
+        if (button.matches('[data-delete-youtube]')) {
+            if (!confirm('Bu klip çekimi silinsin mi?')) return;
+            appData.youtubeProjects.splice(index, 1);
+        } else {
+            const nextIndex = button.dataset.moveYoutube === 'up' ? index - 1 : index + 1;
+            if (index < 0 || nextIndex < 0 || nextIndex >= appData.youtubeProjects.length) return;
+            [appData.youtubeProjects[index], appData.youtubeProjects[nextIndex]] = [appData.youtubeProjects[nextIndex], appData.youtubeProjects[index]];
+        }
         saveData(false);
         renderYoutubeProjectsForm();
-        showToast('Klip çekimi silindi.');
+        showToast(button.matches('[data-delete-youtube]') ? 'Klip çekimi silindi.' : 'Sıralama güncellendi.');
+    });
+
+    youtubeProjectsAdmin?.addEventListener('change', async event => {
+        const fileInput = event.target.closest('.youtube-thumbnail-file, .youtube-video-file');
+        if (!fileInput?.files?.[0]) return;
+        const card = fileInput.closest('[data-youtube-project]');
+        const isVideoFile = fileInput.classList.contains('youtube-video-file');
+        const target = card?.querySelector(isVideoFile ? '.youtube-video' : '.youtube-thumbnail');
+        if (!target) return;
+        try {
+            const previous = target.value.trim();
+            target.value = await window.SiteMediaStore.save(fileInput.files[0], isVideoFile ? 'clip-video' : 'clip-thumbnail');
+            if (window.SiteMediaStore.isStored(previous)) await window.SiteMediaStore.remove(previous);
+            showToast(`${isVideoFile ? 'Video' : 'Kapak görseli'} yüklendi. Kaydetmeyi unutmayın.`);
+        } catch (error) { console.error(error); showToast('Dosya yüklenemedi.', 'error'); }
     });
 
     function renderPartnersForm() {
@@ -681,21 +763,70 @@ document.addEventListener('DOMContentLoaded', () => {
     function readStatsForm() { const nums = document.querySelectorAll('.stat-num-input'); const labels = document.querySelectorAll('.stat-lbl-input'); appData.stats = [...nums].map((input, index) => ({ id: index + 1, number: input.value.trim(), label: labels[index]?.value.trim() || '' })); }
 
     const aboutName = document.getElementById('aboutName'); const aboutImage = document.getElementById('aboutImage');
-    const aboutOwner = document.getElementById('aboutOwner'); const aboutVision = document.getElementById('aboutVision'); const aboutMission = document.getElementById('aboutMission');
+    const aboutVision = document.getElementById('aboutVision'); const aboutMission = document.getElementById('aboutMission');
     const aboutLead = document.getElementById('aboutLead'); const aboutP1 = document.getElementById('aboutP1'); const aboutP2 = document.getElementById('aboutP2');
-    function populateAboutForm() { if (!appData.about) return; aboutName.value = appData.about.name || ''; aboutImage.value = appData.about.image || ''; aboutOwner.value = appData.about.owner || ''; aboutLead.value = appData.about.lead || ''; aboutP1.value = appData.about.p1 || ''; aboutP2.value = appData.about.p2 || ''; aboutVision.value = appData.about.vision || ''; aboutMission.value = appData.about.mission || ''; }
-    function readAboutForm() { appData.about = { ...appData.about, name: aboutName.value.trim(), image: aboutImage.value.trim(), owner: aboutOwner.value.trim(), lead: aboutLead.value.trim(), p1: aboutP1.value.trim(), p2: aboutP2.value.trim(), vision: aboutVision.value.trim(), mission: aboutMission.value.trim() }; }
+    document.getElementById('aboutImageFile')?.addEventListener('change', async event => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+        try {
+            const previous = aboutImage.value.trim();
+            aboutImage.value = await window.SiteMediaStore.save(file, 'about-image');
+            if (window.SiteMediaStore.isStored(previous)) await window.SiteMediaStore.remove(previous);
+            showToast('Hakkımızda görseli yüklendi. Kaydetmeyi unutmayın.');
+        } catch (error) { console.error(error); showToast('Görsel yüklenemedi.', 'error'); }
+    });
+    function populateAboutForm() { if (!appData.about) return; aboutName.value = appData.about.name || ''; aboutImage.value = appData.about.image || ''; aboutLead.value = appData.about.lead || ''; aboutP1.value = appData.about.p1 || ''; aboutP2.value = appData.about.p2 || ''; aboutVision.value = appData.about.vision || ''; aboutMission.value = appData.about.mission || ''; }
+    function readAboutForm() { appData.about = { ...appData.about, name: aboutName.value.trim(), image: aboutImage.value.trim(), owner: '', lead: aboutLead.value.trim(), p1: aboutP1.value.trim(), p2: aboutP2.value.trim(), vision: aboutVision.value.trim(), mission: aboutMission.value.trim() }; }
 
     const testimonialsContainer = document.getElementById('testimonialsContainer');
     function renderTestimonialsForm() {
         testimonialsContainer.innerHTML = '';
-        (appData.testimonials || []).forEach(item => {
-            const card = document.createElement('div'); card.className = 'admin-form-card';
-            card.innerHTML = `<div class="form-grid"><label class="admin-toggle form-full"><input type="checkbox" class="test-enabled" ${item.enabled !== false ? 'checked' : ''}><span><strong>Yorumu Göster</strong><small>Kapatılırsa yorum ana sayfada görünmez.</small></span></label><div class="form-group"><label>Sanatçı / Müşteri Adı</label><input type="text" class="form-control test-name" value="${escapeHtml(item.name)}"></div><div class="form-group"><label>Ünvan</label><input type="text" class="form-control test-title" value="${escapeHtml(item.title)}"></div><div class="form-group form-full"><label>Yorum Metni</label><textarea class="form-control test-text" rows="2">${escapeHtml(item.text)}</textarea></div></div>`;
+        (appData.testimonials || []).forEach((item, index) => {
+            const card = document.createElement('div'); card.className = 'admin-form-card'; card.dataset.testimonial = String(item.id || Date.now() + index);
+            card.innerHTML = `<div class="media-admin-card-header"><strong>Yorum ${index + 1}</strong><span class="admin-order-actions"><button class="btn btn-secondary btn-sm" type="button" data-move-testimonial="up" aria-label="Yukarı taşı"><i class="fas fa-arrow-up"></i></button><button class="btn btn-secondary btn-sm" type="button" data-move-testimonial="down" aria-label="Aşağı taşı"><i class="fas fa-arrow-down"></i></button><button class="btn btn-danger btn-sm" type="button" data-delete-testimonial aria-label="Yorumu sil"><i class="fas fa-trash-alt"></i></button></span></div><div class="form-grid"><label class="admin-toggle form-full"><input type="checkbox" class="test-enabled" ${item.enabled !== false ? 'checked' : ''}><span><strong>Yorumu Göster</strong><small>Kapatılırsa yorum ana sayfada ve Ne Diyorlar sayfasında görünmez.</small></span></label><div class="form-group"><label>Sanatçı / Müşteri Adı</label><input type="text" class="form-control test-name" value="${escapeHtml(item.name)}"></div><div class="form-group"><label>Ünvan</label><input type="text" class="form-control test-title" value="${escapeHtml(item.title)}"></div><div class="form-group form-full"><label>Yorum Metni</label><textarea class="form-control test-text" rows="2">${escapeHtml(item.text)}</textarea></div></div>`;
             testimonialsContainer.appendChild(card);
         });
     }
-    function readTestimonialsForm() { const names = document.querySelectorAll('.test-name'); const titles = document.querySelectorAll('.test-title'); const texts = document.querySelectorAll('.test-text'); const enabled = document.querySelectorAll('.test-enabled'); appData.testimonials = [...names].map((input, index) => ({ id: index + 1, name: input.value.trim(), title: titles[index]?.value.trim() || '', text: texts[index]?.value.trim() || '', enabled: enabled[index]?.checked !== false })); }
+    function readTestimonialsForm() { appData.testimonials = [...testimonialsContainer.querySelectorAll('[data-testimonial]')].map(card => ({ id: Number(card.dataset.testimonial) || Date.now(), name: card.querySelector('.test-name')?.value.trim() || '', title: card.querySelector('.test-title')?.value.trim() || '', text: card.querySelector('.test-text')?.value.trim() || '', enabled: card.querySelector('.test-enabled')?.checked !== false })); }
+    document.getElementById('btnAddTestimonial')?.addEventListener('click', () => {
+        readTestimonialsForm();
+        if (appData.testimonials.length >= 8) return showToast('En fazla 8 yorum ekleyebilirsiniz.', 'error');
+        appData.testimonials.push({ id: Date.now(), name: '', title: '', text: '', enabled: true });
+        renderTestimonialsForm();
+    });
+    testimonialsContainer?.addEventListener('click', event => {
+        const button = event.target.closest('[data-delete-testimonial], [data-move-testimonial]');
+        if (!button) return;
+        readTestimonialsForm();
+        const card = button.closest('[data-testimonial]');
+        const index = appData.testimonials.findIndex(item => String(item.id) === card?.dataset.testimonial);
+        if (button.matches('[data-delete-testimonial]')) {
+            if (!confirm('Bu yorum silinsin mi?')) return;
+            appData.testimonials.splice(index, 1);
+        } else {
+            const nextIndex = button.dataset.moveTestimonial === 'up' ? index - 1 : index + 1;
+            if (index < 0 || nextIndex < 0 || nextIndex >= appData.testimonials.length) return;
+            [appData.testimonials[index], appData.testimonials[nextIndex]] = [appData.testimonials[nextIndex], appData.testimonials[index]];
+        }
+        saveData(false); renderTestimonialsForm(); showToast('Yorum sıralaması güncellendi.');
+    });
+
+    const textFieldLabels = {
+        navHome: 'Menü: Ana Sayfa', navWorks: 'Menü: Çalışmalarım', navClip: 'Menü: Klip Çekimleri', navVideo: 'Menü: Video Klipleri', navGraphic: 'Menü: Grafik Tasarım', navCorporate: 'Menü: Kurumsal', navReferences: 'Menü: Referanslarımız', navAbout: 'Menü: Hakkımızda', navTestimonials: 'Menü: Ne Diyorlar', navContact: 'Menü: İletişim', featuredTag: 'Öne Çıkanlar Üst Etiketi', featuredTitle: 'Öne Çıkanlar Başlığı', featuredMore: 'Daha Fazla Butonu', testimonialsTag: 'Yorumlar Üst Etiketi', testimonialsTitle: 'Yorumlar Başlığı', graphicTag: 'Grafik Tasarım Üst Etiketi', graphicTitle: 'Grafik Tasarım Başlığı', clipTag: 'Klip Çekimleri Üst Etiketi', clipTitle: 'Klip Çekimleri Başlığı', videoTag: 'Video Klipleri Üst Etiketi', videoTitle: 'Video Klipleri Başlığı', referencesTag: 'Referanslar Üst Etiketi', referencesTitle: 'Referanslar Başlığı', aboutTag: 'Hakkımızda Üst Etiketi', contactTag: 'İletişim Üst Etiketi', contactTitle: 'İletişim Başlığı', footerStudio: 'Footer Stüdyo Yazısı', footerCopyright: 'Footer Telif Yazısı'
+    };
+    const siteTextAdmin = document.getElementById('siteTextAdmin');
+    const typographyAdmin = document.getElementById('typographyAdmin');
+    function renderTextAndTypographyForms() {
+        if (siteTextAdmin) siteTextAdmin.innerHTML = Object.entries(textFieldLabels).map(([key, label]) => `<div class="form-group"><label>${escapeHtml(label)}</label><input class="form-control site-text-input" data-text-key="${key}" value="${escapeHtml(appData.siteText?.[key] || '')}"></div>`).join('');
+        const weights = [['bodyWeight', 'Gövde Yazıları'], ['headingWeight', 'Başlıklar'], ['navWeight', 'Menü Yazıları'], ['buttonWeight', 'Buton Yazıları']];
+        if (typographyAdmin) typographyAdmin.innerHTML = weights.map(([key, label]) => `<div class="form-group"><label>${label}</label><select class="form-control typography-input" data-typography-key="${key}">${['300','400','500','600','700','800'].map(weight => `<option value="${weight}" ${String(appData.typography?.[key] || '') === weight ? 'selected' : ''}>${weight}</option>`).join('')}</select></div>`).join('');
+    }
+    function readTextAndTypographyForms() {
+        appData.siteText = { ...(appData.siteText || {}) };
+        siteTextAdmin?.querySelectorAll('[data-text-key]').forEach(input => { appData.siteText[input.dataset.textKey] = input.value.trim(); });
+        appData.typography = { ...(appData.typography || {}) };
+        typographyAdmin?.querySelectorAll('[data-typography-key]').forEach(input => { appData.typography[input.dataset.typographyKey] = input.value; });
+    }
 
     const contactFields = { email: document.getElementById('contactEmail'), phone: document.getElementById('contactPhone'), whatsapp: document.getElementById('contactWhatsapp'), location: document.getElementById('contactLocation'), instagram: document.getElementById('contactInstagram'), youtube: document.getElementById('contactYoutube'), twitter: document.getElementById('contactTwitter'), linkedin: document.getElementById('contactLinkedin') };
     function populateContactForm() { Object.entries(contactFields).forEach(([key, input]) => { input.value = appData.contact?.[key] || ''; }); }
@@ -705,13 +836,14 @@ document.addEventListener('DOMContentLoaded', () => {
         readHeroForm();
         readSectionVisibilityForm();
         readYoutubeProjectsForm();
-        appData.videoClips = readCreativeProjectsForm(videoClipsAdmin, 'Video Klip');
-        appData.graphicProjects = readCreativeProjectsForm(graphicProjectsAdmin, 'Grafik Tasarım');
+        appData.videoClips = readCreativeProjectsForm(videoClipsAdmin, '');
+        appData.graphicProjects = readCreativeProjectsForm(graphicProjectsAdmin, '');
         readPartnersForm();
         readStatsForm();
         readAboutForm();
         readTestimonialsForm();
         readContactForm();
+        readTextAndTypographyForms();
     }
     document.getElementById('btnSaveAll')?.addEventListener('click', () => { readAllForms(); saveData(true); });
     document.getElementById('btnResetData')?.addEventListener('click', () => { if (!confirm('Tüm veriler varsayılana sıfırlansın mı?')) return; localStorage.removeItem(STORAGE_KEY); appData = loadData(); initAll(); showToast('Varsayılan veriler geri yüklendi.'); });
@@ -733,6 +865,7 @@ document.addEventListener('DOMContentLoaded', () => {
         populateAboutForm();
         renderTestimonialsForm();
         populateContactForm();
+        renderTextAndTypographyForms();
     }
     initAll();
 });

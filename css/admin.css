@@ -8,12 +8,12 @@
     --border-hover: rgba(255, 255, 255, 0.18);
     --text-primary: #ffffff;
     --text-secondary: #999999;
-    --accent: #e63946;
-    --accent-light: #ff6b6b;
-    --accent-dark: #c1121f;
-    --accent-glow: rgba(230, 57, 70, 0.3);
+    --accent: #C90B0E;
+    --accent-light: #C90B0E;
+    --accent-dark: #C90B0E;
+    --accent-glow: rgba(201, 11, 14, 0.3);
     --success: #2ec4b6;
-    --danger: #e71d36;
+    --danger: #C90B0E;
     --font-main: 'Poppins', sans-serif;
     --transition: 0.3s ease;
 }
@@ -229,9 +229,9 @@ body {
 }
 
 .btn-danger {
-    background: rgba(231, 29, 54, 0.15);
+    background: rgba(201, 11, 14, 0.15);
     color: var(--danger);
-    border: 1px solid rgba(231, 29, 54, 0.3);
+    border: 1px solid rgba(201, 11, 14, 0.3);
 }
 
 .btn-danger:hover {
@@ -283,7 +283,7 @@ body {
 }
 
 .artist-admin-card:hover {
-    border-color: rgba(230, 57, 70, 0.4);
+    border-color: rgba(201, 11, 14, 0.4);
 }
 
 .artist-card-header {
@@ -477,6 +477,12 @@ body {
     font-size: 0.95rem;
 }
 
+.admin-order-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+}
+
 .admin-toggle-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -547,8 +553,8 @@ body {
 }
 
 .admin-state.is-off {
-    border-color: rgba(231, 29, 54, 0.35);
-    background: rgba(231, 29, 54, 0.08);
+    border-color: rgba(201, 11, 14, 0.35);
+    background: rgba(201, 11, 14, 0.08);
     color: #ff7b8e;
 }
 
@@ -579,7 +585,7 @@ body {
     right: 4px;
     width: 22px;
     height: 22px;
-    background: rgba(230, 57, 70, 0.85);
+    background: rgba(201, 11, 14, 0.85);
     color: white;
     border: none;
     border-radius: 50%;
@@ -719,7 +725,7 @@ textarea.form-control {
 
 .upload-box:hover {
     border-color: var(--accent);
-    background: rgba(230, 57, 70, 0.05);
+    background: rgba(201, 11, 14, 0.05);
 }
 
 .upload-box i {
