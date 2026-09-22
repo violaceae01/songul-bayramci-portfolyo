@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     const STORAGE_KEY = 'sb_site_data';
     const utils = window.SiteDataUtils;
     const clone = value => JSON.parse(JSON.stringify(value));
@@ -10,7 +10,20 @@ document.addEventListener('DOMContentLoaded', () => {
         return window.SiteMediaStore.resolve(value);
     };
 
+    const serverEnabled = Boolean(await window.SiteServer?.ensureAdminSession?.());
     let appData = loadData();
+    if (serverEnabled) {
+        try {
+            const serverData = await window.SiteServer.loadData();
+            if (serverData) {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(serverData));
+                appData = loadData();
+            }
+        } catch (error) {
+            console.error('Sunucu verisi yüklenemedi:', error);
+            showToast('Sunucu verisi yüklenemedi. Lütfen sayfayı yenileyin.', 'error');
+        }
+    }
 
     function loadData() {
         const defaults = typeof siteData !== 'undefined' ? clone(siteData) : {
@@ -90,13 +103,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function saveData(notify = true) {
+    async function saveData(notify = true) {
         try {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
-            if (notify) showToast('Tüm değişiklikler başarıyla kaydedildi!', 'success');
+            if (serverEnabled) await window.SiteServer.saveData(appData);
+            if (notify) showToast(serverEnabled ? 'Değişiklikler canlı siteye kaydedildi!' : 'Tüm değişiklikler başarıyla kaydedildi!', 'success');
         } catch (error) {
             console.error('Kaydetme hatası:', error);
-            showToast('Metin verisi tarayıcı sınırını aştı. Görsel ve videoları dosya yükleme alanlarından seçin.', 'error');
+            showToast(serverEnabled ? 'Değişiklikler sunucuya kaydedilemedi.' : 'Metin verisi tarayıcı sınırını aştı. Görsel ve videoları dosya yükleme alanlarından seçin.', 'error');
         }
     }
 
@@ -961,7 +975,7 @@ document.addEventListener('DOMContentLoaded', () => {
         readTextAndTypographyForms();
         readSiteMediaForm();
     }
-    document.getElementById('btnSaveAll')?.addEventListener('click', () => { readAllForms(); saveData(true); });
+    document.getElementById('btnSaveAll')?.addEventListener('click', async () => { readAllForms(); await saveData(true); });
     document.getElementById('btnResetData')?.addEventListener('click', () => { if (!confirm('Tüm veriler varsayılana sıfırlansın mı?')) return; localStorage.removeItem(STORAGE_KEY); appData = loadData(); initAll(); showToast('Varsayılan veriler geri yüklendi.'); });
     document.getElementById('btnDownloadDataJs')?.addEventListener('click', () => {
         readAllForms(); const blob = new Blob([`const siteData = ${JSON.stringify(appData, null, 2)};\n`], { type: 'application/javascript;charset=utf-8' });

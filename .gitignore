@@ -2,3 +2,9 @@
 .DS_Store
 Thumbs.db
 dist/
+storage/admin.json
+storage/site-data.json
+storage/*.tmp
+uploads/*
+!uploads/.gitkeep
+!uploads/.htaccess

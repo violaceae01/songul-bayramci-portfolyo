@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
 
     // ============================================
     // IMAGE PARTICLE SYSTEM - ON ALL SECTIONS
@@ -310,7 +310,16 @@ document.addEventListener('DOMContentLoaded', () => {
         return typeof siteData !== 'undefined' ? siteData : {};
     }
 
-    const currentSiteData = getSiteData();
+    let currentSiteData = getSiteData();
+    try {
+        const serverData = await window.SiteServer?.loadData?.();
+        if (serverData) {
+            currentSiteData = serverData;
+            localStorage.setItem('sb_site_data', JSON.stringify(serverData));
+        }
+    } catch (error) {
+        console.error('Sunucu verisi yüklenemedi, yerel veri kullanılıyor:', error);
+    }
     const dataUtils = window.SiteDataUtils;
     const escapeHtml = value => dataUtils ? dataUtils.escapeHtml(value) : String(value || '');
     const resolveMediaUrl = async value => {

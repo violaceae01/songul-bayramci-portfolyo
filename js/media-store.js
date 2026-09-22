@@ -3,6 +3,7 @@
     const DB_VERSION = 1;
     const STORE_NAME = 'files';
     const PREFIX = 'idb-media:';
+    const SERVER_PREFIX = 'server-media:';
     const objectUrls = new Map();
 
     function openDatabase() {
@@ -26,6 +27,8 @@
 
     async function save(file, category = 'media') {
         if (!(file instanceof Blob)) throw new Error('Geçerli bir dosya seçilmedi.');
+        const serverStatus = await window.SiteServer?.status?.();
+        if (serverStatus) return window.SiteServer.upload(file, category);
         const id = `${category}-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
         const database = await openDatabase();
         await new Promise((resolve, reject) => {
@@ -46,8 +49,10 @@
     }
 
     async function resolve(reference) {
+        const value = String(reference || '');
+        if (value.startsWith(SERVER_PREFIX)) return value.slice(SERVER_PREFIX.length);
         const id = mediaId(reference);
-        if (!id) return String(reference || '');
+        if (!id) return value;
         if (objectUrls.has(id)) return objectUrls.get(id);
 
         const database = await openDatabase();
@@ -64,6 +69,11 @@
     }
 
     async function remove(reference) {
+        const value = String(reference || '');
+        if (value.startsWith(SERVER_PREFIX)) {
+            await window.SiteServer?.remove?.(value);
+            return;
+        }
         const id = mediaId(reference);
         if (!id) return;
         const url = objectUrls.get(id);
@@ -80,7 +90,7 @@
     }
 
     window.SiteMediaStore = {
-        isStored: reference => Boolean(mediaId(reference)),
+        isStored: reference => Boolean(mediaId(reference)) || String(reference || '').startsWith(SERVER_PREFIX),
         save,
         resolve,
         remove

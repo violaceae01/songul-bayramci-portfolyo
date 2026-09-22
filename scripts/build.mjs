@@ -6,8 +6,10 @@ const projectRoot = join(dirname(fileURLToPath(import.meta.url)), "..");
 const outputRoot = join(projectRoot, "dist");
 const clientRoot = join(outputRoot, "client");
 
-const staticDirectories = ["assets", "css", "data", "Görsel", "js"];
+const staticDirectories = ["assets", "css", "data", "Görsel", "js", "storage", "uploads"];
 const staticFiles = [
+  ".htaccess",
+  "api.php",
   "Code_Generated_Image.png",
   "calismalarim.html",
   "grafik-tasarim.html",
