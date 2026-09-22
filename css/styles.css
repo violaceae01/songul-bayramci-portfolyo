@@ -31,6 +31,14 @@
 
 html {
     scroll-behavior: smooth;
+    overflow-x: hidden;
+}
+
+@supports (overflow: clip) {
+    html,
+    body {
+        overflow-x: clip;
+    }
 }
 
 body {
@@ -615,6 +623,66 @@ footer {
     display: block;
 }
 
+.content-search {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: min(100%, 620px);
+    margin: 0 0 38px;
+    border: 1px solid rgba(255, 255, 255, 0.13);
+    border-radius: 12px;
+    background: rgba(12, 12, 12, 0.86);
+    transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.content-search:focus-within {
+    border-color: rgba(201, 11, 14, 0.82);
+    box-shadow: 0 0 0 3px rgba(201, 11, 14, 0.13);
+}
+
+.content-search > i {
+    margin-left: 20px;
+    color: var(--accent);
+}
+
+.content-search input {
+    width: 100%;
+    min-width: 0;
+    padding: 17px 52px 17px 14px;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: #fff;
+    font: inherit;
+}
+
+.content-search input::placeholder {
+    color: rgba(255, 255, 255, 0.46);
+}
+
+.content-search button {
+    position: absolute;
+    right: 8px;
+    width: 40px;
+    height: 40px;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+}
+
+.content-search button:hover,
+.content-search button:focus-visible {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+}
+
+.content-search-empty {
+    margin: 0 0 30px;
+    color: var(--text-secondary);
+}
+
 .artist-directory-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -760,6 +828,11 @@ footer {
     align-items: center;
 }
 
+.artist-detail-hero-grid > *,
+.artist-concert-header > * {
+    min-width: 0;
+}
+
 .artist-detail-cover-wrap {
     position: relative;
     aspect-ratio: 1080 / 1350;
@@ -790,15 +863,19 @@ footer {
     font-family: var(--font-display);
     font-size: clamp(3.2rem, 8vw, 7rem);
     line-height: 0.98;
+    overflow-wrap: anywhere;
+    word-break: normal;
 }
 
 .artist-detail-heading p {
     max-width: 650px;
     color: var(--text-secondary);
     font-size: 1.08rem;
+    overflow-wrap: anywhere;
 }
 
 .artist-detail-about {
+    min-width: 0;
     max-width: 690px;
     padding: 22px 0 22px 24px;
     border-left: 2px solid var(--accent);
@@ -815,6 +892,7 @@ footer {
 
 .artist-detail-about p {
     line-height: 1.8;
+    overflow-wrap: anywhere;
 }
 
 .artist-concerts-section {
@@ -861,6 +939,7 @@ footer {
     font-family: var(--font-display);
     font-size: clamp(2.2rem, 5vw, 4.2rem);
     line-height: 1.05;
+    overflow-wrap: anywhere;
 }
 
 .artist-concert-header p {
@@ -877,6 +956,15 @@ footer {
     border: 1px solid rgba(201, 11, 14, 0.24);
     border-radius: 14px;
     background: rgba(201, 11, 14, 0.055);
+    min-width: 0;
+}
+
+.concert-video-panel .btn,
+.concert-video-panel > span,
+.concert-photo-card strong,
+.concert-photo-card small {
+    max-width: 100%;
+    overflow-wrap: anywhere;
 }
 
 .concert-video-panel > span {
@@ -2258,8 +2346,84 @@ button.youtube-project-link:hover .youtube-project-media img {
 
 /* Testimonials */
 .testimonials-section {
+    --media-overlay: linear-gradient(180deg, #090909 0%, rgba(9, 9, 9, 0.96) 5%, rgba(9, 9, 9, 0.72) 15%, rgba(5, 5, 5, 0.52) 34%, rgba(5, 5, 5, 0.88) 100%);
     padding: 85px 0;
-    background: transparent;
+}
+
+.home-about-section,
+.testimonials-section,
+.contact-footer-scene {
+    margin-top: clamp(34px, 5vw, 76px);
+}
+
+.reveal-background,
+.contact-footer-scene {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    background-color: #090909;
+}
+
+.section-media-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.section-media-bg img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    object-fit: cover;
+    object-position: var(--media-position, center);
+    opacity: 0.16;
+    filter: brightness(0.18) saturate(0.55) blur(5px);
+    transform: translate3d(0, 3%, 0) scale(1.1);
+    transition: opacity 1.5s ease, filter 1.8s ease, transform 2s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform, filter, opacity;
+}
+
+.reveal-background::after,
+.contact-footer-scene::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: var(--media-overlay, linear-gradient(180deg, rgba(5, 5, 5, 0.58), rgba(5, 5, 5, 0.88)));
+}
+
+.reveal-background.active .section-media-bg img,
+.contact-footer-scene.active .section-media-bg img {
+    opacity: 1;
+    filter: brightness(1) saturate(1) blur(0);
+    transform: translate3d(0, 0, 0) scale(1.04);
+}
+
+.reveal-background > :not(.section-media-bg),
+.contact-footer-scene > :not(.section-media-bg) {
+    position: relative;
+    z-index: 2;
+}
+
+@keyframes mediaImageDevelop {
+    0% { opacity: 0; clip-path: inset(16% 0 16% 0); }
+    100% { opacity: 1; clip-path: inset(0 0 0 0); }
+}
+
+.artist-directory-card img,
+.concert-photo-card img,
+.rotating-gallery-card img,
+.featured-artist-media img,
+.creative-project-media img,
+.youtube-project-media img {
+    animation: mediaImageDevelop 1.15s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .testimonials-grid {
@@ -2319,6 +2483,63 @@ button.youtube-project-link:hover .youtube-project-media img {
     background: transparent;
 }
 
+.contact-footer-scene {
+    --media-position: center;
+    --media-overlay:
+        linear-gradient(180deg, #090909 0%, rgba(9, 9, 9, 0.94) 5%, rgba(9, 9, 9, 0.48) 18%, rgba(9, 9, 9, 0.14) 38%, rgba(5, 5, 5, 0.28) 72%, rgba(5, 5, 5, 0.68) 100%);
+    width: 100%;
+    max-width: none;
+}
+
+.contact-footer-scene .contact-section,
+.contact-footer-scene .footer {
+    background-color: transparent;
+    background-image: none;
+}
+
+.contact-footer-scene .footer {
+    min-height: auto;
+    padding: 42px 0 44px;
+    border-top-color: rgba(255, 255, 255, 0.14);
+}
+
+.contact-footer-scene .footer-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    width: min(100%, 920px);
+    margin: 0 auto;
+    padding: 18px 24px;
+    border-radius: 14px;
+    background: rgba(0, 0, 0, 0.38);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.28);
+    backdrop-filter: blur(3px);
+}
+
+.contact-footer-scene .footer .copyright,
+.contact-footer-scene .footer .footer-signature {
+    margin: 0;
+    color: #fff;
+    opacity: 1;
+    text-shadow: 0 2px 14px rgba(0, 0, 0, 0.95);
+}
+
+.contact-footer-scene .footer .copyright {
+    font-size: clamp(0.88rem, 1.1vw, 1rem);
+}
+
+.contact-footer-scene .footer .footer-signature {
+    font-size: clamp(0.82rem, 1vw, 0.94rem);
+}
+
+.home-contact-section .section-desc {
+    color: #C90B0E;
+    font-weight: 600;
+}
+
 .home-about-centered .about-grid {
     display: block;
     max-width: 920px;
@@ -2328,6 +2549,10 @@ button.youtube-project-link:hover .youtube-project-media img {
 .home-about-centered .about-content,
 .home-about-centered .about-content .section-tag {
     text-align: center;
+}
+
+.home-about-centered .about-content {
+    text-shadow: 0 3px 22px rgba(0, 0, 0, 0.9);
 }
 
 .home-about-centered .skills-grid {
@@ -2614,29 +2839,16 @@ button.youtube-project-link:hover .youtube-project-media img {
 
 /* Footer */
 .footer {
-    padding: 80px 0 40px;
-    background: rgba(10, 10, 10, 0.7);
+    position: relative;
+    isolation: isolate;
+    padding: 46px 0 40px;
+    background: #080808;
     text-align: center;
     border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.footer-logo {
-    font-family: var(--font-display);
-    font-size: 2rem;
-    font-weight: 700;
-    letter-spacing: 4px;
-    margin-bottom: 10px;
-}
-
 .footer p {
     color: var(--text-secondary);
-}
-
-.footer-divider {
-    width: 60px;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, var(--accent), transparent);
-    margin: 30px auto;
 }
 
 .copyright {
@@ -2647,42 +2859,85 @@ button.youtube-project-link:hover .youtube-project-media img {
     margin-top: 12px;
     font-size: 0.8rem;
     letter-spacing: 1.5px;
-    text-transform: uppercase;
-}
-
-.footer-signature span {
-    margin-left: 5px;
-    color: var(--accent);
-    font-family: var(--font-display);
-    font-size: 1rem;
-    font-style: italic;
-    letter-spacing: 0.5px;
     text-transform: none;
-    text-shadow: 0 0 18px var(--accent-glow);
 }
 
-/* Home Signature Artwork */
-.home-signature-section {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+/* Home About Background & Contact Signature Artwork */
+.home-about-section {
+    isolation: isolate;
     overflow: hidden;
-    padding: 30px 24px 90px;
-    background: transparent;
+    display: flex;
+    min-height: clamp(620px, 56.25vw, 900px);
+    aspect-ratio: 16 / 9;
+    align-items: center;
+    --media-overlay: linear-gradient(180deg, #090909 0%, rgba(9, 9, 9, 0.95) 5%, rgba(9, 9, 9, 0.68) 17%, rgba(5, 5, 5, 0.43) 38%, rgba(5, 5, 5, 0.62) 100%);
+}
+
+.home-about-section .container {
+    position: relative;
+    z-index: 2;
+}
+
+.home-about-section .section-media-bg img {
+    right: auto;
+    left: 50%;
+    width: auto;
+    min-width: 100%;
+    height: 100%;
+    object-fit: fill;
+    background: #090909;
+    transform: translate3d(-50%, 2%, 0) scale(1.035);
+}
+
+.home-about-section.active .section-media-bg img {
+    opacity: 0.9;
+    filter: brightness(0.82) saturate(1) blur(0);
+    transform: translate3d(-50%, 0, 0) scale(1);
+}
+
+.home-contact-section {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+}
+
+.home-contact-section .container {
+    position: relative;
+    z-index: 2;
 }
 
 .home-signature-artwork {
-    position: relative;
-    width: min(1100px, 92vw);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 0;
+    width: min(1250px, 108vw);
+    pointer-events: none;
+    opacity: 0;
+    filter: brightness(0.16) saturate(0.55) blur(8px);
+    transform: translate(-50%, -43%) scale(0.9);
+    transition: opacity 1.3s ease, filter 1.7s ease, transform 1.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.contact-footer-scene.active .home-signature-artwork {
+    opacity: 0.72;
+    filter: brightness(0.72) saturate(0.82) blur(0);
+    transform: translate(-50%, -50%) scale(1);
+    animation: contactArtworkDrift 10s ease-in-out 1.7s infinite alternate;
 }
 
 .home-signature-artwork img {
     display: block;
     width: 100%;
-    opacity: 0.58;
-    filter: saturate(0.9) brightness(1.05);
+    opacity: 0.25;
+    filter: saturate(0.78) brightness(0.72);
     transform: rotate(-2deg);
-    animation: signatureFloat 6s ease-in-out infinite;
+}
+
+@keyframes contactArtworkDrift {
+    0% { transform: translate(-51.5%, -50%) scale(0.99); }
+    50% { transform: translate(-48.5%, -51.5%) scale(1.025); }
+    100% { transform: translate(-50.5%, -49%) scale(1.01); }
 }
 
 .signature-paint-drips {
@@ -2705,8 +2960,11 @@ button.youtube-project-link:hover .youtube-project-media img {
     box-shadow: 0 8px 18px rgba(201, 11, 14, 0.18);
     transform: scaleY(0.18);
     transform-origin: top;
-    opacity: 0.15;
-    animation: signaturePaintDrip 4.6s ease-in-out infinite;
+    opacity: 0;
+}
+
+.contact-footer-scene.active .signature-paint-drips i {
+    animation: signaturePaintDripOnce 1.45s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .signature-paint-drips i::after {
@@ -2721,22 +2979,18 @@ button.youtube-project-link:hover .youtube-project-media img {
     transform: translateX(50%);
 }
 
-.signature-paint-drips i:nth-child(1) { left: 7%; --drip-height: 58px; animation-delay: -1.1s; }
-.signature-paint-drips i:nth-child(2) { left: 22%; --drip-height: 92px; animation-delay: -3.4s; animation-duration: 5.4s; }
-.signature-paint-drips i:nth-child(3) { left: 39%; --drip-height: 66px; animation-delay: -2.2s; }
-.signature-paint-drips i:nth-child(4) { left: 55%; --drip-height: 104px; animation-delay: -4.1s; animation-duration: 5.8s; }
-.signature-paint-drips i:nth-child(5) { left: 69%; --drip-height: 74px; animation-delay: -0.7s; }
-.signature-paint-drips i:nth-child(6) { left: 82%; --drip-height: 96px; animation-delay: -2.9s; animation-duration: 5.1s; }
-.signature-paint-drips i:nth-child(7) { left: 94%; --drip-height: 55px; animation-delay: -1.8s; }
+.signature-paint-drips i:nth-child(1) { left: 7%; --drip-height: 58px; animation-delay: 0.08s; }
+.signature-paint-drips i:nth-child(2) { left: 22%; --drip-height: 92px; animation-delay: 0.2s; }
+.signature-paint-drips i:nth-child(3) { left: 39%; --drip-height: 66px; animation-delay: 0.32s; }
+.signature-paint-drips i:nth-child(4) { left: 55%; --drip-height: 104px; animation-delay: 0.14s; }
+.signature-paint-drips i:nth-child(5) { left: 69%; --drip-height: 74px; animation-delay: 0.38s; }
+.signature-paint-drips i:nth-child(6) { left: 82%; --drip-height: 96px; animation-delay: 0.25s; }
+.signature-paint-drips i:nth-child(7) { left: 94%; --drip-height: 55px; animation-delay: 0.46s; }
 
-@keyframes signatureFloat {
-    0%, 100% { transform: translateY(0) rotate(-2deg); filter: saturate(0.9) brightness(1.05); }
-    50% { transform: translateY(-8px) rotate(-1.4deg); filter: saturate(1.05) brightness(1.12); }
-}
-
-@keyframes signaturePaintDrip {
-    0%, 100% { transform: scaleY(0.18); opacity: 0.12; }
-    45%, 62% { transform: scaleY(1); opacity: 0.7; }
+@keyframes signaturePaintDripOnce {
+    0% { transform: scaleY(0.12); opacity: 0; }
+    65% { transform: scaleY(1); opacity: 0.7; }
+    100% { transform: scaleY(0.82); opacity: 0.36; }
 }
 
 /* ============================================
@@ -3053,22 +3307,31 @@ button.youtube-project-link:hover .youtube-project-media img {
     display: none;
 }
 
-body[data-page-section="graphicDesign"] .lightbox {
+body[data-page-section="graphicDesign"] .lightbox,
+.artist-page .lightbox {
     flex-direction: column;
     gap: 16px;
     padding: 74px 20px 24px;
+    overflow-y: auto;
 }
 
-body[data-page-section="graphicDesign"] .lightbox-image {
+body[data-page-section="graphicDesign"] .lightbox-image,
+.artist-page .lightbox-image {
     max-height: calc(100vh - 190px);
     object-fit: contain;
 }
 
-body[data-page-section="graphicDesign"] .lightbox-info {
+body[data-page-section="graphicDesign"] .lightbox-info,
+.artist-page .lightbox-info {
     position: static;
     width: min(720px, 100%);
     transform: none;
     padding: 0 12px;
+}
+
+.artist-page .lightbox-info h3,
+.artist-page .lightbox-info p {
+    overflow-wrap: anywhere;
 }
 
 @media (max-width: 900px) {
@@ -3079,6 +3342,15 @@ body[data-page-section="graphicDesign"] .lightbox-info {
 }
 
 @media (max-width: 600px) {
+    .content-search {
+        width: 100%;
+        margin-bottom: 26px;
+    }
+
+    .content-search input {
+        padding-top: 14px;
+        padding-bottom: 14px;
+    }
     .featured-artists-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 10px;
@@ -3136,9 +3408,31 @@ body[data-page-section="graphicDesign"] .lightbox-info {
 @media (prefers-reduced-motion: reduce) {
     .brand-marquee-track,
     .rotating-gallery-track,
+    .section-media-bg img,
+    .home-signature-artwork,
     .home-signature-artwork img,
     .signature-paint-drips i {
         animation: none;
+    }
+
+    .artist-directory-card img,
+    .concert-photo-card img,
+    .rotating-gallery-card img,
+    .featured-artist-media img,
+    .creative-project-media img,
+    .youtube-project-media img {
+        animation: none;
+    }
+
+    .section-media-bg img {
+        opacity: 1;
+        filter: none;
+        transform: none;
+        transition: none;
+    }
+
+    .home-signature-artwork {
+        transition: none;
     }
 
     .rotating-gallery-viewport {
@@ -3611,17 +3905,13 @@ body[data-page-section="graphicDesign"] .lightbox-info {
         padding: 130px 0 70px;
     }
 
-    .home-signature-section {
-        padding: 15px 12px 60px;
-    }
-
     .home-signature-artwork {
-        width: 120vw;
+        width: 128vw;
         max-width: none;
     }
 
     .home-signature-artwork img {
-        opacity: 0.52;
+        opacity: 0.26;
     }
 
     .about-image img {
@@ -3717,11 +4007,12 @@ body[data-page-section="graphicDesign"] .lightbox-info {
 
     /* Footer */
     .footer {
-        padding: 60px 0 35px;
+        min-height: 360px;
+        padding: 70px 0 35px;
     }
 
-    .footer-logo {
-        font-size: 1.6rem;
+    .contact-footer-scene .footer {
+        padding-bottom: calc(92px + env(safe-area-inset-bottom));
     }
 
     /* Lightbox Modal */
@@ -4016,13 +4307,8 @@ video {
         overflow-wrap: anywhere;
     }
 
-    .home-signature-section {
-        padding-right: 0;
-        padding-left: 0;
-    }
-
     .home-signature-artwork {
-        width: min(900px, 112vw);
+        width: min(900px, 138vw);
         max-width: none;
     }
 
@@ -4042,14 +4328,6 @@ video {
 
     .footer-content {
         overflow-wrap: anywhere;
-    }
-
-    .footer-logo {
-        line-height: 1.3;
-    }
-
-    .footer-signature span {
-        display: inline-block;
     }
 
     .lightbox {
@@ -4120,17 +4398,40 @@ video {
 
 @media (max-width: 430px) {
     .artist-directory-grid {
-        grid-template-columns: 1fr;
-        gap: 18px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 9px;
     }
 
     .artist-directory-card {
-        max-width: 360px;
-        margin: 0 auto;
+        width: 100%;
+        max-width: none;
+        margin: 0;
+        border-radius: 8px;
+    }
+
+    .artist-directory-overlay {
+        padding: 14px 9px 10px;
+    }
+
+    .artist-directory-overlay small {
+        margin-bottom: 4px;
+        font-size: 0.46rem;
+        letter-spacing: 0.35px;
     }
 
     .artist-directory-overlay strong {
-        font-size: 1.45rem;
+        margin-bottom: 4px;
+        font-size: 0.88rem;
+        line-height: 1.08;
+    }
+
+    .artist-directory-overlay > span {
+        font-size: 0.52rem;
+        letter-spacing: 0.25px;
+    }
+
+    .artist-directory-overlay i {
+        margin-left: 3px;
     }
 
     .skills-grid {

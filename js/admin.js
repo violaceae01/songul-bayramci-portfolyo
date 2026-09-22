@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function loadData() {
         const defaults = typeof siteData !== 'undefined' ? clone(siteData) : {
-            hero: {}, stats: [], artists: [], homeGallery: [], youtubeProjects: [], graphicProjects: [], videoClips: [], partners: [], sectionVisibility: {}, about: {}, testimonials: [], contact: {}
+            hero: {}, stats: [], artists: [], homeGallery: [], youtubeProjects: [], graphicProjects: [], videoClips: [], partners: [], sectionVisibility: {}, siteMedia: {}, about: {}, testimonials: [], contact: {}
         };
         try {
             const saved = localStorage.getItem(STORAGE_KEY);
@@ -23,10 +23,14 @@ document.addEventListener('DOMContentLoaded', () => {
             merged.hero = { ...(defaults.hero || {}), ...(parsed.hero || {}) };
             merged.contact = { ...(defaults.contact || {}), ...(parsed.contact || {}) };
             merged.sectionVisibility = { ...(defaults.sectionVisibility || {}), ...(parsed.sectionVisibility || {}) };
+            merged.siteMedia = { ...(defaults.siteMedia || {}), ...(parsed.siteMedia || {}) };
             merged.siteText = { ...(defaults.siteText || {}), ...(parsed.siteText || {}) };
             merged.typography = { ...(defaults.typography || {}), ...(parsed.typography || {}) };
             const savedContentVersion = Number(parsed.contentVersion || 0);
             const currentContentVersion = Number(defaults.contentVersion || 0);
+            if (savedContentVersion < 5) {
+                merged.sectionVisibility.homeServices = false;
+            }
             if (savedContentVersion < currentContentVersion && Array.isArray(defaults.graphicProjects)) {
                 const existingGraphicIds = new Set((parsed.graphicProjects || []).map(item => String(item.id)));
                 const missingGraphicProjects = defaults.graphicProjects
@@ -107,19 +111,56 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 3200);
     }
 
+    const pageAdminConfig = {
+        home: { panel: 'tab-home', title: 'Anasayfa Ayarları', visibility: ['homeHero', 'homeStats', 'homeServices', 'featuredArtists', 'partnerLogos', 'homeAbout', 'testimonials', 'homeContact', 'homeSignature', 'siteFooter', 'scrollTop'] },
+        about: { panel: 'tab-about', title: 'Hakkımda Sayfası Ayarları', visibility: ['aboutPage', 'aboutVisionMission'] },
+        works: { panel: 'tab-portfolio', title: 'Çalışmalarım Sayfası Ayarları', visibility: ['worksPage'] },
+        clips: { panel: 'tab-clips', title: 'Klip Çekimleri Sayfası Ayarları', visibility: ['clipShootings'] },
+        video: { panel: 'tab-video-clips', title: 'Video Klipleri Sayfası Ayarları', visibility: ['videoClips'] },
+        graphics: { panel: 'tab-graphics', title: 'Grafik Tasarım Sayfası Ayarları', visibility: ['graphicDesign'] },
+        contact: { panel: 'tab-contact', title: 'İletişim Sayfası Ayarları', visibility: ['contactPage', 'contactDetails', 'contactForm'] },
+        references: { panel: 'tab-references', title: 'Referanslar Sayfası Ayarları', visibility: ['referencesPage'] },
+        testimonials: { panel: 'tab-testimonials', title: 'Ne Diyorlar Sayfası Ayarları', visibility: ['testimonialsPage'] }
+    };
+
+    function makePageSettingsCard(pageKey, config) {
+        const panel = document.getElementById(config.panel);
+        if (!panel) return;
+        const visibilityLabels = config.visibility.map(key => document.querySelector(`[data-section-toggle="${key}"]`)?.closest('.admin-toggle')).filter(Boolean);
+        const card = document.createElement('div');
+        card.className = 'admin-card page-settings-card';
+        card.innerHTML = `<div class="card-header"><div><h2>${escapeHtml(config.title)}</h2><p class="admin-card-description">Bu sayfanın görünürlüğünü ve sabit metinlerini aynı yerden yönetin.</p></div></div><div class="admin-toggle-grid" data-page-visibility="${pageKey}"></div><div class="form-grid page-text-grid" data-site-text-page="${pageKey}"></div>`;
+        visibilityLabels.forEach(label => card.querySelector('[data-page-visibility]')?.appendChild(label));
+        panel.prepend(card);
+    }
+
+    function organizeAdminPanels() {
+        const homePanel = document.getElementById('tab-home');
+        const statsCard = document.getElementById('tab-stats')?.querySelector('.admin-card');
+        const typographyCard = document.getElementById('typographyAdmin')?.closest('.admin-card');
+        const mediaCard = document.getElementById('siteMediaAdmin')?.closest('.admin-card');
+        if (homePanel) {
+            if (statsCard) homePanel.appendChild(statsCard);
+            if (mediaCard) homePanel.appendChild(mediaCard);
+            if (typographyCard) homePanel.appendChild(typographyCard);
+        }
+        Object.entries(pageAdminConfig).forEach(([pageKey, config]) => makePageSettingsCard(pageKey, config));
+        document.getElementById('tab-visibility')?.remove();
+        document.getElementById('tab-stats')?.remove();
+        document.getElementById('tab-texts')?.remove();
+    }
+    organizeAdminPanels();
+
     const tabDescriptions = {
-        'tab-portfolio': { title: 'Sanatçı & Konser Yönetimi', desc: 'Sanatçıları, konserlerini, galerilerini ve video bağlantılarını yönetin.' },
-        'tab-hero': { title: 'Hero & Başlıklar', desc: 'Ana sayfa giriş alanındaki başlıkları, alt başlığı ve arka plan videosunu güncelleyin.' },
-        'tab-visibility': { title: 'Sayfa ve Bölüm Görünürlüğü', desc: 'Sitedeki her bölümü silmeden açın veya kapatın.' },
-        'tab-clips': { title: 'Klip Çekimleri', desc: 'Klipleri sıralayın, kapak ve video dosyalarını bilgisayarınızdan yükleyin.' },
+        'tab-home': { title: 'Anasayfa', desc: 'Anasayfada görünen banner, bölümler, metinler ve görselleri yönetin.' },
+        'tab-portfolio': { title: 'Çalışmalarım', desc: 'Sanatçıları, konserlerini, galerilerini ve video bağlantılarını yönetin.' },
+        'tab-clips': { title: 'Klip Çekimleri', desc: 'Klipleri sıralayın, YouTube bağlantılarını ve isteğe bağlı kapak görsellerini yönetin.' },
         'tab-video-clips': { title: 'Video Klipleri', desc: 'Video klipleri sıralayın ve medya dosyalarını yönetin.' },
         'tab-graphics': { title: 'Grafik Tasarım', desc: 'Afiş ve tasarım çalışmalarını sıralayın ve doğrudan yükleyin.' },
-        'tab-references': { title: 'Referanslarımız', desc: 'Çalışılan markaları ve logo dosyalarını yönetin.' },
-        'tab-stats': { title: 'İstatistik Sayaçları', desc: 'Sitede yer alan deneyim ve istatistik sayılarını düzenleyin.' },
-        'tab-about': { title: 'Hakkımızda Bölümü', desc: 'Marka, vizyon, misyon ve hakkımızda metinlerini yönetin.' },
-        'tab-testimonials': { title: 'Referanslar & Yorumlar', desc: 'Sanatçı ve müşteri referanslarını düzenleyin.' },
-        'tab-contact': { title: 'İletişim & Sosyal Medya', desc: 'İletişim bilgilerini ve sosyal medya bağlantılarını güncelleyin.' },
-        'tab-texts': { title: 'Metinler & Tipografi', desc: 'Sayfa metinlerini ve yazı kalınlıklarını tek yerden yönetin.' },
+        'tab-references': { title: 'Referanslar', desc: 'Çalışılan markaları ve logo dosyalarını yönetin.' },
+        'tab-about': { title: 'Hakkımda', desc: 'Marka, vizyon, misyon ve hakkımızda metinlerini yönetin.' },
+        'tab-testimonials': { title: 'Ne Diyorlar', desc: 'Sanatçı ve müşteri yorumlarını düzenleyin.' },
+        'tab-contact': { title: 'İletişim', desc: 'İletişim bilgilerini ve sosyal medya bağlantılarını güncelleyin.' },
         'tab-backup': { title: 'Yedekleme & Dışa Aktar', desc: 'Verilerinizi kalıcı dosya olarak indirin veya varsayılanlara sıfırlayın.' }
     };
 
@@ -443,13 +484,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const sectionVisibilityAdmin = document.getElementById('sectionVisibilityAdmin');
     function populateSectionVisibilityForm() {
-        sectionVisibilityAdmin?.querySelectorAll('[data-section-toggle]').forEach(input => {
+        document.querySelectorAll('[data-section-toggle]').forEach(input => {
             input.checked = appData.sectionVisibility?.[input.dataset.sectionToggle] !== false;
         });
     }
     function readSectionVisibilityForm() {
         const nextVisibility = { ...(appData.sectionVisibility || {}) };
-        sectionVisibilityAdmin?.querySelectorAll('[data-section-toggle]').forEach(input => {
+        document.querySelectorAll('[data-section-toggle]').forEach(input => {
             nextVisibility[input.dataset.sectionToggle] = input.checked;
         });
         appData.sectionVisibility = nextVisibility;
@@ -483,7 +524,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="form-group"><label>Yıl</label><input type="text" class="form-control creative-year" value="${escapeHtml(project.year)}" placeholder="2026"></div>
                     ${options.showCategory ? `<div class="form-group form-full"><label>Etiket (isteğe bağlı)</label><input type="text" class="form-control creative-category" value="${escapeHtml(project.category ?? '')}" placeholder="Boş bırakırsanız sitede gösterilmez"></div>` : ''}
                     <div class="form-group form-full"><label>${options.isVideo ? 'Özel Kapak Görseli (isteğe bağlı)' : 'Proje Görseli'}</label><input type="file" class="form-control creative-image-file" accept="image/*"><input type="hidden" class="creative-image" value="${escapeHtml(project.image)}"><p class="form-help">${options.isVideo ? 'Görsel yüklemezseniz YouTube kapağı otomatik kullanılır.' : 'Görseli doğrudan bilgisayarınızdan seçin.'}</p></div>
-                    ${options.isVideo ? `<div class="form-group form-full"><label>Video Dosyası (isteğe bağlı)</label><input type="file" class="form-control creative-video-file" accept="video/mp4,video/webm,video/quicktime"><input type="hidden" class="creative-video" value="${escapeHtml(project.videoFile || '')}"><p class="form-help">Bilgisayardan video yüklerseniz sitede doğrudan oynatılır.</p></div><div class="form-group form-full"><label>YouTube Video Bağlantısı (isteğe bağlı)</label><input type="url" class="form-control creative-url" value="${escapeHtml(project.url)}" placeholder="https://www.youtube.com/watch?v=..."></div>` : '<input type="hidden" class="creative-url" value="">'}
+                    ${options.isVideo ? `<div class="form-group form-full"><label>Video Dosyası (reklamsız oynatma)</label><input type="file" class="form-control creative-video-file" accept="video/mp4,video/webm,video/quicktime"><input type="hidden" class="creative-video" value="${escapeHtml(project.videoFile || '')}"><p class="form-help">Bilgisayardan yüklenen video YouTube kullanılmadan, doğrudan sitede oynatılır.</p></div><div class="form-group form-full"><label>YouTube Video Bağlantısı (isteğe bağlı)</label><input type="url" class="form-control creative-url" value="${escapeHtml(project.url)}" placeholder="https://www.youtube.com/watch?v=..."><p class="form-help">Yalnızca video dosyası yüklenmediyse kullanılır. YouTube reklamları site tarafından kapatılamaz.</p></div>` : '<input type="hidden" class="creative-url" value="">'}
                 </div>`;
             container.appendChild(card);
         });
@@ -592,8 +633,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="form-group"><label>Etiket (isteğe bağlı)</label><input type="text" class="form-control youtube-category" value="${escapeHtml(project.category ?? '')}" placeholder="Boş bırakırsanız sitede gösterilmez"></div>
                     <div class="form-group"><label>Kapak Yerleşimi</label><select class="form-control youtube-fit"><option value="cover" ${project.thumbnailFit !== 'contain' ? 'selected' : ''}>Görseli kapla</option><option value="contain" ${project.thumbnailFit === 'contain' ? 'selected' : ''}>Logoyu sığdır</option></select></div>
                     <div class="form-group form-full"><label>Özel Kapak Görseli (isteğe bağlı)</label><input type="file" class="form-control youtube-thumbnail-file" accept="image/*"><input type="hidden" class="youtube-thumbnail" value="${escapeHtml(project.thumbnail)}"><p class="form-help">Yüklemezseniz YouTube kapağı otomatik alınır.</p></div>
-                    <div class="form-group form-full"><label>Video Dosyası (isteğe bağlı)</label><input type="file" class="form-control youtube-video-file" accept="video/mp4,video/webm,video/quicktime"><input type="hidden" class="youtube-video" value="${escapeHtml(project.videoFile || '')}"><p class="form-help">Bilgisayardan yüklenen video sitede doğrudan oynatılır.</p></div>
-                    <div class="form-group form-full"><label>YouTube Klip Bağlantısı (isteğe bağlı)</label><input type="url" class="form-control youtube-url" value="${escapeHtml(project.url)}" placeholder="https://www.youtube.com/watch?v=..."><p class="form-help">Video dosyası yoksa bu bağlantı kullanılır ve kapak otomatik alınır.</p></div>
+                    <div class="form-group form-full"><label>YouTube Klip Bağlantısı</label><input type="url" class="form-control youtube-url" value="${escapeHtml(project.url)}" placeholder="https://www.youtube.com/watch?v=..."><p class="form-help">Klip sitedeki oynatıcıda YouTube üzerinden açılır. Özel kapak yüklemezseniz YouTube kapağı otomatik alınır.</p></div>
                 </div>`;
             youtubeProjectsAdmin.appendChild(card);
         });
@@ -607,7 +647,7 @@ document.addEventListener('DOMContentLoaded', () => {
             year: card.querySelector('.youtube-year')?.value.trim() || '',
             category: card.querySelector('.youtube-category')?.value.trim() || '',
             thumbnail: card.querySelector('.youtube-thumbnail')?.value.trim() || '',
-            videoFile: card.querySelector('.youtube-video')?.value.trim() || '',
+            videoFile: '',
             thumbnailFit: card.querySelector('.youtube-fit')?.value || 'cover',
             url: card.querySelector('.youtube-url')?.value.trim() || '',
             enabled: card.querySelector('.youtube-enabled')?.checked !== false
@@ -641,17 +681,16 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     youtubeProjectsAdmin?.addEventListener('change', async event => {
-        const fileInput = event.target.closest('.youtube-thumbnail-file, .youtube-video-file');
+        const fileInput = event.target.closest('.youtube-thumbnail-file');
         if (!fileInput?.files?.[0]) return;
         const card = fileInput.closest('[data-youtube-project]');
-        const isVideoFile = fileInput.classList.contains('youtube-video-file');
-        const target = card?.querySelector(isVideoFile ? '.youtube-video' : '.youtube-thumbnail');
+        const target = card?.querySelector('.youtube-thumbnail');
         if (!target) return;
         try {
             const previous = target.value.trim();
-            target.value = await window.SiteMediaStore.save(fileInput.files[0], isVideoFile ? 'clip-video' : 'clip-thumbnail');
+            target.value = await window.SiteMediaStore.save(fileInput.files[0], 'clip-thumbnail');
             if (window.SiteMediaStore.isStored(previous)) await window.SiteMediaStore.remove(previous);
-            showToast(`${isVideoFile ? 'Video' : 'Kapak görseli'} yüklendi. Kaydetmeyi unutmayın.`);
+            showToast('Kapak görseli yüklendi. Kaydetmeyi unutmayın.');
         } catch (error) { console.error(error); showToast('Dosya yüklenemedi.', 'error'); }
     });
 
@@ -812,21 +851,84 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     const textFieldLabels = {
-        navHome: 'Menü: Ana Sayfa', navWorks: 'Menü: Çalışmalarım', navClip: 'Menü: Klip Çekimleri', navVideo: 'Menü: Video Klipleri', navGraphic: 'Menü: Grafik Tasarım', navCorporate: 'Menü: Kurumsal', navReferences: 'Menü: Referanslarımız', navAbout: 'Menü: Hakkımızda', navTestimonials: 'Menü: Ne Diyorlar', navContact: 'Menü: İletişim', featuredTag: 'Öne Çıkanlar Üst Etiketi', featuredTitle: 'Öne Çıkanlar Başlığı', featuredMore: 'Daha Fazla Butonu', testimonialsTag: 'Yorumlar Üst Etiketi', testimonialsTitle: 'Yorumlar Başlığı', graphicTag: 'Grafik Tasarım Üst Etiketi', graphicTitle: 'Grafik Tasarım Başlığı', clipTag: 'Klip Çekimleri Üst Etiketi', clipTitle: 'Klip Çekimleri Başlığı', videoTag: 'Video Klipleri Üst Etiketi', videoTitle: 'Video Klipleri Başlığı', referencesTag: 'Referanslar Üst Etiketi', referencesTitle: 'Referanslar Başlığı', aboutTag: 'Hakkımızda Üst Etiketi', contactTag: 'İletişim Üst Etiketi', contactTitle: 'İletişim Başlığı', footerStudio: 'Footer Stüdyo Yazısı', footerCopyright: 'Footer Telif Yazısı'
+        navHome: 'Menü: Ana Sayfa', navWorks: 'Menü: Çalışmalarım', navClip: 'Menü: Klip Çekimleri', navVideo: 'Menü: Video Klipleri', navGraphic: 'Menü: Grafik Tasarım', navCorporate: 'Menü: Kurumsal', navReferences: 'Menü: Referanslarımız', navAbout: 'Menü: Hakkımızda', navTestimonials: 'Menü: Ne Diyorlar', navContact: 'Menü: İletişim', featuredTag: 'Öne Çıkanlar Üst Etiketi', featuredTitle: 'Öne Çıkanlar Başlığı', featuredMore: 'Daha Fazla Butonu', servicesTag: 'Çekim Stili Üst Etiketi', servicesTitle: 'Çekim Stili Başlığı', service1Kicker: 'Çekim Stili 1 Kısa Başlık', service1Title: 'Çekim Stili 1 Başlık', service1Description: 'Çekim Stili 1 Açıklama', service2Kicker: 'Çekim Stili 2 Kısa Başlık', service2Title: 'Çekim Stili 2 Başlık', service2Description: 'Çekim Stili 2 Açıklama', service3Kicker: 'Çekim Stili 3 Kısa Başlık', service3Title: 'Çekim Stili 3 Başlık', service3Description: 'Çekim Stili 3 Açıklama', testimonialsTag: 'Yorumlar Üst Etiketi', testimonialsTitle: 'Yorumlar Başlığı', graphicTag: 'Grafik Tasarım Üst Etiketi', graphicTitle: 'Grafik Tasarım Başlığı', clipTag: 'Klip Çekimleri Üst Etiketi', clipTitle: 'Klip Çekimleri Başlığı', videoTag: 'Video Klipleri Üst Etiketi', videoTitle: 'Video Klipleri Başlığı', referencesTag: 'Referanslar Üst Etiketi', referencesTitle: 'Referanslar Başlığı', aboutTag: 'Hakkımızda Üst Etiketi', contactTag: 'İletişim Üst Etiketi', contactTitle: 'İletişim Başlığı', footerCopyright: 'Footer Yasal Metin 1', footerLegal: 'Footer Yasal Metin 2'
+    };
+    const textFieldsByPage = {
+        home: ['navHome', 'navCorporate', 'featuredTag', 'featuredTitle', 'featuredMore', 'servicesTag', 'servicesTitle', 'service1Kicker', 'service1Title', 'service1Description', 'service2Kicker', 'service2Title', 'service2Description', 'service3Kicker', 'service3Title', 'service3Description', 'footerCopyright', 'footerLegal'],
+        about: ['navAbout', 'aboutTag'],
+        works: ['navWorks'],
+        clips: ['navClip', 'clipTag', 'clipTitle'],
+        video: ['navVideo', 'videoTag', 'videoTitle'],
+        graphics: ['navGraphic', 'graphicTag', 'graphicTitle'],
+        contact: ['navContact', 'contactTag', 'contactTitle'],
+        references: ['navReferences', 'referencesTag', 'referencesTitle'],
+        testimonials: ['navTestimonials', 'testimonialsTag', 'testimonialsTitle']
     };
     const siteTextAdmin = document.getElementById('siteTextAdmin');
     const typographyAdmin = document.getElementById('typographyAdmin');
     function renderTextAndTypographyForms() {
-        if (siteTextAdmin) siteTextAdmin.innerHTML = Object.entries(textFieldLabels).map(([key, label]) => `<div class="form-group"><label>${escapeHtml(label)}</label><input class="form-control site-text-input" data-text-key="${key}" value="${escapeHtml(appData.siteText?.[key] || '')}"></div>`).join('');
+        document.querySelectorAll('[data-site-text-page]').forEach(container => {
+            const keys = textFieldsByPage[container.dataset.siteTextPage] || [];
+            container.innerHTML = keys.map(key => `<div class="form-group"><label>${escapeHtml(textFieldLabels[key] || key)}</label><input class="form-control site-text-input" data-text-key="${key}" value="${escapeHtml(appData.siteText?.[key] || '')}"></div>`).join('');
+        });
         const weights = [['bodyWeight', 'Gövde Yazıları'], ['headingWeight', 'Başlıklar'], ['navWeight', 'Menü Yazıları'], ['buttonWeight', 'Buton Yazıları']];
         if (typographyAdmin) typographyAdmin.innerHTML = weights.map(([key, label]) => `<div class="form-group"><label>${label}</label><select class="form-control typography-input" data-typography-key="${key}">${['300','400','500','600','700','800'].map(weight => `<option value="${weight}" ${String(appData.typography?.[key] || '') === weight ? 'selected' : ''}>${weight}</option>`).join('')}</select></div>`).join('');
     }
     function readTextAndTypographyForms() {
         appData.siteText = { ...(appData.siteText || {}) };
-        siteTextAdmin?.querySelectorAll('[data-text-key]').forEach(input => { appData.siteText[input.dataset.textKey] = input.value.trim(); });
+        document.querySelectorAll('.site-text-input[data-text-key]').forEach(input => { appData.siteText[input.dataset.textKey] = input.value.trim(); });
         appData.typography = { ...(appData.typography || {}) };
         typographyAdmin?.querySelectorAll('[data-typography-key]').forEach(input => { appData.typography[input.dataset.typographyKey] = input.value; });
     }
+
+    const siteMediaAdmin = document.getElementById('siteMediaAdmin');
+    async function updateSiteMediaPreview(key) {
+        const reference = siteMediaAdmin?.querySelector(`.site-media-reference[data-media-key="${key}"]`)?.value.trim() || '';
+        const preview = siteMediaAdmin?.querySelector(`[data-media-preview="${key}"]`);
+        if (!preview) return;
+        const source = await resolveAdminMedia(reference);
+        preview.src = source || '';
+        preview.style.display = source ? 'block' : 'none';
+    }
+    function populateSiteMediaForm() {
+        siteMediaAdmin?.querySelectorAll('.site-media-reference').forEach(input => {
+            const key = input.dataset.mediaKey;
+            input.value = appData.siteMedia?.[key] || '';
+            input.setAttribute('value', input.value);
+            updateSiteMediaPreview(key);
+        });
+    }
+    function readSiteMediaForm() {
+        appData.siteMedia = { ...(appData.siteMedia || {}) };
+        siteMediaAdmin?.querySelectorAll('.site-media-reference').forEach(input => {
+            appData.siteMedia[input.dataset.mediaKey] = input.value.trim();
+        });
+    }
+    siteMediaAdmin?.addEventListener('change', async event => {
+        const input = event.target.closest('.site-media-file');
+        if (!input) return;
+        const file = input.files?.[0];
+        if (!file) return;
+        if (!file.type.startsWith('image/')) {
+            showToast('Lütfen bir görsel dosyası seçin.', 'error');
+            input.value = '';
+            return;
+        }
+        const key = input.dataset.mediaKey;
+        const referenceInput = siteMediaAdmin.querySelector(`.site-media-reference[data-media-key="${key}"]`);
+        if (!referenceInput) return;
+        try {
+            const previousReference = referenceInput.value.trim();
+            referenceInput.value = await window.SiteMediaStore.save(file, `site-${key}`);
+            referenceInput.setAttribute('value', referenceInput.value);
+            if (window.SiteMediaStore.isStored(previousReference)) await window.SiteMediaStore.remove(previousReference);
+            await updateSiteMediaPreview(key);
+            showToast('Arka plan görseli yüklendi. Tümünü Kaydet düğmesine basın.');
+        } catch (error) {
+            console.error('Arka plan görseli yükleme hatası:', error);
+            showToast('Görsel yüklenemedi. Tarayıcı depolama alanını kontrol edin.', 'error');
+        }
+    });
 
     const contactFields = { email: document.getElementById('contactEmail'), phone: document.getElementById('contactPhone'), whatsapp: document.getElementById('contactWhatsapp'), location: document.getElementById('contactLocation'), instagram: document.getElementById('contactInstagram'), youtube: document.getElementById('contactYoutube'), twitter: document.getElementById('contactTwitter'), linkedin: document.getElementById('contactLinkedin') };
     function populateContactForm() { Object.entries(contactFields).forEach(([key, input]) => { input.value = appData.contact?.[key] || ''; }); }
@@ -844,6 +946,7 @@ document.addEventListener('DOMContentLoaded', () => {
         readTestimonialsForm();
         readContactForm();
         readTextAndTypographyForms();
+        readSiteMediaForm();
     }
     document.getElementById('btnSaveAll')?.addEventListener('click', () => { readAllForms(); saveData(true); });
     document.getElementById('btnResetData')?.addEventListener('click', () => { if (!confirm('Tüm veriler varsayılana sıfırlansın mı?')) return; localStorage.removeItem(STORAGE_KEY); appData = loadData(); initAll(); showToast('Varsayılan veriler geri yüklendi.'); });
@@ -866,6 +969,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderTestimonialsForm();
         populateContactForm();
         renderTextAndTypographyForms();
+        populateSiteMediaForm();
     }
     initAll();
 });

@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/styles.css?v=20260921-responsive">
+    <link rel="stylesheet" href="css/styles.css?v=20260922-search-admin">
 </head>
 <body class="creative-page" data-page-section="videoClips">
     <div class="cursor-dot"></div>
@@ -18,7 +18,7 @@
 
     <nav class="main-nav scrolled" id="mainNav">
         <div class="nav-container">
-            <a href="index.html#home" class="nav-logo" aria-label="Les Mejor Creative ana sayfa"><img src="assets/images/les-mejor-logo-white.png" alt="Les Mejor Creative"></a>
+            <a href="index.html#home" class="nav-logo" aria-label="Les Mejor Creative ana sayfa"><img src="assets/images/les-mejor-logo-white.png?v=20260921-logo" alt="Les Mejor Creative"></a>
             <div class="nav-links" id="mainMenu">
                 <a href="index.html#home" class="nav-link">ANA SAYFA</a>
                 <a href="calismalarim.html" class="nav-link" data-nav-section="worksPage">ÇALIŞMALARIM</a>
@@ -40,6 +40,13 @@
                     <span class="section-tag">YÖNETİLEN PROJELER</span>
                     <h1 class="section-title" id="videoClipsTitle">VİDEO KLİPLERİ</h1>
                 </header>
+                <div class="content-search reveal active">
+                    <i class="fas fa-search" aria-hidden="true"></i>
+                    <label class="sr-only" for="videoClipSearchInput">Sanatçı ara</label>
+                    <input id="videoClipSearchInput" type="search" placeholder="Sanatçı ara..." autocomplete="off">
+                    <button id="videoClipSearchClear" type="button" aria-label="Aramayı temizle" hidden><i class="fas fa-xmark" aria-hidden="true"></i></button>
+                </div>
+                <p class="content-search-empty" id="videoClipSearchEmpty" hidden>Aramanızla eşleşen sanatçı veya klip bulunamadı.</p>
                 <div class="creative-projects-grid" id="videoClipsGrid">
                     <p class="creative-projects-empty">Video klipleri yükleniyor...</p>
                 </div>
@@ -50,15 +57,15 @@
     <div class="youtube-video-modal" id="youtubeVideoModal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="youtubeVideoTitle">
         <div class="youtube-video-modal-dialog">
             <div class="youtube-video-modal-header"><h2 id="youtubeVideoTitle">Video</h2><button class="youtube-video-modal-close" type="button" aria-label="Videoyu kapat">&times;</button></div>
-            <div class="youtube-video-frame-wrap"><iframe id="youtubeVideoFrame" src="" title="YouTube videosu" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe><video id="projectVideoPlayer" controls playsinline hidden></video></div>
+            <div class="youtube-video-frame-wrap"><iframe id="youtubeVideoFrame" src="" title="YouTube videosu" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe><video id="projectVideoPlayer" controls playsinline hidden></video></div>
         </div>
     </div>
 
-    <footer class="footer"><div class="container"><div class="footer-content"><div class="footer-logo">LES MEJOR CREATIVE</div><p>Creative Production Studio</p><div class="footer-divider"></div><p class="copyright">&copy; 2026 Tüm Hakları Saklıdır.</p><p class="footer-signature">Cooked by <span>Songül Bayramcı</span></p></div></div></footer>
+    <footer class="footer"><div class="container"><div class="footer-content"><p class="copyright">All rights are reserved. No part of this publication may be reproduced,</p><p class="footer-signature">lesmejorcreative Copyright &copy; 2026</p></div></div></footer>
     <button class="scroll-to-top" id="scrollToTop" type="button" aria-label="Sayfanın başına dön"><i class="fas fa-arrow-up" aria-hidden="true"></i></button>
-    <script src="data/data.js?v=20260921-responsive"></script>
-    <script src="js/data-utils.js?v=20260921-responsive"></script>
-    <script src="js/media-store.js?v=20260921-responsive"></script>
-    <script src="js/script.js?v=20260921-responsive"></script>
+    <script src="data/data.js?v=20260922-html-layer"></script>
+    <script src="js/data-utils.js?v=20260922-html-layer"></script>
+    <script src="js/media-store.js?v=20260922-html-layer"></script>
+    <script src="js/script.js?v=20260922-youtube-shadows"></script>
 </body>
 </html>

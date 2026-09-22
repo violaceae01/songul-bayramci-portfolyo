@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/styles.css?v=20260921-responsive">
+    <link rel="stylesheet" href="css/styles.css?v=20260922-youtube-shadows">
 </head>
 <body>
     <!-- Cursor -->
@@ -22,7 +22,7 @@
     <!-- Navigation -->
     <nav class="main-nav" id="mainNav">
         <div class="nav-container">
-            <a href="#home" class="nav-logo" aria-label="Les Mejor Creative ana sayfa"><img src="assets/images/les-mejor-logo-white.png" alt="Les Mejor Creative"></a>
+            <a href="#home" class="nav-logo" aria-label="Les Mejor Creative ana sayfa"><img src="assets/images/les-mejor-logo-white.png?v=20260921-logo" alt="Les Mejor Creative"></a>
             <div class="nav-links" id="mainMenu">
                 <a href="#home" class="nav-link active">ANA SAYFA</a>
                 <a href="calismalarim.html" class="nav-link" data-nav-section="worksPage">ÇALIŞMALARIM</a>
@@ -97,11 +97,11 @@
         <div class="container">
             <div class="video-showcase reveal">
                 <div class="section-header">
-                    <span class="section-tag">VIDEOS</span>
-                    <h2 class="section-title">ÇEKİM STİLİM</h2>
+                    <span class="section-tag" id="servicesTag">VIDEOS</span>
+                    <h2 class="section-title" id="servicesTitle">ÇEKİM STİLİM</h2>
                 </div>
                 <div class="video-grid">
-                    <div class="video-card">
+                    <div class="video-card" data-service-card="1">
                         <div class="video-placeholder">
                             <i class="fas fa-play-circle"></i>
                             <span>4K Çözünürlük</span>
@@ -111,7 +111,7 @@
                             <p>Profesyonel kamera açıları ile etkileyici görüntüler</p>
                         </div>
                     </div>
-                    <div class="video-card">
+                    <div class="video-card" data-service-card="2">
                         <div class="video-placeholder">
                             <i class="fas fa-microphone-alt"></i>
                             <span>Canlı Ses Kaydı</span>
@@ -121,7 +121,7 @@
                             <p>HD ses kaydı ile profesyonel prodüksiyon</p>
                         </div>
                     </div>
-                    <div class="video-card">
+                    <div class="video-card" data-service-card="3">
                         <div class="video-placeholder">
                             <i class="fas fa-film"></i>
                             <span>Sinematik</span>
@@ -171,7 +171,10 @@
     </section>
 
     <!-- About -->
-    <section id="home-about" class="about-section home-about-section home-about-centered" data-section-key="homeAbout">
+    <section id="home-about" class="about-section home-about-section home-about-centered reveal-logo reveal-background" data-section-key="homeAbout">
+        <div class="section-media-bg" aria-hidden="true">
+            <img src="assets/images/home-about-background.jpg" data-managed-media-image="aboutBackground" alt="" decoding="async">
+        </div>
         <div class="container">
             <div class="about-grid">
                 <div class="about-content reveal">
@@ -186,7 +189,10 @@
     </section>
 
     <!-- Testimonials -->
-    <section class="testimonials-section" data-section-key="testimonials">
+    <section class="testimonials-section reveal-background" data-section-key="testimonials">
+        <div class="section-media-bg" aria-hidden="true">
+            <img src="assets/images/home-testimonials-banner.png" data-managed-media-image="testimonialsBanner" alt="" decoding="async">
+        </div>
         <div class="container">
             <div class="section-header reveal">
                 <span class="section-tag">MÜŞTERİ YORUMLARI</span>
@@ -221,8 +227,15 @@
         </div>
     </section>
 
+    <div class="contact-footer-scene reveal-background">
     <!-- Contact -->
     <section id="home-contact" class="contact-section home-contact-section" data-section-key="homeContact">
+        <div class="home-signature-artwork" data-section-key="homeSignature" aria-hidden="true">
+            <img src="assets/images/songul-signature-transparent.png" alt="">
+            <div class="signature-paint-drips">
+                <i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+            </div>
+        </div>
         <div class="container">
             <div class="section-header reveal">
                 <span class="section-tag">İLETİŞİM</span>
@@ -272,28 +285,16 @@
         </div>
     </section>
 
-    <!-- Signature Artwork -->
-    <section class="home-signature-section" data-section-key="homeSignature" aria-hidden="true">
-        <div class="home-signature-artwork">
-            <img src="assets/images/songul-signature-transparent.png" alt="">
-            <div class="signature-paint-drips">
-                <i></i><i></i><i></i><i></i><i></i><i></i><i></i>
-            </div>
-        </div>
-    </section>
-
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
             <div class="footer-content">
-                <div class="footer-logo">LES MEJOR CREATIVE</div>
-                <p>Creative Production Studio</p>
-                <div class="footer-divider"></div>
-                <p class="copyright">&copy; 2026 Tüm Hakları Saklıdır.</p>
-                <p class="footer-signature">Cooked by <span>Songül Bayramcı</span></p>
+                <p class="copyright">All rights are reserved. No part of this publication may be reproduced,</p>
+                <p class="footer-signature">lesmejorcreative Copyright &copy; 2026</p>
             </div>
         </div>
     </footer>
+    </div>
 
     <div class="lightbox" id="lightbox">
         <button class="lightbox-close" id="lightboxClose" type="button" aria-label="Fotoğrafı kapat">&times;</button>
@@ -308,9 +309,9 @@
         <i class="fas fa-arrow-up" aria-hidden="true"></i>
     </button>
 
-    <script src="data/data.js?v=20260921-responsive"></script>
-    <script src="js/data-utils.js?v=20260921-responsive"></script>
-    <script src="js/media-store.js?v=20260921-responsive"></script>
-    <script src="js/script.js?v=20260921-responsive"></script>
+    <script src="data/data.js?v=20260922-about-background"></script>
+    <script src="js/data-utils.js?v=20260922-html-layer"></script>
+    <script src="js/media-store.js?v=20260922-html-layer"></script>
+    <script src="js/script.js?v=20260922-youtube-shadows"></script>
 </body>
 </html>

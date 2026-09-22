@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/admin.css?v=20260921-responsive">
+    <link rel="stylesheet" href="css/admin.css?v=20260922-html-layer">
 </head>
 <body>
 
@@ -23,53 +23,15 @@
         </div>
 
         <ul class="sidebar-menu">
-            <li class="sidebar-item">
-                <a href="#portfolio" class="sidebar-link active" data-tab="tab-portfolio">
-                    <i class="fas fa-images"></i>
-                    <span>Sanatçılar & Konserler</span>
-                </a>
-            </li>
-            <li class="sidebar-item">
-                <a href="#hero" class="sidebar-link" data-tab="tab-hero">
-                    <i class="fas fa-heading"></i>
-                    <span>Hero & Başlıklar</span>
-                </a>
-            </li>
-            <li class="sidebar-item">
-                <a href="#visibility" class="sidebar-link" data-tab="tab-visibility">
-                    <i class="fas fa-eye"></i>
-                    <span>Görünürlük</span>
-                </a>
-            </li>
+            <li class="sidebar-item"><a href="#home" class="sidebar-link active" data-tab="tab-home"><i class="fas fa-house"></i><span>Anasayfa</span></a></li>
+            <li class="sidebar-item"><a href="#about" class="sidebar-link" data-tab="tab-about"><i class="fas fa-circle-info"></i><span>Hakkımda</span></a></li>
+            <li class="sidebar-item"><a href="#portfolio" class="sidebar-link" data-tab="tab-portfolio"><i class="fas fa-images"></i><span>Çalışmalarım</span></a></li>
             <li class="sidebar-item"><a href="#clips" class="sidebar-link" data-tab="tab-clips"><i class="fab fa-youtube"></i><span>Klip Çekimleri</span></a></li>
             <li class="sidebar-item"><a href="#video-clips" class="sidebar-link" data-tab="tab-video-clips"><i class="fas fa-film"></i><span>Video Klipleri</span></a></li>
             <li class="sidebar-item"><a href="#graphics" class="sidebar-link" data-tab="tab-graphics"><i class="fas fa-pen-ruler"></i><span>Grafik Tasarım</span></a></li>
-            <li class="sidebar-item"><a href="#references" class="sidebar-link" data-tab="tab-references"><i class="fas fa-building"></i><span>Referanslarımız</span></a></li>
-            <li class="sidebar-item">
-                <a href="#stats" class="sidebar-link" data-tab="tab-stats">
-                    <i class="fas fa-chart-line"></i>
-                    <span>İstatistikler</span>
-                </a>
-            </li>
-            <li class="sidebar-item">
-                <a href="#about" class="sidebar-link" data-tab="tab-about">
-                    <i class="fas fa-user"></i>
-                    <span>Hakkımızda</span>
-                </a>
-            </li>
-            <li class="sidebar-item">
-                <a href="#testimonials" class="sidebar-link" data-tab="tab-testimonials">
-                    <i class="fas fa-comments"></i>
-                    <span>Yorumlar</span>
-                </a>
-            </li>
-            <li class="sidebar-item">
-                <a href="#contact" class="sidebar-link" data-tab="tab-contact">
-                    <i class="fas fa-address-book"></i>
-                    <span>İletişim & Sosyal</span>
-                </a>
-            </li>
-            <li class="sidebar-item"><a href="#texts" class="sidebar-link" data-tab="tab-texts"><i class="fas fa-font"></i><span>Metinler & Tipografi</span></a></li>
+            <li class="sidebar-item"><a href="#contact" class="sidebar-link" data-tab="tab-contact"><i class="fas fa-address-book"></i><span>İletişim</span></a></li>
+            <li class="sidebar-item"><a href="#references" class="sidebar-link" data-tab="tab-references"><i class="fas fa-building"></i><span>Referanslar</span></a></li>
+            <li class="sidebar-item"><a href="#testimonials" class="sidebar-link" data-tab="tab-testimonials"><i class="fas fa-comments"></i><span>Ne Diyorlar</span></a></li>
             <li class="sidebar-item">
                 <a href="#backup" class="sidebar-link" data-tab="tab-backup">
                     <i class="fas fa-database"></i>
@@ -91,8 +53,8 @@
         <!-- Top Header -->
         <header class="admin-header">
             <div class="header-title">
-                <h1 id="pageTitle">Sanatçı & Konser Yönetimi</h1>
-                <p id="pageDesc">Sanatçıları, sanatçılara bağlı konserleri, galerileri ve video bağlantılarını yönetin.</p>
+                <h1 id="pageTitle">Anasayfa</h1>
+                <p id="pageDesc">Anasayfada görünen banner, bölümler, metinler ve görselleri yönetin.</p>
             </div>
             <div class="header-actions">
                 <button class="btn btn-secondary" id="btnResetData">
@@ -105,7 +67,7 @@
         </header>
 
         <!-- 1. TAB: ARTISTS & PORTFOLIO -->
-        <section id="tab-portfolio" class="tab-panel active">
+        <section id="tab-portfolio" class="tab-panel">
             <div class="admin-card">
                 <div class="card-header">
                     <h2>Sanatçılar (<span id="artistsCount">0</span>)</h2>
@@ -133,7 +95,7 @@
                     <label class="admin-toggle"><input type="checkbox" data-section-toggle="testimonials"><span><strong>Müşteri Yorumları</strong><small>Ana sayfadaki yorum kartları</small></span></label>
                     <label class="admin-toggle"><input type="checkbox" data-section-toggle="testimonialsPage"><span><strong>Ne Diyorlar Sayfası</strong><small>Kurumsal menüsündeki ayrı yorumlar sayfası</small></span></label>
                     <label class="admin-toggle"><input type="checkbox" data-section-toggle="homeContact"><span><strong>Ana Sayfa İletişim</strong><small>İletişim formu ve bilgileri</small></span></label>
-                    <label class="admin-toggle"><input type="checkbox" data-section-toggle="homeSignature"><span><strong>İmza Görseli</strong><small>Ana sayfa altındaki hareketli imza</small></span></label>
+                    <label class="admin-toggle"><input type="checkbox" data-section-toggle="homeSignature"><span><strong>Hakkımızda Animasyonlu Logo</strong><small>Hakkımızda metninin arkasındaki hareketli Les Mejor grafitisi</small></span></label>
                     <label class="admin-toggle"><input type="checkbox" data-section-toggle="worksPage"><span><strong>Çalışmalarımız</strong><small>Sanatçı ve konser sayfaları</small></span></label>
                     <label class="admin-toggle"><input type="checkbox" data-section-toggle="referencesPage"><span><strong>Referanslarımız</strong><small>Marka logoları sayfası</small></span></label>
                     <label class="admin-toggle"><input type="checkbox" data-section-toggle="clipShootings"><span><strong>Klip Çekimleri</strong><small>Klip çekimleri sayfası ve menü bağlantısı</small></span></label>
@@ -155,7 +117,7 @@
                 <div class="card-header">
                     <div>
                         <h2>Klip Çekimleri</h2>
-                        <p class="admin-card-description">Klip bağlantısını ekleyin; kapak görseli YouTube'dan otomatik alınır.</p>
+                        <p class="admin-card-description">YouTube klip bağlantısını ekleyin; video sitedeki oynatıcıda açılır ve kapak görseli otomatik alınabilir.</p>
                     </div>
                     <button class="btn btn-primary btn-sm" id="btnAddYoutubeProject" type="button">
                         <i class="fas fa-plus"></i> Yeni Çekim Ekle
@@ -168,7 +130,7 @@
         <section id="tab-video-clips" class="tab-panel">
             <div class="admin-card">
                 <div class="card-header">
-                    <div><h2>Video Klipleri</h2><p class="admin-card-description">YouTube bağlantısı girildiğinde kapak görseli otomatik alınır.</p></div>
+                    <div><h2>Video Klipleri</h2><p class="admin-card-description">Reklamsız site içi oynatma için video dosyası yükleyin. YouTube bağlantısı yalnızca dosya yüklenmediğinde kullanılır.</p></div>
                     <button class="btn btn-primary btn-sm" id="btnAddVideoClip" type="button"><i class="fas fa-plus"></i> Yeni Video Klip Ekle</button>
                 </div>
                 <div id="videoClipsAdmin"></div>
@@ -201,7 +163,7 @@
         </section>
 
         <!-- 2. TAB: HERO -->
-        <section id="tab-hero" class="tab-panel">
+        <section id="tab-home" class="tab-panel active">
             <div class="admin-card">
                 <div class="card-header">
                     <h2>Hero / Giriş Bölümü Ayarları</h2>
@@ -314,6 +276,28 @@
             <div class="admin-card">
                 <div class="card-header"><div><h2>Yazı Kalınlıkları</h2><p class="admin-card-description">Tüm sayfalarda gövde, başlık, menü ve buton yazılarının kalınlığını belirleyin.</p></div></div>
                 <div class="form-grid" id="typographyAdmin"></div>
+            </div>
+            <div class="admin-card">
+                <div class="card-header">
+                    <div>
+                        <h2>Ana Sayfa Arka Plan Görselleri</h2>
+                        <p class="admin-card-description">Müşteri yorumları ile ana sayfadaki Hakkımızda alanının arka plan görsellerini bilgisayarınızdan değiştirebilirsiniz.</p>
+                    </div>
+                </div>
+                <div class="form-grid" id="siteMediaAdmin">
+                    <div class="form-group">
+                        <label>Müşteri Yorumları Arka Planı</label>
+                        <input type="file" class="form-control site-media-file" data-media-key="testimonialsBanner" accept="image/*">
+                        <input type="hidden" class="site-media-reference" data-media-key="testimonialsBanner">
+                        <img class="image-preview site-media-preview" data-media-preview="testimonialsBanner" alt="Müşteri yorumları arka planı önizlemesi">
+                    </div>
+                    <div class="form-group form-full">
+                        <label>Ana Sayfa Hakkımızda Arka Planı</label>
+                        <input type="file" class="form-control site-media-file" data-media-key="aboutBackground" accept="image/*">
+                        <input type="hidden" class="site-media-reference" data-media-key="aboutBackground">
+                        <img class="image-preview site-media-preview" data-media-preview="aboutBackground" alt="Ana sayfa Hakkımızda arka planı önizlemesi">
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -524,9 +508,9 @@
     <!-- Toast Notifications Container -->
     <div class="toast-container" id="toastContainer"></div>
 
-    <script src="data/data.js?v=20260921-responsive"></script>
-    <script src="js/data-utils.js?v=20260921-responsive"></script>
-    <script src="js/media-store.js?v=20260921-responsive"></script>
-    <script src="js/admin.js?v=20260921-responsive"></script>
+    <script src="data/data.js?v=20260922-about-background"></script>
+    <script src="js/data-utils.js?v=20260922-html-layer"></script>
+    <script src="js/media-store.js?v=20260922-html-layer"></script>
+    <script src="js/admin.js?v=20260922-search-admin"></script>
 </body>
 </html>

@@ -229,11 +229,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     const defaultVisibility = siteData.sectionVisibility || {};
                     const savedVisibility = parsed.sectionVisibility || {};
                     parsed.sectionVisibility = { ...defaultVisibility, ...savedVisibility };
+                    parsed.siteMedia = { ...(siteData.siteMedia || {}), ...(parsed.siteMedia || {}) };
                     parsed.contact = { ...(siteData.contact || {}), ...(parsed.contact || {}) };
                     parsed.siteText = { ...(siteData.siteText || {}), ...(parsed.siteText || {}) };
                     parsed.typography = { ...(siteData.typography || {}), ...(parsed.typography || {}) };
                     const savedContentVersion = Number(parsed.contentVersion || 0);
                     const currentContentVersion = Number(siteData.contentVersion || 0);
+                    if (savedContentVersion < 5) {
+                        parsed.sectionVisibility.homeServices = false;
+                        updated = true;
+                    }
                     if (savedContentVersion < currentContentVersion && Array.isArray(siteData.graphicProjects)) {
                         const existingGraphicIds = new Set((parsed.graphicProjects || []).map(item => String(item.id)));
                         const missingGraphicProjects = siteData.graphicProjects
@@ -566,7 +571,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const text = currentSiteData.siteText || {};
         const selectors = {
             navHome: 'a.nav-link[href*="index.html#home"]', navWorks: '[data-nav-section="worksPage"]', navClip: '[data-nav-section="clipShootings"]', navVideo: '[data-nav-section="videoClips"]', navGraphic: '[data-nav-section="graphicDesign"]', navReferences: '[data-nav-section="referencesPage"]', navAbout: '[data-nav-section="aboutPage"]', navTestimonials: '[data-nav-section="testimonialsPage"]', navContact: '[data-nav-section="contactPage"]',
-            footerStudio: '.footer-content > p:not(.copyright):not(.footer-signature)', footerCopyright: '.footer .copyright'
+            footerCopyright: '.footer .copyright', footerLegal: '.footer .footer-signature'
         };
         Object.entries(selectors).forEach(([key, selector]) => {
             if (!text[key]) return;
@@ -583,6 +588,20 @@ document.addEventListener('DOMContentLoaded', () => {
             if (title && text[pageKeys[1]]) title.textContent = text[pageKeys[1]];
         }
         if (document.body.classList.contains('home-page') || document.getElementById('featuredArtistsGrid')) {
+            const serviceSection = document.querySelector('[data-section-key="homeServices"]');
+            if (serviceSection) {
+                const serviceFields = {
+                    servicesTag: '#servicesTag', servicesTitle: '#servicesTitle',
+                    service1Kicker: '[data-service-card="1"] .video-placeholder span', service1Title: '[data-service-card="1"] .video-info h3', service1Description: '[data-service-card="1"] .video-info p',
+                    service2Kicker: '[data-service-card="2"] .video-placeholder span', service2Title: '[data-service-card="2"] .video-info h3', service2Description: '[data-service-card="2"] .video-info p',
+                    service3Kicker: '[data-service-card="3"] .video-placeholder span', service3Title: '[data-service-card="3"] .video-info h3', service3Description: '[data-service-card="3"] .video-info p'
+                };
+                Object.entries(serviceFields).forEach(([key, selector]) => {
+                    if (!Object.prototype.hasOwnProperty.call(text, key)) return;
+                    const element = serviceSection.querySelector(selector);
+                    if (element) element.textContent = text[key] || '';
+                });
+            }
             const featured = document.querySelector('[data-section-key="featuredArtists"]');
             if (featured) { const tag = featured.querySelector('.section-tag'); const title = featured.querySelector('.section-title'); if (tag && text.featuredTag) tag.textContent = text.featuredTag; if (title && text.featuredTitle) title.textContent = text.featuredTitle; }
             const testimonialSection = document.querySelector('[data-section-key="testimonials"]');
@@ -682,7 +701,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ============================================
     // SCROLL REVEAL
     // ============================================
-    const reveals = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
+    const reveals = document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-background, .reveal-logo');
 
     const revealObserver = 'IntersectionObserver' in window
         ? new IntersectionObserver((entries) => {
@@ -743,6 +762,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const link = document.createElement('a');
             link.className = 'artist-directory-card reveal active';
             link.href = `sanatci.html?artist=${encodeURIComponent(artist.slug)}`;
+            link.dataset.searchText = `${artist.name || ''} ${artist.bio || ''}`.toLocaleLowerCase('tr-TR');
             link.innerHTML = `
                 <img src="${escapeHtml(artist.cover)}" alt="${escapeHtml(artist.name)}" loading="${artistIndex < 4 ? 'eager' : 'lazy'}" decoding="async">
                 <span class="artist-directory-overlay">
@@ -915,7 +935,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const sectionVisibility = {
         homeHero: true,
         homeStats: true,
-        homeServices: true,
+        homeServices: false,
         featuredArtists: true,
         partnerLogos: true,
         homeAbout: true,
@@ -940,6 +960,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function isSectionVisible(key) {
         return sectionVisibility[key] !== false;
+    }
+
+    async function applyManagedMedia() {
+        const media = {
+            ...(typeof siteData !== 'undefined' ? siteData.siteMedia || {} : {}),
+            ...(currentSiteData.siteMedia || {})
+        };
+        const asCssUrl = source => {
+            let normalized = String(source || '');
+            try {
+                normalized = new URL(normalized, document.baseURI).href;
+            } catch (_) {
+                // Blob/data URL'leri ve geçerli göreli yollar olduğu gibi kullanılabilir.
+            }
+            return `url("${normalized.replace(/"/g, '%22')}")`;
+        };
+        for (const element of document.querySelectorAll('[data-managed-media]')) {
+            const reference = media[element.dataset.managedMedia] || '';
+            const source = await resolveMediaUrl(reference);
+            if (source) element.style.setProperty('--managed-background-image', asCssUrl(source));
+        }
+        for (const image of document.querySelectorAll('[data-managed-media-image]')) {
+            const reference = media[image.dataset.managedMediaImage] || '';
+            const source = await resolveMediaUrl(reference);
+            if (source) image.src = source;
+        }
     }
 
     function applySectionVisibility() {
@@ -1023,7 +1069,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const player = document.getElementById('projectVideoPlayer');
         if (player) { player.pause(); player.removeAttribute('src'); player.hidden = true; }
         frame.hidden = false;
-        frame.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(videoId)}?autoplay=1&rel=0`;
+        const playerParams = new URLSearchParams({ autoplay: '1', rel: '0', playsinline: '1' });
+        if (/^https?:$/.test(window.location.protocol)) {
+            playerParams.set('origin', window.location.origin);
+            playerParams.set('widget_referrer', window.location.href);
+        }
+        frame.referrerPolicy = 'strict-origin-when-cross-origin';
+        frame.src = `https://www.youtube.com/embed/${encodeURIComponent(videoId)}?${playerParams.toString()}`;
         frame.title = title || 'YouTube videosu';
         if (heading) heading.textContent = title || 'Klip Çekimi';
         modal.classList.add('active');
@@ -1091,7 +1143,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const usesAutomaticThumbnail = !project.thumbnail && Boolean(videoId);
             const thumbnailReference = project.thumbnail || youtubeThumbnail(videoId);
             const thumbnail = await resolveMediaUrl(thumbnailReference);
-            const hasPlayableMedia = Boolean(project.videoFile || videoId);
+            const hasPlayableMedia = Boolean(videoId);
             const cardTag = hasPlayableMedia ? 'button' : projectUrl ? 'a' : 'div';
             const linkAttributes = hasPlayableMedia
                 ? `type="button" aria-label="${escapeHtml(project.title)} klibini sitede izle"`
@@ -1102,7 +1154,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         ${thumbnail ? `<img src="${escapeHtml(thumbnail)}" alt="${escapeHtml(project.title)}" loading="lazy" decoding="async"${usesAutomaticThumbnail ? ` data-youtube-video-id="${escapeHtml(videoId)}"` : ''}>` : ''}
                         <span class="youtube-project-placeholder"><i class="fab fa-youtube" aria-hidden="true"></i><small>${escapeHtml(project.title)}</small></span>
                         ${String(project.category || '').trim() ? `<span class="youtube-project-type">${escapeHtml(project.category)}</span>` : ''}
-                        ${projectUrl ? '<span class="youtube-project-play"><i class="fas fa-play" aria-hidden="true"></i></span>' : ''}
+                        ${hasPlayableMedia ? '<span class="youtube-project-play"><i class="fas fa-play" aria-hidden="true"></i></span>' : ''}
                     </span>
                     <span class="youtube-project-info">
                         <strong>${escapeHtml(project.title)}</strong>
@@ -1112,9 +1164,7 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
             const media = article.querySelector('.youtube-project-media');
             const image = article.querySelector('img');
-            if (project.videoFile) {
-                article.querySelector('.youtube-project-link')?.addEventListener('click', () => openUploadedVideo(project.videoFile, project.title));
-            } else if (videoId) {
+            if (videoId) {
                 article.querySelector('.youtube-project-link')?.addEventListener('click', () => openYouTubeModal(videoId, project.title));
             }
             image?.addEventListener('error', () => {
@@ -1157,6 +1207,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const hasPlayableMedia = isVideo && Boolean(item.videoFile || videoId);
             const card = document.createElement(hasPlayableMedia ? 'button' : isVideo && projectUrl ? 'a' : isVideo ? 'article' : 'button');
             card.className = 'creative-project-card reveal active';
+            card.dataset.searchText = `${item.title || ''} ${item.category || ''} ${item.year || ''}`.toLocaleLowerCase('tr-TR');
             if (!isVideo) {
                 card.type = 'button';
                 card.setAttribute('aria-label', `${item.title} görselini büyüt`);
@@ -1294,13 +1345,49 @@ document.addEventListener('DOMContentLoaded', () => {
         partners.forEach(partner => grid.appendChild(createPartnerCard(partner, { grid: true })));
     }
 
+    function setupContentSearch({ inputId, clearId, emptyId, gridId, cardSelector, countId }) {
+        const input = document.getElementById(inputId);
+        const clear = document.getElementById(clearId);
+        const empty = document.getElementById(emptyId);
+        const grid = document.getElementById(gridId);
+        if (!input || !grid) return;
+
+        const filter = () => {
+            const query = input.value.trim().toLocaleLowerCase('tr-TR');
+            const cards = [...grid.querySelectorAll(cardSelector)];
+            let visibleCount = 0;
+            cards.forEach(card => {
+                const searchText = card.dataset.searchText || card.textContent.toLocaleLowerCase('tr-TR');
+                const matches = !query || searchText.includes(query);
+                card.hidden = !matches;
+                if (matches) visibleCount += 1;
+            });
+            if (clear) clear.hidden = !query;
+            if (empty) empty.hidden = !query || visibleCount > 0;
+            const count = countId ? document.getElementById(countId) : null;
+            if (count) count.textContent = query ? `${visibleCount} sanatçı bulundu` : `${cards.length} sanatçı`;
+        };
+
+        input.addEventListener('input', filter);
+        clear?.addEventListener('click', () => {
+            input.value = '';
+            filter();
+            input.focus();
+        });
+        filter();
+    }
+
+    applyManagedMedia();
     applySectionVisibility();
     loadArtistDirectory();
+    setupContentSearch({ inputId: 'artistSearchInput', clearId: 'artistSearchClear', emptyId: 'artistSearchEmpty', gridId: 'artistDirectory', cardSelector: '.artist-directory-card', countId: 'artistDirectoryCount' });
     loadArtistDetail();
     loadFeaturedArtists();
     loadYoutubeProjects();
     loadCreativeProjects('graphicDesignGrid', 'graphicProjects', 'graphicDesign', 'Grafik tasarım çalışmaları', 'Grafik Tasarım');
-    loadCreativeProjects('videoClipsGrid', 'videoClips', 'videoClips', 'Video klipleri', '', true);
+    loadCreativeProjects('videoClipsGrid', 'videoClips', 'videoClips', 'Video klipleri', '', true).then(() => {
+        setupContentSearch({ inputId: 'videoClipSearchInput', clearId: 'videoClipSearchClear', emptyId: 'videoClipSearchEmpty', gridId: 'videoClipsGrid', cardSelector: '.creative-project-card' });
+    });
     loadPartnerLogos();
     loadReferences();
 

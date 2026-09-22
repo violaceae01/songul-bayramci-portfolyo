@@ -1,5 +1,5 @@
 const siteData = {
-  "contentVersion": 4,
+  "contentVersion": 5,
   "hero": {
     "tag": "KONSER & ETKİNLİK ÇEKİMİ",
     "titleLine1": "HER ANI",
@@ -175,7 +175,7 @@ const siteData = {
   "sectionVisibility": {
     "homeHero": true,
     "homeStats": true,
-    "homeServices": true,
+    "homeServices": false,
     "featuredArtists": true,
     "partnerLogos": true,
     "homeAbout": true,
@@ -210,6 +210,11 @@ const siteData = {
       "enabled": true
     }
   ],
+  "siteMedia": {
+    "testimonialsBanner": "assets/images/home-testimonials-banner.png",
+    "footerBackground": "assets/images/footer-banner.jpg",
+    "aboutBackground": "assets/images/home-about-background.jpg"
+  },
   "graphicProjects": [
     {
       "id": "kubilay-karca-turne-afisi-siyah",
@@ -311,6 +316,17 @@ const siteData = {
     "featuredTag": "PORTFÖY",
     "featuredTitle": "ÖNE ÇIKAN SANATÇILAR",
     "featuredMore": "Daha Fazla",
+    "servicesTag": "VIDEOS",
+    "servicesTitle": "ÇEKİM STİLİM",
+    "service1Kicker": "4K Çözünürlük",
+    "service1Title": "Dinamik Açılar",
+    "service1Description": "Profesyonel kamera açıları ile etkileyici görüntüler",
+    "service2Kicker": "Canlı Ses Kaydı",
+    "service2Title": "Kaliteli Ses",
+    "service2Description": "HD ses kaydı ile profesyonel prodüksiyon",
+    "service3Kicker": "Sinematik",
+    "service3Title": "Sinematik Görüntüler",
+    "service3Description": "Film kalitesinde çekim ve post-prodüksiyon",
     "testimonialsTag": "NE DİYORLAR",
     "testimonialsTitle": "MÜŞTERİ YORUMLARI",
     "graphicTag": "TASARIM PORTFÖYÜ",
@@ -324,8 +340,8 @@ const siteData = {
     "aboutTag": "HAKKIMIZDA",
     "contactTag": "İLETİŞİM",
     "contactTitle": "PROJEMİZ VAR!",
-    "footerStudio": "Creative Production Studio",
-    "footerCopyright": "© 2026 Tüm Hakları Saklıdır."
+    "footerCopyright": "All rights are reserved. No part of this publication may be reproduced,",
+    "footerLegal": "lesmejorcreative Copyright © 2026"
   },
   "contact": {
     "email": "songul@ornek.com",
