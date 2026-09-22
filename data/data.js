@@ -1,5 +1,5 @@
 const siteData = {
-  "contentVersion": 5,
+  "contentVersion": 6,
   "hero": {
     "tag": "KONSER & ETKİNLİK ÇEKİMİ",
     "titleLine1": "HER ANI",

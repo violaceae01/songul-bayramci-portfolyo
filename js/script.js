@@ -239,6 +239,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         parsed.sectionVisibility.homeServices = false;
                         updated = true;
                     }
+                    if (savedContentVersion < 6) {
+                        parsed.siteText.footerCopyright = siteData.siteText?.footerCopyright || 'All rights are reserved. No part of this publication may be reproduced,';
+                        parsed.siteText.footerLegal = siteData.siteText?.footerLegal || 'lesmejorcreative Copyright © 2026';
+                        updated = true;
+                    }
                     if (savedContentVersion < currentContentVersion && Array.isArray(siteData.graphicProjects)) {
                         const existingGraphicIds = new Set((parsed.graphicProjects || []).map(item => String(item.id)));
                         const missingGraphicProjects = siteData.graphicProjects
