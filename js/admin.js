@@ -16,8 +16,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             const serverData = await window.SiteServer.loadData();
             if (serverData) {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(serverData));
-                appData = loadData();
+                appData = loadData(serverData);
             }
         } catch (error) {
             console.error('Sunucu verisi yüklenemedi:', error);
@@ -25,13 +24,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    function loadData() {
+    function loadData(sourceData = null) {
         const defaults = typeof siteData !== 'undefined' ? clone(siteData) : {
             hero: {}, stats: [], artists: [], homeGallery: [], youtubeProjects: [], graphicProjects: [], videoClips: [], partners: [], sectionVisibility: {}, siteMedia: {}, about: {}, testimonials: [], contact: {}
         };
         try {
-            const saved = localStorage.getItem(STORAGE_KEY);
-            const parsed = saved ? JSON.parse(saved) : {};
+            const saved = sourceData ? null : localStorage.getItem(STORAGE_KEY);
+            const parsed = sourceData && typeof sourceData === 'object' ? clone(sourceData) : (saved ? JSON.parse(saved) : {});
             const merged = { ...defaults, ...parsed };
             merged.hero = { ...(defaults.hero || {}), ...(parsed.hero || {}) };
             merged.contact = { ...(defaults.contact || {}), ...(parsed.contact || {}) };
@@ -94,7 +93,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     return isOldDemo ? clone(defaults.youtubeProjects[0]) : project;
                 });
             }
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+            if (!serverEnabled) localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
             return merged;
         } catch (error) {
             console.error('Veri yükleme hatası:', error);
@@ -105,8 +104,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function saveData(notify = true) {
         try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
             if (serverEnabled) await window.SiteServer.saveData(appData);
+            else localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
             if (notify) showToast(serverEnabled ? 'Değişiklikler canlı siteye kaydedildi!' : 'Tüm değişiklikler başarıyla kaydedildi!', 'success');
         } catch (error) {
             console.error('Kaydetme hatası:', error);
