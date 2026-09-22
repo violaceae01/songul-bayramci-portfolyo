@@ -104,6 +104,34 @@ function requireAuth(): void
     if (!isAuthenticated()) respond(['ok' => false, 'message' => 'Oturum açmanız gerekiyor.'], 401);
 }
 
+function detectUploadedMime(string $path): string
+{
+    if (class_exists('finfo')) {
+        $detected = (new finfo(FILEINFO_MIME_TYPE))->file($path);
+        if (is_string($detected) && $detected !== '') return $detected;
+    }
+
+    if (function_exists('mime_content_type')) {
+        $detected = @mime_content_type($path);
+        if (is_string($detected) && $detected !== '') return $detected;
+    }
+
+    $imageInfo = @getimagesize($path);
+    if (is_array($imageInfo) && !empty($imageInfo['mime'])) return (string) $imageInfo['mime'];
+
+    $handle = @fopen($path, 'rb');
+    if ($handle === false) return '';
+    $header = (string) fread($handle, 32);
+    fclose($handle);
+
+    if (substr($header, 0, 4) === "\x1A\x45\xDF\xA3") return 'video/webm';
+    if (substr($header, 4, 4) === 'ftyp') {
+        return substr($header, 8, 4) === 'qt  ' ? 'video/quicktime' : 'video/mp4';
+    }
+
+    return '';
+}
+
 function setupTokenHash(): string
 {
     if (!is_file(CONFIG_FILE)) return '';
@@ -199,7 +227,7 @@ if ($action === 'upload') {
     }
     if (!is_uploaded_file((string) ($file['tmp_name'] ?? ''))) respond(['ok' => false, 'message' => 'Geçici yükleme dosyası doğrulanamadı.'], 400);
     if (($file['size'] ?? 0) > 250 * 1024 * 1024) respond(['ok' => false, 'message' => 'Dosya 250 MB sınırını aşıyor.'], 413);
-    $mime = (new finfo(FILEINFO_MIME_TYPE))->file($file['tmp_name']) ?: '';
+    $mime = detectUploadedMime((string) $file['tmp_name']);
     $allowed = [
         'image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp', 'image/gif' => 'gif',
         'video/mp4' => 'mp4', 'video/webm' => 'webm', 'video/quicktime' => 'mov',
