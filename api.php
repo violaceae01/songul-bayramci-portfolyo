@@ -121,15 +121,26 @@ function detectUploadedMime(string $path): string
 
     $handle = @fopen($path, 'rb');
     if ($handle === false) return '';
-    $header = (string) fread($handle, 32);
+    $header = (string) fread($handle, 8192);
     fclose($handle);
 
+    if (preg_match('/<svg\b/i', $header) === 1) return 'image/svg+xml';
     if (substr($header, 0, 4) === "\x1A\x45\xDF\xA3") return 'video/webm';
     if (substr($header, 4, 4) === 'ftyp') {
         return substr($header, 8, 4) === 'qt  ' ? 'video/quicktime' : 'video/mp4';
     }
 
     return '';
+}
+
+function isSafeSvg(string $path): bool
+{
+    $size = @filesize($path);
+    if (!is_int($size) || $size <= 0 || $size > 10 * 1024 * 1024) return false;
+    $source = @file_get_contents($path);
+    if (!is_string($source) || preg_match('/<svg\b/i', $source) !== 1) return false;
+
+    return preg_match('/<!DOCTYPE|<!ENTITY|<script\b|<foreignObject\b|<iframe\b|<object\b|<embed\b|\son[a-z]+\s*=|javascript\s*:/i', $source) !== 1;
 }
 
 function setupTokenHash(): string
@@ -229,10 +240,13 @@ if ($action === 'upload') {
     if (($file['size'] ?? 0) > 250 * 1024 * 1024) respond(['ok' => false, 'message' => 'Dosya 250 MB sınırını aşıyor.'], 413);
     $mime = detectUploadedMime((string) $file['tmp_name']);
     $allowed = [
-        'image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp', 'image/gif' => 'gif',
+        'image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp', 'image/gif' => 'gif', 'image/svg+xml' => 'svg',
         'video/mp4' => 'mp4', 'video/webm' => 'webm', 'video/quicktime' => 'mov',
     ];
     if (!isset($allowed[$mime])) respond(['ok' => false, 'message' => 'Bu dosya türü desteklenmiyor.'], 415);
+    if ($mime === 'image/svg+xml' && !isSafeSvg((string) $file['tmp_name'])) {
+        respond(['ok' => false, 'message' => 'SVG dosyası güvenlik kontrolünden geçemedi.'], 415);
+    }
     $category = preg_replace('/[^a-z0-9-]+/i', '-', (string) ($_POST['category'] ?? 'media')) ?: 'media';
     $filename = strtolower($category) . '-' . gmdate('Ymd-His') . '-' . bin2hex(random_bytes(5)) . '.' . $allowed[$mime];
     $target = UPLOAD_DIR . '/' . $filename;
