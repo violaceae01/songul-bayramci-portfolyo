@@ -112,26 +112,46 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const pageAdminConfig = {
-        home: { panel: 'tab-home', title: 'Anasayfa Ayarları', visibility: ['homeHero', 'homeStats', 'homeServices', 'featuredArtists', 'partnerLogos', 'homeAbout', 'testimonials', 'homeContact', 'homeSignature', 'siteFooter', 'scrollTop'] },
-        about: { panel: 'tab-about', title: 'Hakkımda Sayfası Ayarları', visibility: ['aboutPage', 'aboutVisionMission'] },
-        works: { panel: 'tab-portfolio', title: 'Çalışmalarım Sayfası Ayarları', visibility: ['worksPage'] },
-        clips: { panel: 'tab-clips', title: 'Klip Çekimleri Sayfası Ayarları', visibility: ['clipShootings'] },
-        video: { panel: 'tab-video-clips', title: 'Video Klipleri Sayfası Ayarları', visibility: ['videoClips'] },
-        graphics: { panel: 'tab-graphics', title: 'Grafik Tasarım Sayfası Ayarları', visibility: ['graphicDesign'] },
-        contact: { panel: 'tab-contact', title: 'İletişim Sayfası Ayarları', visibility: ['contactPage', 'contactDetails', 'contactForm'] },
-        references: { panel: 'tab-references', title: 'Referanslar Sayfası Ayarları', visibility: ['referencesPage'] },
-        testimonials: { panel: 'tab-testimonials', title: 'Ne Diyorlar Sayfası Ayarları', visibility: ['testimonialsPage'] }
+        home: {
+            panel: 'tab-home',
+            groups: [
+                { title: 'Ana Menü', description: 'Ana sayfada görünen menü başlıklarını düzenleyin.', textFields: ['navHome', 'navCorporate'] },
+                { title: 'Ana Banner', description: 'Banner görünürlüğü ile video ve başlık ayarları bu alanın hemen altında yer alır.', visibility: ['homeHero'] },
+                { title: 'İstatistikler', description: 'Sayaç bölümünü açıp kapatın; sayılar aynı alanın altındaki karttan düzenlenir.', visibility: ['homeStats'] },
+                { title: 'Çekim Stili', description: 'Bu bölüme ait görünürlük, başlık ve kart metinleri.', visibility: ['homeServices'], textFields: ['servicesTag', 'servicesTitle', 'service1Kicker', 'service1Title', 'service1Description', 'service2Kicker', 'service2Title', 'service2Description', 'service3Kicker', 'service3Title', 'service3Description'] },
+                { title: 'Öne Çıkan Sanatçılar', description: 'Ana sayfadaki sanatçı bölümünün görünürlüğü ve sabit metinleri.', visibility: ['featuredArtists'], textFields: ['featuredTag', 'featuredTitle', 'featuredMore'] },
+                { title: 'Referans Logo Şeridi', description: 'Ana sayfadaki kayan marka logolarını açıp kapatın.', visibility: ['partnerLogos'] },
+                { title: 'Hakkımızda', description: 'Ana sayfa Hakkımızda alanı ve hareketli Les Mejor görseli.', visibility: ['homeAbout', 'homeSignature'] },
+                { title: 'Müşteri Yorumları', description: 'Ana sayfadaki yorum bölümünü açıp kapatın. Yorum içerikleri Ne Diyorlar sekmesindedir.', visibility: ['testimonials'] },
+                { title: 'Projemiz Var ve Footer', description: 'İletişim alanı, alt bilgi ve yukarı çık düğmesini birlikte yönetin.', visibility: ['homeContact', 'siteFooter', 'scrollTop'], textFields: ['footerCopyright', 'footerLegal'] }
+            ]
+        },
+        about: { panel: 'tab-about', groups: [{ title: 'Hakkımızda Sayfası', description: 'Sayfa görünürlüğü, menü adı ve bölüm başlığı.', visibility: ['aboutPage', 'aboutVisionMission'], textFields: ['navAbout', 'aboutTag'] }] },
+        works: { panel: 'tab-portfolio', groups: [{ title: 'Çalışmalarım Sayfası', description: 'Sanatçı ve konser sayfasının görünürlüğü ile menü adı.', visibility: ['worksPage'], textFields: ['navWorks'] }] },
+        clips: { panel: 'tab-clips', groups: [{ title: 'Klip Çekimleri Sayfası', description: 'Sayfanın görünürlüğü, menü adı ve üst başlıkları.', visibility: ['clipShootings'], textFields: ['navClip', 'clipTag', 'clipTitle'] }] },
+        video: { panel: 'tab-video-clips', groups: [{ title: 'Video Klipleri Sayfası', description: 'Sayfanın görünürlüğü, menü adı ve üst başlıkları.', visibility: ['videoClips'], textFields: ['navVideo', 'videoTag', 'videoTitle'] }] },
+        graphics: { panel: 'tab-graphics', groups: [{ title: 'Grafik Tasarım Sayfası', description: 'Sayfanın görünürlüğü, menü adı ve üst başlıkları.', visibility: ['graphicDesign'], textFields: ['navGraphic', 'graphicTag', 'graphicTitle'] }] },
+        contact: { panel: 'tab-contact', groups: [{ title: 'İletişim Sayfası', description: 'İletişim alanlarının görünürlüğü, menü adı ve başlıkları.', visibility: ['contactPage', 'contactDetails', 'contactForm'], textFields: ['navContact', 'contactTag', 'contactTitle'] }] },
+        references: { panel: 'tab-references', groups: [{ title: 'Referanslar Sayfası', description: 'Referans sayfasının görünürlüğü, menü adı ve başlıkları.', visibility: ['referencesPage'], textFields: ['navReferences', 'referencesTag', 'referencesTitle'] }] },
+        testimonials: { panel: 'tab-testimonials', groups: [{ title: 'Ne Diyorlar Sayfası', description: 'Yorum sayfasının görünürlüğü, menü adı ve başlıkları.', visibility: ['testimonialsPage'], textFields: ['navTestimonials', 'testimonialsTag', 'testimonialsTitle'] }] }
     };
 
-    function makePageSettingsCard(pageKey, config) {
+    function makePageSettingsCards(pageKey, config) {
         const panel = document.getElementById(config.panel);
         if (!panel) return;
-        const visibilityLabels = config.visibility.map(key => document.querySelector(`[data-section-toggle="${key}"]`)?.closest('.admin-toggle')).filter(Boolean);
-        const card = document.createElement('div');
-        card.className = 'admin-card page-settings-card';
-        card.innerHTML = `<div class="card-header"><div><h2>${escapeHtml(config.title)}</h2><p class="admin-card-description">Bu sayfanın görünürlüğünü ve sabit metinlerini aynı yerden yönetin.</p></div></div><div class="admin-toggle-grid" data-page-visibility="${pageKey}"></div><div class="form-grid page-text-grid" data-site-text-page="${pageKey}"></div>`;
-        visibilityLabels.forEach(label => card.querySelector('[data-page-visibility]')?.appendChild(label));
-        panel.prepend(card);
+        const fragment = document.createDocumentFragment();
+        (config.groups || []).forEach((group, index) => {
+            const visibilityLabels = (group.visibility || []).map(key => document.querySelector(`[data-section-toggle="${key}"]`)?.closest('.admin-toggle')).filter(Boolean);
+            const textFields = group.textFields || [];
+            if (!visibilityLabels.length && !textFields.length) return;
+            const card = document.createElement('div');
+            card.className = 'admin-card page-settings-card';
+            card.dataset.adminArea = `${pageKey}-${index}`;
+            card.innerHTML = `<div class="card-header"><div><h2>${escapeHtml(group.title)}</h2><p class="admin-card-description">${escapeHtml(group.description || 'Bu alana ait görünürlük ve metin ayarları.')}</p></div></div>${visibilityLabels.length ? `<div class="admin-toggle-grid" data-page-visibility="${pageKey}-${index}"></div>` : ''}${textFields.length ? `<div class="form-grid page-text-grid" data-site-text-fields="${escapeHtml(textFields.join(','))}"></div>` : ''}`;
+            visibilityLabels.forEach(label => card.querySelector('[data-page-visibility]')?.appendChild(label));
+            fragment.appendChild(card);
+        });
+        panel.prepend(fragment);
     }
 
     function organizeAdminPanels() {
@@ -144,7 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (mediaCard) homePanel.appendChild(mediaCard);
             if (typographyCard) homePanel.appendChild(typographyCard);
         }
-        Object.entries(pageAdminConfig).forEach(([pageKey, config]) => makePageSettingsCard(pageKey, config));
+        Object.entries(pageAdminConfig).forEach(([pageKey, config]) => makePageSettingsCards(pageKey, config));
         document.getElementById('tab-visibility')?.remove();
         document.getElementById('tab-stats')?.remove();
         document.getElementById('tab-texts')?.remove();
@@ -853,22 +873,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const textFieldLabels = {
         navHome: 'Menü: Ana Sayfa', navWorks: 'Menü: Çalışmalarım', navClip: 'Menü: Klip Çekimleri', navVideo: 'Menü: Video Klipleri', navGraphic: 'Menü: Grafik Tasarım', navCorporate: 'Menü: Kurumsal', navReferences: 'Menü: Referanslarımız', navAbout: 'Menü: Hakkımızda', navTestimonials: 'Menü: Ne Diyorlar', navContact: 'Menü: İletişim', featuredTag: 'Öne Çıkanlar Üst Etiketi', featuredTitle: 'Öne Çıkanlar Başlığı', featuredMore: 'Daha Fazla Butonu', servicesTag: 'Çekim Stili Üst Etiketi', servicesTitle: 'Çekim Stili Başlığı', service1Kicker: 'Çekim Stili 1 Kısa Başlık', service1Title: 'Çekim Stili 1 Başlık', service1Description: 'Çekim Stili 1 Açıklama', service2Kicker: 'Çekim Stili 2 Kısa Başlık', service2Title: 'Çekim Stili 2 Başlık', service2Description: 'Çekim Stili 2 Açıklama', service3Kicker: 'Çekim Stili 3 Kısa Başlık', service3Title: 'Çekim Stili 3 Başlık', service3Description: 'Çekim Stili 3 Açıklama', testimonialsTag: 'Yorumlar Üst Etiketi', testimonialsTitle: 'Yorumlar Başlığı', graphicTag: 'Grafik Tasarım Üst Etiketi', graphicTitle: 'Grafik Tasarım Başlığı', clipTag: 'Klip Çekimleri Üst Etiketi', clipTitle: 'Klip Çekimleri Başlığı', videoTag: 'Video Klipleri Üst Etiketi', videoTitle: 'Video Klipleri Başlığı', referencesTag: 'Referanslar Üst Etiketi', referencesTitle: 'Referanslar Başlığı', aboutTag: 'Hakkımızda Üst Etiketi', contactTag: 'İletişim Üst Etiketi', contactTitle: 'İletişim Başlığı', footerCopyright: 'Footer Yasal Metin 1', footerLegal: 'Footer Yasal Metin 2'
     };
-    const textFieldsByPage = {
-        home: ['navHome', 'navCorporate', 'featuredTag', 'featuredTitle', 'featuredMore', 'servicesTag', 'servicesTitle', 'service1Kicker', 'service1Title', 'service1Description', 'service2Kicker', 'service2Title', 'service2Description', 'service3Kicker', 'service3Title', 'service3Description', 'footerCopyright', 'footerLegal'],
-        about: ['navAbout', 'aboutTag'],
-        works: ['navWorks'],
-        clips: ['navClip', 'clipTag', 'clipTitle'],
-        video: ['navVideo', 'videoTag', 'videoTitle'],
-        graphics: ['navGraphic', 'graphicTag', 'graphicTitle'],
-        contact: ['navContact', 'contactTag', 'contactTitle'],
-        references: ['navReferences', 'referencesTag', 'referencesTitle'],
-        testimonials: ['navTestimonials', 'testimonialsTag', 'testimonialsTitle']
-    };
     const siteTextAdmin = document.getElementById('siteTextAdmin');
     const typographyAdmin = document.getElementById('typographyAdmin');
     function renderTextAndTypographyForms() {
-        document.querySelectorAll('[data-site-text-page]').forEach(container => {
-            const keys = textFieldsByPage[container.dataset.siteTextPage] || [];
+        document.querySelectorAll('[data-site-text-fields]').forEach(container => {
+            const keys = String(container.dataset.siteTextFields || '').split(',').filter(Boolean);
             container.innerHTML = keys.map(key => `<div class="form-group"><label>${escapeHtml(textFieldLabels[key] || key)}</label><input class="form-control site-text-input" data-text-key="${key}" value="${escapeHtml(appData.siteText?.[key] || '')}"></div>`).join('');
         });
         const weights = [['bodyWeight', 'Gövde Yazıları'], ['headingWeight', 'Başlıklar'], ['navWeight', 'Menü Yazıları'], ['buttonWeight', 'Buton Yazıları']];

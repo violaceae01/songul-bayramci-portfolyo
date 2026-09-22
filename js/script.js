@@ -1061,15 +1061,122 @@ document.addEventListener('DOMContentLoaded', () => {
         return videoId ? `https://img.youtube.com/vi/${videoId}/${quality}.jpg` : '';
     }
 
-    function openYouTubeModal(videoId, title = '') {
+    let activeYoutubePlayer = null;
+    let youtubeApiPromise = null;
+    let youtubeFallbackTimer = null;
+
+    function ensureYoutubeFrame() {
+        const wrap = document.querySelector('#youtubeVideoModal .youtube-video-frame-wrap');
+        if (!wrap) return null;
+        let frame = document.getElementById('youtubeVideoFrame');
+        if (frame) return frame;
+        frame = document.createElement('iframe');
+        frame.id = 'youtubeVideoFrame';
+        frame.title = 'YouTube videosu';
+        frame.referrerPolicy = 'strict-origin-when-cross-origin';
+        frame.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+        frame.allowFullscreen = true;
+        wrap.prepend(frame);
+        return frame;
+    }
+
+    function ensureYoutubeFallback() {
+        const wrap = document.querySelector('#youtubeVideoModal .youtube-video-frame-wrap');
+        if (!wrap) return null;
+        let fallback = wrap.querySelector('.youtube-player-fallback');
+        if (fallback) return fallback;
+        fallback = document.createElement('div');
+        fallback.className = 'youtube-player-fallback';
+        fallback.hidden = true;
+        fallback.innerHTML = `
+            <img class="youtube-player-fallback-image" src="" alt="">
+            <div class="youtube-player-fallback-shade"></div>
+            <div class="youtube-player-fallback-content">
+                <i class="fab fa-youtube" aria-hidden="true"></i>
+                <strong>Video YouTube'da açılacak</strong>
+                <p>Bu tarayıcı YouTube oynatıcısına gerekli güvenlik bilgisini iletmedi.</p>
+                <a class="btn btn-primary youtube-player-fallback-link" href="#" target="_blank" rel="noopener noreferrer">YouTube'da İzle <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+            </div>`;
+        wrap.appendChild(fallback);
+        return fallback;
+    }
+
+    function resetYoutubeFallback() {
+        const fallback = ensureYoutubeFallback();
+        if (fallback) fallback.hidden = true;
+        if (youtubeFallbackTimer) clearTimeout(youtubeFallbackTimer);
+        youtubeFallbackTimer = null;
+    }
+
+    function showYoutubeFallback(videoId, title = '') {
         const modal = document.getElementById('youtubeVideoModal');
         const frame = document.getElementById('youtubeVideoFrame');
+        if (!modal?.classList.contains('active') || !videoId || (frame?.dataset.videoId && frame.dataset.videoId !== videoId)) return;
+        if (youtubeFallbackTimer) clearTimeout(youtubeFallbackTimer);
+        youtubeFallbackTimer = null;
+        try { activeYoutubePlayer?.stopVideo?.(); } catch (error) { /* YouTube already stopped. */ }
+        if (frame) {
+            frame.hidden = true;
+            frame.src = '';
+        }
+        const fallback = ensureYoutubeFallback();
+        if (!fallback) return;
+        const image = fallback.querySelector('.youtube-player-fallback-image');
+        const link = fallback.querySelector('.youtube-player-fallback-link');
+        const heading = fallback.querySelector('strong');
+        if (image) {
+            image.src = youtubeThumbnail(videoId, 'hqdefault');
+            image.alt = title ? `${title} video kapağı` : 'YouTube video kapağı';
+        }
+        if (link) link.href = `https://www.youtube.com/watch?v=${encodeURIComponent(videoId)}`;
+        if (heading) heading.textContent = title || "Video YouTube'da açılacak";
+        fallback.hidden = false;
+    }
+
+    function loadYoutubeIframeApi() {
+        if (window.YT?.Player) return Promise.resolve(window.YT);
+        if (youtubeApiPromise) return youtubeApiPromise;
+        youtubeApiPromise = new Promise((resolve, reject) => {
+            const previousReady = window.onYouTubeIframeAPIReady;
+            const timeout = window.setTimeout(() => reject(new Error('YouTube API zaman aşımı')), 8000);
+            window.onYouTubeIframeAPIReady = () => {
+                if (typeof previousReady === 'function') previousReady();
+                window.clearTimeout(timeout);
+                resolve(window.YT);
+            };
+            let script = document.querySelector('script[data-youtube-iframe-api]');
+            if (!script) {
+                script = document.createElement('script');
+                script.src = 'https://www.youtube.com/iframe_api';
+                script.async = true;
+                script.dataset.youtubeIframeApi = 'true';
+                script.addEventListener('error', () => {
+                    window.clearTimeout(timeout);
+                    reject(new Error('YouTube API yüklenemedi'));
+                }, { once: true });
+                document.head.appendChild(script);
+            }
+        }).catch(error => {
+            youtubeApiPromise = null;
+            throw error;
+        });
+        return youtubeApiPromise;
+    }
+
+    function openYouTubeModal(videoId, title = '') {
+        const modal = document.getElementById('youtubeVideoModal');
         const heading = document.getElementById('youtubeVideoTitle');
-        if (!modal || !frame || !videoId) return;
+        if (!modal || !videoId) return;
+        try { activeYoutubePlayer?.destroy?.(); } catch (error) { /* Player may already be gone. */ }
+        activeYoutubePlayer = null;
+        const frame = ensureYoutubeFrame();
+        if (!frame) return;
+        resetYoutubeFallback();
         const player = document.getElementById('projectVideoPlayer');
         if (player) { player.pause(); player.removeAttribute('src'); player.hidden = true; }
         frame.hidden = false;
-        const playerParams = new URLSearchParams({ autoplay: '1', rel: '0', playsinline: '1' });
+        frame.dataset.videoId = videoId;
+        const playerParams = new URLSearchParams({ autoplay: '1', rel: '0', playsinline: '1', enablejsapi: '1' });
         if (/^https?:$/.test(window.location.protocol)) {
             playerParams.set('origin', window.location.origin);
             playerParams.set('widget_referrer', window.location.href);
@@ -1082,16 +1189,41 @@ document.addEventListener('DOMContentLoaded', () => {
         modal.setAttribute('aria-hidden', 'false');
         document.body.style.overflow = 'hidden';
         modal.querySelector('.youtube-video-modal-close')?.focus();
+        youtubeFallbackTimer = window.setTimeout(() => showYoutubeFallback(videoId, title), 9000);
+        loadYoutubeIframeApi().then(YT => {
+            const currentFrame = document.getElementById('youtubeVideoFrame');
+            if (!currentFrame || currentFrame.dataset.videoId !== videoId || !modal.classList.contains('active')) return;
+            activeYoutubePlayer = new YT.Player(currentFrame, {
+                events: {
+                    onReady: () => {
+                        if (youtubeFallbackTimer) clearTimeout(youtubeFallbackTimer);
+                        youtubeFallbackTimer = null;
+                    },
+                    onStateChange: event => {
+                        if (event.data === YT.PlayerState.PLAYING && youtubeFallbackTimer) {
+                            clearTimeout(youtubeFallbackTimer);
+                            youtubeFallbackTimer = null;
+                        }
+                    },
+                    onError: () => showYoutubeFallback(videoId, title)
+                }
+            });
+        }).catch(() => {
+            if (!youtubeFallbackTimer) showYoutubeFallback(videoId, title);
+        });
     }
 
     async function openUploadedVideo(reference, title = '') {
         const modal = document.getElementById('youtubeVideoModal');
-        const frame = document.getElementById('youtubeVideoFrame');
+        const frame = ensureYoutubeFrame();
         const player = document.getElementById('projectVideoPlayer');
         const heading = document.getElementById('youtubeVideoTitle');
         if (!modal || !player || !reference) return;
         const source = await resolveMediaUrl(reference);
         if (!source) return;
+        resetYoutubeFallback();
+        try { activeYoutubePlayer?.destroy?.(); } catch (error) { /* Player may already be gone. */ }
+        activeYoutubePlayer = null;
         if (frame) { frame.src = ''; frame.hidden = true; }
         player.src = source; player.hidden = false; player.load(); player.play().catch(() => {});
         if (heading) heading.textContent = title || 'Video';
@@ -1103,10 +1235,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const modal = document.getElementById('youtubeVideoModal');
         const frame = document.getElementById('youtubeVideoFrame');
         const player = document.getElementById('projectVideoPlayer');
-        if (!modal || !frame) return;
+        if (!modal) return;
         modal.classList.remove('active');
         modal.setAttribute('aria-hidden', 'true');
-        frame.src = '';
+        resetYoutubeFallback();
+        try { activeYoutubePlayer?.destroy?.(); } catch (error) { /* Player may already be gone. */ }
+        activeYoutubePlayer = null;
+        if (frame) frame.src = '';
         if (player) { player.pause(); player.removeAttribute('src'); player.hidden = true; }
         document.body.style.overflow = '';
     }
