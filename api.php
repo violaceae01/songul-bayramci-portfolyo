@@ -176,9 +176,28 @@ if ($action === 'save') {
 if ($action === 'upload') {
     requirePost();
     requireAuth();
-    if (empty($_FILES['file']) || !is_uploaded_file($_FILES['file']['tmp_name'])) respond(['ok' => false, 'message' => 'Dosya yüklenemedi.'], 400);
+    if (empty($_FILES['file'])) {
+        $contentLength = (int) ($_SERVER['CONTENT_LENGTH'] ?? 0);
+        $message = $contentLength > 0
+            ? 'Dosya sunucunun yükleme sınırını aşıyor.'
+            : 'Dosya yüklenemedi.';
+        respond(['ok' => false, 'message' => $message], 400);
+    }
     $file = $_FILES['file'];
-    if (($file['error'] ?? UPLOAD_ERR_OK) !== UPLOAD_ERR_OK) respond(['ok' => false, 'message' => 'Dosya yükleme hatası oluştu.'], 400);
+    $uploadError = (int) ($file['error'] ?? UPLOAD_ERR_OK);
+    if ($uploadError !== UPLOAD_ERR_OK) {
+        $message = match ($uploadError) {
+            UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE => 'Dosya sunucunun yükleme sınırını aşıyor.',
+            UPLOAD_ERR_PARTIAL => 'Dosya yüklemesi yarıda kesildi. Lütfen yeniden deneyin.',
+            UPLOAD_ERR_NO_FILE => 'Yüklenecek dosya bulunamadı.',
+            UPLOAD_ERR_NO_TMP_DIR => 'Sunucunun geçici yükleme klasörü bulunamadı.',
+            UPLOAD_ERR_CANT_WRITE => 'Dosya sunucu diskine yazılamadı.',
+            UPLOAD_ERR_EXTENSION => 'Dosya yüklemesi sunucu tarafından durduruldu.',
+            default => 'Dosya yükleme hatası oluştu.',
+        };
+        respond(['ok' => false, 'message' => $message], 400);
+    }
+    if (!is_uploaded_file((string) ($file['tmp_name'] ?? ''))) respond(['ok' => false, 'message' => 'Geçici yükleme dosyası doğrulanamadı.'], 400);
     if (($file['size'] ?? 0) > 250 * 1024 * 1024) respond(['ok' => false, 'message' => 'Dosya 250 MB sınırını aşıyor.'], 413);
     $mime = (new finfo(FILEINFO_MIME_TYPE))->file($file['tmp_name']) ?: '';
     $allowed = [
@@ -206,4 +225,3 @@ if ($action === 'delete-media') {
 }
 
 respond(['ok' => false, 'message' => 'İşlem bulunamadı.'], 404);
-

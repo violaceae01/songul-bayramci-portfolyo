@@ -9,6 +9,7 @@ const clientRoot = join(outputRoot, "client");
 const staticDirectories = ["assets", "css", "data", "Görsel", "js", "storage", "uploads"];
 const staticFiles = [
   ".htaccess",
+  ".user.ini",
   "api.php",
   "Code_Generated_Image.png",
   "calismalarim.html",

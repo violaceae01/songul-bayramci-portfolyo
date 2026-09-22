@@ -129,6 +129,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         }, 3200);
     }
 
+    function showUploadError(error, label = 'Dosya') {
+        const detail = String(error?.message || '').trim();
+        const fallback = serverEnabled
+            ? 'Sunucu yüklemeyi tamamlayamadı. Lütfen yeniden deneyin.'
+            : 'Tarayıcı depolama alanını kontrol edin.';
+        showToast(`${label} yüklenemedi. ${detail || fallback}`, 'error');
+    }
+
     const pageAdminConfig = {
         home: {
             panel: 'tab-home',
@@ -449,7 +457,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 showToast('Görsel yüklendi. Kaydetmeyi unutmayın.');
             } catch (error) {
                 console.error('Görsel yükleme hatası:', error);
-                showToast('Görsel yüklenemedi. Tarayıcı depolama alanını kontrol edin.', 'error');
+                showUploadError(error, 'Görsel');
             }
         };
         zone.addEventListener('click', () => fileInput.click());
@@ -516,7 +524,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             showToast('Banner videosu bilgisayardan yüklendi. Kaydetmeyi unutmayın.');
         } catch (error) {
             console.error('Video yükleme hatası:', error);
-            showToast('Video yüklenemedi. Tarayıcı depolama alanını kontrol edin.', 'error');
+            showUploadError(error, 'Video');
         }
     });
 
@@ -824,7 +832,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             showToast('Logo dosyası yüklendi. Kaydetmeyi unutmayın.');
         } catch (error) {
             console.error('Logo yükleme hatası:', error);
-            showToast('Logo yüklenemedi. Tarayıcı depolama alanını kontrol edin.', 'error');
+            showUploadError(error, 'Logo');
         }
     });
 
@@ -850,7 +858,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             aboutImage.value = await window.SiteMediaStore.save(file, 'about-image');
             if (window.SiteMediaStore.isStored(previous)) await window.SiteMediaStore.remove(previous);
             showToast('Hakkımızda görseli yüklendi. Kaydetmeyi unutmayın.');
-        } catch (error) { console.error(error); showToast('Görsel yüklenemedi.', 'error'); }
+        } catch (error) { console.error(error); showUploadError(error, 'Görsel'); }
     });
     function populateAboutForm() { if (!appData.about) return; aboutName.value = appData.about.name || ''; aboutImage.value = appData.about.image || ''; aboutLead.value = appData.about.lead || ''; aboutP1.value = appData.about.p1 || ''; aboutP2.value = appData.about.p2 || ''; aboutVision.value = appData.about.vision || ''; aboutMission.value = appData.about.mission || ''; }
     function readAboutForm() { appData.about = { ...appData.about, name: aboutName.value.trim(), image: aboutImage.value.trim(), owner: '', lead: aboutLead.value.trim(), p1: aboutP1.value.trim(), p2: aboutP2.value.trim(), vision: aboutVision.value.trim(), mission: aboutMission.value.trim() }; }
@@ -953,7 +961,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             showToast('Arka plan görseli yüklendi. Tümünü Kaydet düğmesine basın.');
         } catch (error) {
             console.error('Arka plan görseli yükleme hatası:', error);
-            showToast('Görsel yüklenemedi. Tarayıcı depolama alanını kontrol edin.', 'error');
+            showUploadError(error, 'Görsel');
         }
     });
 
