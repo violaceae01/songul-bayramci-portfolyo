@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/admin.css?v=20260922-cpanel1">
+    <link rel="stylesheet" href="css/admin.css?v=20260923-content1">
 </head>
 <body>
 
@@ -152,7 +152,7 @@
                 <div class="card-header">
                     <div>
                         <h2>Referans Logoları</h2>
-                        <p class="admin-card-description">Logoları bilgisayarınızdan yükleyin. Ana sayfada kayar, Referanslarımız sayfasında kare kartlar halinde görünür.</p>
+                        <p class="admin-card-description">Logoları bilgisayarınızdan yükleyin. Referanslar sayfasındaki logolardan ana sayfa şeridinde görünecek en fazla 8 taneyi kendiniz seçin.</p>
                     </div>
                     <button class="btn btn-primary btn-sm" id="btnAddPartner" type="button">
                         <i class="fas fa-plus"></i> Yeni Logo Ekle
@@ -190,7 +190,7 @@
                             <label for="heroVideoFile">Banner Videosunu Bilgisayardan Yükle</label>
                             <input type="file" id="heroVideoFile" class="form-control" accept="video/mp4,video/webm,video/quicktime">
                             <input type="hidden" id="heroBgVideo">
-                            <p class="form-help">MP4 veya WebM önerilir. Video tarayıcının medya deposunda saklanır; bağlantı yapıştırmanız gerekmez.</p>
+                            <p class="form-help">MP4 veya WebM önerilir. Video doğrudan sunucuya yüklenir; bağlantı yapıştırmanız gerekmez.</p>
                             <video id="heroVideoPreview" class="video-preview" controls muted playsinline preload="metadata"></video>
                         </div>
                     </div>
@@ -323,6 +323,11 @@
                             <p class="form-help">“Projemiz Var” formu bu numaraya WhatsApp mesajı hazırlar.</p>
                         </div>
                         <div class="form-group form-full">
+                            <label>İletişim Formu Proje Türleri</label>
+                            <textarea id="contactProjectTypes" class="form-control" rows="5" placeholder="Konser Çekimi&#10;Müzik Klibi&#10;Etkinlik Çekimi&#10;Diğer"></textarea>
+                            <p class="form-help">Her satıra bir proje türü yazın. Ana sayfa ve İletişim sayfasındaki seçim listesi buradan güncellenir.</p>
+                        </div>
+                        <div class="form-group form-full">
                             <label>Konum / Şehir</label>
                             <input type="text" id="contactLocation" class="form-control">
                         </div>
@@ -354,9 +359,9 @@
                     <h2>Veri Yedekleme ve Dışa Aktarma</h2>
                 </div>
                 <p style="color: var(--text-secondary); margin-bottom: 20px;">
-                    Panel üzerinden yaptığınız tüm güncellemeler tarayıcınızın belleğinde (localStorage) tutulur. Kalıcı dosya yedeği almak veya başka cihazlara aktarmak için aşağıdaki seçenekleri kullanabilirsiniz.
+                    Panel üzerinden yaptığınız tüm güncellemeler sunucuda kalıcı olarak saklanır. Ayrıca düzenli yedek alabilir veya mevcut yedeği geri yükleyebilirsiniz.
                 </p>
-                <p class="form-help" style="margin-bottom: 20px;">Bilgisayardan yüklenen logo ve videolar tarayıcının medya deposunda saklanır. GitHub Pages statik olduğu için bu dosyaların tüm ziyaretçilere ulaşması ayrıca yayımlama işlemi gerektirir.</p>
+                <p class="form-help" style="margin-bottom: 20px;">Bilgisayardan yüklenen logo, görsel ve videolar sunucunun medya alanında saklanır ve kaydettiğiniz anda sitede kullanılabilir.</p>
                 <div class="backup-actions">
                     <button class="btn btn-primary" id="btnDownloadDataJs">
                         <i class="fas fa-download"></i> data.js Dosyası Olarak İndir
@@ -508,10 +513,10 @@
     <!-- Toast Notifications Container -->
     <div class="toast-container" id="toastContainer"></div>
 
-    <script src="data/data.js?v=20260922-footer-migration"></script>
-    <script src="js/data-utils.js?v=20260922-html-layer"></script>
-    <script src="js/server-api.js?v=20260922-cpanel1"></script>
-    <script src="js/media-store.js?v=20260922-cpanel1"></script>
-    <script src="js/admin.js?v=20260922-cpanel1"></script>
+    <script src="data/data.js?v=20260923-content1"></script>
+    <script src="js/data-utils.js?v=20260923-content1"></script>
+    <script src="js/server-api.js?v=20260923-content1"></script>
+    <script src="js/media-store.js?v=20260923-content1"></script>
+    <script src="js/admin.js?v=20260923-content1"></script>
 </body>
 </html>

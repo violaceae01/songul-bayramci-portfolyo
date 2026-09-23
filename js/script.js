@@ -858,7 +858,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                             </a>
                         </div>` : ''}
                 </header>
-                <div class="concert-photo-grid"></div>
+                <div class="concert-gallery-shell">
+                    <div class="concert-gallery-nav" ${gallery.length > 1 ? '' : 'hidden'}>
+                        <button type="button" class="concert-gallery-arrow is-prev" aria-label="Önceki görsel"><i class="fas fa-arrow-left"></i></button>
+                        <button type="button" class="concert-gallery-arrow is-next" aria-label="Sonraki görsel"><i class="fas fa-arrow-right"></i></button>
+                    </div>
+                    <div class="concert-photo-grid" tabindex="0" aria-label="${escapeHtml(concert.name)} fotoğraf galerisi"></div>
+                </div>
             `;
 
             const photoGrid = article.querySelector('.concert-photo-grid');
@@ -879,6 +885,24 @@ document.addEventListener('DOMContentLoaded', async () => {
                     const photo = button.querySelector('img');
                     if (photo && window.SiteMediaStore?.isStored(image.src)) setStoredImageSource(photo, image.src);
                 });
+
+                const previousButton = article.querySelector('.concert-gallery-arrow.is-prev');
+                const nextButton = article.querySelector('.concert-gallery-arrow.is-next');
+                const updateGalleryButtons = () => {
+                    const maxScroll = Math.max(0, photoGrid.scrollWidth - photoGrid.clientWidth - 2);
+                    if (previousButton) previousButton.disabled = photoGrid.scrollLeft <= 2;
+                    if (nextButton) nextButton.disabled = photoGrid.scrollLeft >= maxScroll;
+                };
+                const moveGallery = direction => {
+                    const card = photoGrid.querySelector('.concert-photo-card');
+                    const gap = Number.parseFloat(getComputedStyle(photoGrid).columnGap || getComputedStyle(photoGrid).gap) || 20;
+                    const distance = (card?.getBoundingClientRect().width || photoGrid.clientWidth * 0.75) + gap;
+                    photoGrid.scrollBy({ left: direction * distance, behavior: 'smooth' });
+                };
+                previousButton?.addEventListener('click', () => moveGallery(-1));
+                nextButton?.addEventListener('click', () => moveGallery(1));
+                photoGrid.addEventListener('scroll', updateGalleryButtons, { passive: true });
+                requestAnimationFrame(updateGalleryButtons);
             }
 
             artistConcertsList.appendChild(article);
@@ -891,7 +915,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         featuredArtistsGrid.innerHTML = '';
 
         const featuredArtists = [...artistsList]
-            .filter(artist => artist.visible !== false && artist.featured !== false && artist.cover)
+            .filter(artist => artist.visible !== false && artist.featured === true && artist.cover)
             .sort((a, b) => (Number(a.featuredOrder) || 0) - (Number(b.featuredOrder) || 0));
         const initialLimit = window.matchMedia('(max-width: 600px)').matches ? 4 : 8;
 
@@ -1276,7 +1300,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         const projects = (currentSiteData.youtubeProjects || (typeof siteData !== 'undefined' ? siteData.youtubeProjects : []) || [])
-            .filter(project => project && project.title && project.enabled !== false);
+            .map((project, index) => ({ ...project, _savedOrder: index }))
+            .filter(project => project && (project.artist || project.song || project.title) && project.enabled !== false)
+            .sort((a, b) => {
+                const yearDifference = (Number.parseInt(b.year, 10) || 0) - (Number.parseInt(a.year, 10) || 0);
+                return yearDifference || a._savedOrder - b._savedOrder;
+            });
         grid.innerHTML = '';
 
         if (!projects.length) {
@@ -1287,6 +1316,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         for (const project of projects) {
             const article = document.createElement('article');
             article.className = 'youtube-project-card reveal active';
+            const artistName = String(project.artist || project.title || '').trim();
+            const songName = String(project.song || '').trim();
+            const accessibleTitle = [artistName, songName].filter(Boolean).join(' — ');
             const projectUrl = safeExternalUrl(project.url);
             const videoId = extractYouTubeVideoId(projectUrl);
             const usesAutomaticThumbnail = !project.thumbnail && Boolean(videoId);
@@ -1295,18 +1327,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             const hasPlayableMedia = Boolean(videoId);
             const cardTag = hasPlayableMedia ? 'button' : projectUrl ? 'a' : 'div';
             const linkAttributes = hasPlayableMedia
-                ? `type="button" aria-label="${escapeHtml(project.title)} klibini sitede izle"`
-                : projectUrl ? `href="${escapeHtml(projectUrl)}" target="_blank" rel="noopener noreferrer" aria-label="${escapeHtml(project.title)} klip çekimini aç"` : '';
+                ? `type="button" aria-label="${escapeHtml(accessibleTitle)} klibini sitede izle"`
+                : projectUrl ? `href="${escapeHtml(projectUrl)}" target="_blank" rel="noopener noreferrer" aria-label="${escapeHtml(accessibleTitle)} klip çekimini aç"` : '';
             article.innerHTML = `
                 <${cardTag} class="youtube-project-link" ${linkAttributes}>
                     <span class="youtube-project-media ${project.thumbnailFit === 'contain' && !usesAutomaticThumbnail ? 'is-contain' : ''} ${thumbnail ? '' : 'is-missing'}">
-                        ${thumbnail ? `<img src="${escapeHtml(thumbnail)}" alt="${escapeHtml(project.title)}" loading="lazy" decoding="async"${usesAutomaticThumbnail ? ` data-youtube-video-id="${escapeHtml(videoId)}"` : ''}>` : ''}
-                        <span class="youtube-project-placeholder"><i class="fab fa-youtube" aria-hidden="true"></i><small>${escapeHtml(project.title)}</small></span>
-                        ${String(project.category || '').trim() ? `<span class="youtube-project-type">${escapeHtml(project.category)}</span>` : ''}
+                        ${thumbnail ? `<img src="${escapeHtml(thumbnail)}" alt="${escapeHtml(accessibleTitle)}" loading="lazy" decoding="async"${usesAutomaticThumbnail ? ` data-youtube-video-id="${escapeHtml(videoId)}"` : ''}>` : ''}
+                        <span class="youtube-project-placeholder"><i class="fab fa-youtube" aria-hidden="true"></i><small>${escapeHtml(accessibleTitle)}</small></span>
                         ${hasPlayableMedia ? '<span class="youtube-project-play"><i class="fas fa-play" aria-hidden="true"></i></span>' : ''}
                     </span>
                     <span class="youtube-project-info">
-                        <strong>${escapeHtml(project.title)}</strong>
+                        ${String(project.category || '').trim() ? `<small class="youtube-project-type">${escapeHtml(project.category)}</small>` : ''}
+                        <strong>${escapeHtml(artistName)}</strong>
+                        ${songName ? `<em>${escapeHtml(songName)}</em>` : ''}
                         <span><small>${escapeHtml(project.year || '')}</small><small>${videoId ? 'Sitede İzle' : projectUrl ? 'Videoyu Aç' : 'Yakında'}</small></span>
                     </span>
                 </${cardTag}>
@@ -1314,7 +1347,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const media = article.querySelector('.youtube-project-media');
             const image = article.querySelector('img');
             if (videoId) {
-                article.querySelector('.youtube-project-link')?.addEventListener('click', () => openYouTubeModal(videoId, project.title));
+                article.querySelector('.youtube-project-link')?.addEventListener('click', () => openYouTubeModal(videoId, accessibleTitle));
             }
             image?.addEventListener('error', () => {
                 const automaticVideoId = image.dataset.youtubeVideoId;
@@ -1377,7 +1410,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 </span>
                 <span class="creative-project-info">
                     <strong>${escapeHtml(item.title)}</strong>
-                    <span><small>${escapeHtml(item.year || '')}</small><small>${!isVideo && imageUrl ? 'Büyüt' : projectUrl ? 'Projeyi Aç' : ''}</small></span>
+                    <span>${isVideo
+                        ? `<small>${hasPlayableMedia || projectUrl ? 'Projeyi Aç' : ''}</small><small>${escapeHtml(item.year || '')}</small>`
+                        : `<small>${escapeHtml(item.year || '')}</small><small>${imageUrl ? 'Büyüt' : ''}</small>`}
+                    </span>
                 </span>`;
 
             const media = card.querySelector('.creative-project-media');
@@ -1442,16 +1478,24 @@ document.addEventListener('DOMContentLoaded', async () => {
         return element;
     }
 
-    function activePartners() {
-        return (currentSiteData.partners || (typeof siteData !== 'undefined' ? siteData.partners : []) || [])
-            .filter(partner => partner && partner.enabled !== false && (partner.logo || partner.name));
+    function activePartners(homeOnly = false) {
+        const seen = new Set();
+        const partners = (currentSiteData.partners || (typeof siteData !== 'undefined' ? siteData.partners : []) || [])
+            .filter(partner => partner && partner.enabled !== false && (!homeOnly || partner.homeFeatured === true) && (partner.logo || partner.name))
+            .filter(partner => {
+                const key = String(partner.id || `${partner.name}|${partner.logo}`);
+                if (seen.has(key)) return false;
+                seen.add(key);
+                return true;
+            });
+        return homeOnly ? partners.slice(0, 8) : partners;
     }
 
     function loadPartnerLogos() {
         const track = document.getElementById('partnerLogoTrack');
         if (!track) return;
 
-        const partners = activePartners();
+        const partners = activePartners(true);
         track.innerHTML = '';
 
         if (!partners.length) {
@@ -1595,6 +1639,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     // CONTACT FORM
     // ============================================
     const contactForm = document.getElementById('contactForm');
+    const projectTypes = Array.isArray(currentSiteData.contact?.projectTypes) && currentSiteData.contact.projectTypes.length
+        ? currentSiteData.contact.projectTypes.map(value => String(value || '').trim()).filter(Boolean)
+        : ['Konser Çekimi', 'Müzik Klibi', 'Etkinlik Çekimi', 'Diğer'];
+
+    document.querySelectorAll('select[name="projectType"]').forEach(select => {
+        const placeholder = document.createElement('option');
+        placeholder.value = '';
+        placeholder.textContent = 'Proje Türü Seçin';
+        select.replaceChildren(placeholder);
+        projectTypes.forEach(type => {
+            const option = document.createElement('option');
+            option.value = type;
+            option.textContent = type;
+            select.appendChild(option);
+        });
+    });
 
     if (contactForm) {
         contactForm.addEventListener('submit', (e) => {
@@ -1616,7 +1676,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 '',
                 'Yeni proje talebi:',
                 `Ad Soyad: ${formData.get('name') || ''}`,
-                `E-posta: ${formData.get('email') || ''}`,
+                `Firma İsmi: ${formData.get('company') || ''}`,
+                `Telefon: ${formData.get('phone') || ''}`,
                 `Proje Türü: ${projectLabel}`,
                 `Proje Detayı: ${formData.get('message') || ''}`
             ].join('\n');

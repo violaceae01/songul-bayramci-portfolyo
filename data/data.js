@@ -1,5 +1,5 @@
 const siteData = {
-  "contentVersion": 6,
+  "contentVersion": 7,
   "hero": {
     "tag": "KONSER & ETKİNLİK ÇEKİMİ",
     "titleLine1": "HER ANI",
@@ -200,7 +200,10 @@ const siteData = {
   "youtubeProjects": [
     {
       "id": 1,
+      "adminLabel": "Klip Çekimi 1",
       "title": "Kubilay Karça",
+      "artist": "Kubilay Karça",
+      "song": "",
       "year": "2023",
       "category": "Klip Çekimi",
       "thumbnail": "",
@@ -218,6 +221,7 @@ const siteData = {
   "graphicProjects": [
     {
       "id": "kubilay-karca-turne-afisi-siyah",
+      "adminLabel": "Grafik Tasarım 1",
       "title": "Kubilay Karça — Turne Afişi",
       "year": "2026",
       "category": "Afiş Tasarımı",
@@ -227,6 +231,7 @@ const siteData = {
     },
     {
       "id": "kubilay-karca-turne-afisi-kirmizi",
+      "adminLabel": "Grafik Tasarım 2",
       "title": "Kubilay Karça — Turne Afişi",
       "year": "2026",
       "category": "Afiş Tasarımı",
@@ -238,6 +243,7 @@ const siteData = {
   "videoClips": [
     {
       "id": 1,
+      "adminLabel": "Video Klip 1",
       "title": "Kubilay Karça",
       "year": "2023",
       "category": "Video Klip",
@@ -250,10 +256,12 @@ const siteData = {
   "partners": [
     {
       "id": 1,
+      "adminLabel": "Kurum Logosu 1",
       "name": "Afyonkarahisar Belediyesi",
       "logo": "assets/logos/afyonkarahisar-belediyesi.webp",
       "url": "https://www.afyon.bel.tr/",
-      "enabled": true
+      "enabled": true,
+      "homeFeatured": true
     }
   ],
   "about": {
@@ -351,6 +359,7 @@ const siteData = {
     "instagram": "https://www.instagram.com/lesmejorcreative.eu/",
     "youtube": "https://youtube.com/",
     "twitter": "https://twitter.com/",
-    "linkedin": "https://linkedin.com/"
+    "linkedin": "https://linkedin.com/",
+    "projectTypes": ["Konser Çekimi", "Müzik Klibi", "Etkinlik Çekimi", "Diğer"]
   }
 };

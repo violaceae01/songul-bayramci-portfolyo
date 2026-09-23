@@ -45,7 +45,7 @@
             bio: artist?.bio || '',
             cover: artist?.cover || '',
             visible: artist?.visible !== false,
-            featured: artist?.featured !== false,
+            featured: artist?.featured === undefined ? true : (artist.featured === true || artist.featured === 1 || artist.featured === 'true'),
             featuredOrder: Number.isFinite(Number(artist?.featuredOrder)) ? Number(artist.featuredOrder) : index,
             concerts: []
         };
