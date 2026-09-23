@@ -16,11 +16,11 @@ const staticFiles = [
   "grafik-tasarim.html",
   "hakkimda.html",
   "iletisim.html",
-  "index.html",
+  "anasayfa.html",
   "klip-cekimleri.html",
   "referanslar.html",
   "sanatci.html",
-  "songul.html",
+  "lmadmin.html",
   "video-klipleri.html",
   "yorumlar.html",
   "youtube.html",
@@ -40,12 +40,47 @@ for (const file of staticFiles) {
   await cp(join(projectRoot, file), join(clientRoot, file));
 }
 
-const workerSource = `export default {
+const workerSource = `const cleanPages = new Set([
+  "/anasayfa",
+  "/calismalarim",
+  "/grafik-tasarim",
+  "/hakkimda",
+  "/iletisim",
+  "/klip-cekimleri",
+  "/lmadmin",
+  "/referanslar",
+  "/sanatci",
+  "/video-klipleri",
+  "/yorumlar",
+  "/youtube",
+]);
+
+export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
     if (url.pathname === "/") {
-      url.pathname = "/index.html";
+      return Response.redirect(new URL("/anasayfa", url).toString(), 301);
+    }
+
+    if (url.pathname === "/index" || url.pathname === "/index.html") {
+      return Response.redirect(new URL("/anasayfa", url).toString(), 301);
+    }
+
+    if (url.pathname === "/songul" || url.pathname === "/songul.html") {
+      return Response.redirect(new URL("/lmadmin", url).toString(), 301);
+    }
+
+    if (url.pathname.endsWith(".html")) {
+      return Response.redirect(new URL(url.pathname.slice(0, -5) || "/anasayfa", url).toString(), 301);
+    }
+
+    if (url.pathname.length > 1 && url.pathname.endsWith("/")) {
+      return Response.redirect(new URL(url.pathname.slice(0, -1), url).toString(), 301);
+    }
+
+    if (cleanPages.has(url.pathname)) {
+      url.pathname += ".html";
       request = new Request(url, request);
     }
 

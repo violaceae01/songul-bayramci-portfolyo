@@ -1,5 +1,35 @@
-Options -Indexes
-DirectoryIndex index.html
+Options -Indexes -MultiViews
+DirectoryIndex anasayfa.html
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Eski adresleri yeni temiz adreslere yönlendir.
+    RewriteCond %{THE_REQUEST} \s/+index\.html(?:[?\s]) [NC]
+    RewriteRule ^index\.html$ /anasayfa [R=301,L,NE]
+
+    RewriteCond %{THE_REQUEST} \s/+songul\.html(?:[?\s]) [NC]
+    RewriteRule ^songul\.html$ /lmadmin [R=301,L,NE]
+
+    RewriteCond %{THE_REQUEST} \s/+(.+?)\.html(?:[?\s]) [NC]
+    RewriteRule ^(.+)\.html$ /$1 [R=301,L,NE]
+
+    RewriteRule ^index/?$ /anasayfa [R=301,L]
+    RewriteRule ^songul/?$ /lmadmin [R=301,L]
+
+    # Alan adı doğrudan açıldığında /anasayfa adresini kullan.
+    RewriteRule ^$ /anasayfa [R=301,L]
+
+    # Temiz adreslerde sondaki gereksiz / işaretini kaldır.
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.+)/$ /$1 [R=301,L]
+
+    # Temiz adresleri sunucudaki HTML dosyalarına dahili olarak bağla.
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME}.html -f
+    RewriteRule ^(.+?)/?$ $1.html [L]
+</IfModule>
 
 <IfModule mod_headers.c>
     Header always set X-Content-Type-Options "nosniff"
@@ -10,4 +40,3 @@ DirectoryIndex index.html
 <FilesMatch "^(composer\.(json|lock)|package(-lock)?\.json|\.env|.*\.log)$">
     Require all denied
 </FilesMatch>
-

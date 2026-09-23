@@ -531,7 +531,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (!menu.querySelector('[data-nav-section="testimonialsPage"]')) {
             const testimonialLink = document.createElement('a');
-            testimonialLink.href = 'yorumlar.html';
+            testimonialLink.href = 'yorumlar';
             testimonialLink.className = 'nav-link';
             testimonialLink.dataset.navSection = 'testimonialsPage';
             testimonialLink.textContent = 'NE DİYORLAR';
@@ -584,7 +584,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     function applyEditableTextAndTypography() {
         const text = currentSiteData.siteText || {};
         const selectors = {
-            navHome: 'a.nav-link[href*="index.html#home"]', navWorks: '[data-nav-section="worksPage"]', navClip: '[data-nav-section="clipShootings"]', navVideo: '[data-nav-section="videoClips"]', navGraphic: '[data-nav-section="graphicDesign"]', navReferences: '[data-nav-section="referencesPage"]', navAbout: '[data-nav-section="aboutPage"]', navTestimonials: '[data-nav-section="testimonialsPage"]', navContact: '[data-nav-section="contactPage"]',
+            navHome: 'a.nav-link[href*="anasayfa#home"]', navWorks: '[data-nav-section="worksPage"]', navClip: '[data-nav-section="clipShootings"]', navVideo: '[data-nav-section="videoClips"]', navGraphic: '[data-nav-section="graphicDesign"]', navReferences: '[data-nav-section="referencesPage"]', navAbout: '[data-nav-section="aboutPage"]', navTestimonials: '[data-nav-section="testimonialsPage"]', navContact: '[data-nav-section="contactPage"]',
             footerCopyright: '.footer .copyright', footerLegal: '.footer .footer-signature'
         };
         Object.entries(selectors).forEach(([key, selector]) => {
@@ -775,7 +775,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const photoCount = artist.concerts.reduce((total, concert) => total + (concert.images?.length || 0), 0);
             const link = document.createElement('a');
             link.className = 'artist-directory-card reveal active';
-            link.href = `sanatci.html?artist=${encodeURIComponent(artist.slug)}`;
+            link.href = `sanatci?artist=${encodeURIComponent(artist.slug)}`;
             link.dataset.searchText = `${artist.name || ''} ${artist.bio || ''}`.toLocaleLowerCase('tr-TR');
             link.innerHTML = `
                 <img src="${escapeHtml(artist.cover)}" alt="${escapeHtml(artist.name)}" loading="${artistIndex < 4 ? 'eager' : 'lazy'}" decoding="async">
@@ -812,7 +812,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <section class="artist-not-found"><div class="container">
                     <span class="section-tag">404</span><h1>Sanatçı bulunamadı</h1>
                     <p>Aradığınız sanatçı kaldırılmış veya bağlantı değişmiş olabilir.</p>
-                    <a href="calismalarim.html" class="btn btn-primary">Tüm Sanatçılar</a>
+                    <a href="calismalarim" class="btn btn-primary">Tüm Sanatçılar</a>
                 </div></section>`;
             return;
         }
@@ -929,7 +929,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const photoCount = artist.concerts.reduce((total, concert) => total + (concert.images?.length || 0), 0);
             const card = document.createElement('a');
             card.className = 'featured-artist-card';
-            card.href = `sanatci.html?artist=${encodeURIComponent(artist.slug)}`;
+            card.href = `sanatci?artist=${encodeURIComponent(artist.slug)}`;
             card.dataset.featuredExtra = index >= initialLimit ? 'true' : 'false';
             card.hidden = index >= initialLimit;
             card.setAttribute('aria-label', `${artist.name} sanatçı sayfasını aç`);
@@ -1043,7 +1043,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <section class="disabled-page-message">
                         <span class="section-tag">LES MEJOR CREATIVE</span>
                         <h1>BU BÖLÜM ŞU ANDA YAYINDA DEĞİL</h1>
-                        <a class="btn btn-outline" href="index.html">Ana Sayfaya Dön</a>
+                        <a class="btn btn-outline" href="anasayfa">Ana Sayfaya Dön</a>
                     </section>`;
             }
         }

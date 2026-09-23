@@ -280,7 +280,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <div class="artist-cover-wrap"><img src="${escapeHtml(artist.cover)}" alt="${escapeHtml(artist.name)}" class="artist-cover-thumb"></div>
                     <div class="artist-info-wrap">
                         <h3>${escapeHtml(artist.name)}</h3>
-                        <p>${artist.concerts.length} konser · <a href="sanatci.html?artist=${encodeURIComponent(artist.slug)}" target="_blank">sanatçı sayfasını aç</a></p>
+                        <p>${artist.concerts.length} konser · <a href="sanatci?artist=${encodeURIComponent(artist.slug)}" target="_blank">sanatçı sayfasını aç</a></p>
                         <div class="admin-state-row"><span class="admin-state ${artist.visible !== false ? 'is-on' : 'is-off'}">${artist.visible !== false ? 'Sitede açık' : 'Sitede kapalı'}</span><span class="admin-state ${artist.featured !== false ? 'is-on' : 'is-off'}">${artist.featured !== false ? `Öne çıkan sıra: ${featuredArtists.findIndex(item => String(item.id) === String(artist.id)) + 1}` : 'Öne çıkarılmıyor'}</span></div>
                         <label class="admin-toggle artist-featured-switch"><input type="checkbox" data-action="toggle-featured" data-artist-id="${artist.id}" ${artist.featured === true ? 'checked' : ''}><span><strong>Ana Sayfada Öne Çıkar</strong><small>Kapatıldığında sanatçı ana sayfadan hemen kaldırılır.</small></span></label>
                         ${artist.bio ? `<p class="artist-bio-preview">${escapeHtml(artist.bio)}</p>` : ''}
