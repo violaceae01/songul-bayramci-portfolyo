@@ -312,17 +312,32 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <h3>${escapeHtml(artist.name)}</h3>
                         <p>${artist.concerts.length} konser · <a href="sanatci?artist=${encodeURIComponent(artist.slug)}" target="_blank">sanatçı sayfasını aç</a></p>
                         <div class="admin-state-row"><span class="admin-state ${artist.visible !== false ? 'is-on' : 'is-off'}">${artist.visible !== false ? 'Sitede açık' : 'Sitede kapalı'}</span><span class="admin-state ${artist.featured !== false ? 'is-on' : 'is-off'}">${artist.featured !== false ? `Öne çıkan sıra: ${featuredArtists.findIndex(item => String(item.id) === String(artist.id)) + 1}` : 'Öne çıkarılmıyor'}</span></div>
-                        <label class="admin-toggle artist-featured-switch"><input type="checkbox" data-action="toggle-featured" data-artist-id="${artist.id}" ${artist.featured === true ? 'checked' : ''}><span><strong>Ana Sayfada Öne Çıkar</strong><small>Kapatıldığında sanatçı ana sayfadan hemen kaldırılır.</small></span></label>
-                        ${artist.bio ? `<p class="artist-bio-preview">${escapeHtml(artist.bio)}</p>` : ''}
                     </div>
                     <div class="artist-actions-wrap">
                         ${artist.featured !== false ? `<button class="btn btn-secondary btn-sm" data-action="featured-up" data-artist-id="${artist.id}" title="Öne çıkanlarda yukarı taşı"><i class="fas fa-arrow-up"></i></button><button class="btn btn-secondary btn-sm" data-action="featured-down" data-artist-id="${artist.id}" title="Öne çıkanlarda aşağı taşı"><i class="fas fa-arrow-down"></i></button>` : ''}
-                        <button class="btn btn-primary btn-sm" data-action="add-concert" data-artist-id="${artist.id}"><i class="fas fa-plus"></i> Yeni Konser</button>
-                        <button class="btn btn-secondary btn-sm" data-action="edit-artist" data-artist-id="${artist.id}"><i class="fas fa-edit"></i> Sanatçı</button>
+                        <button class="btn btn-primary btn-sm" type="button" data-open-admin-editor><i class="fas fa-pen"></i> Düzenle</button>
                         <button class="btn btn-danger btn-sm" data-action="delete-artist" data-artist-id="${artist.id}" aria-label="Sanatçıyı sil"><i class="fas fa-trash-alt"></i></button>
                     </div>
                 </div>
-                <div class="artist-concerts-admin-list">${concertsHtml}</div>`;
+                <div class="modal admin-item-editor-modal" aria-hidden="true">
+                    <div class="modal-content admin-item-editor-content admin-artist-editor-content" role="dialog" aria-modal="true">
+                        <div class="modal-header admin-item-editor-header"><h2 class="admin-item-editor-title">${escapeHtml(artist.name)} Düzenle</h2><button class="modal-close" type="button" data-close-admin-editor aria-label="Düzenleme penceresini kapat">&times;</button></div>
+                        <div class="artist-editor-summary">
+                            <div class="artist-editor-cover"><img src="${escapeHtml(artist.cover)}" data-media-reference="${escapeHtml(artist.cover)}" alt="${escapeHtml(artist.name)}"></div>
+                            <div>
+                                <div class="admin-state-row"><span class="admin-state ${artist.visible !== false ? 'is-on' : 'is-off'}">${artist.visible !== false ? 'Sitede açık' : 'Sitede kapalı'}</span><span class="admin-state ${artist.featured !== false ? 'is-on' : 'is-off'}">${artist.featured !== false ? `Öne çıkan sıra: ${featuredArtists.findIndex(item => String(item.id) === String(artist.id)) + 1}` : 'Öne çıkarılmıyor'}</span></div>
+                                <label class="admin-toggle artist-featured-switch"><input type="checkbox" data-action="toggle-featured" data-artist-id="${artist.id}" ${artist.featured === true ? 'checked' : ''}><span><strong>Ana Sayfada Öne Çıkar</strong><small>Kapatıldığında sanatçı ana sayfadan hemen kaldırılır.</small></span></label>
+                                ${artist.bio ? `<p class="artist-bio-preview artist-editor-bio">${escapeHtml(artist.bio)}</p>` : '<p class="artist-bio-preview artist-editor-bio">Hakkında metni eklenmedi.</p>'}
+                            </div>
+                        </div>
+                        <div class="artist-editor-actions">
+                            <button class="btn btn-primary" data-action="add-concert" data-artist-id="${artist.id}"><i class="fas fa-plus"></i> Yeni Konser</button>
+                            <button class="btn btn-secondary" data-action="edit-artist" data-artist-id="${artist.id}"><i class="fas fa-edit"></i> Sanatçı Bilgileri</button>
+                        </div>
+                        <div class="artist-concerts-admin-list">${concertsHtml}</div>
+                        <div class="admin-item-editor-footer"><button class="btn btn-primary" type="button" data-close-admin-editor><i class="fas fa-check"></i> Düzenlemeyi Bitir</button></div>
+                    </div>
+                </div>`;
             artistsListEl.appendChild(card);
             const coverImage = card.querySelector('.artist-cover-thumb');
             if (coverImage && window.SiteMediaStore?.isStored(artist.cover)) resolveAdminMedia(artist.cover).then(source => { if (source) coverImage.src = source; });
@@ -363,11 +378,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         const artist = findById(appData.artists, button.dataset.artistId);
         if (!artist) return;
         const concert = findById(artist.concerts, button.dataset.concertId);
+        const parentEditor = button.closest('.admin-item-editor-modal');
 
-        if (action === 'edit-artist') openArtistModal(artist);
-        if (action === 'add-concert') openConcertModal(artist.id);
-        if (action === 'edit-concert' && concert) openConcertModal(artist.id, concert);
-        if (action === 'add-photo' && concert) openPhotoModal(artist.id, concert.id);
+        if (action === 'edit-artist') { closeAdminItemEditor(parentEditor); openArtistModal(artist); }
+        if (action === 'add-concert') { closeAdminItemEditor(parentEditor); openConcertModal(artist.id); }
+        if (action === 'edit-concert' && concert) { closeAdminItemEditor(parentEditor); openConcertModal(artist.id, concert); }
+        if (action === 'add-photo' && concert) { closeAdminItemEditor(parentEditor); openPhotoModal(artist.id, concert.id); }
         if (action === 'delete-artist' && confirm(`${artist.name} ve tüm konserleri silinsin mi?`)) {
             appData.artists = appData.artists.filter(item => String(item.id) !== String(artist.id));
             saveData(false); renderArtistsList(); showToast('Sanatçı silindi.');
@@ -594,6 +610,50 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (container === videoClipsAdmin) refreshVideoClipsSearch();
         if (container === graphicProjectsAdmin) refreshGraphicsSearch();
     };
+
+    function closeAdminItemEditor(editor = document.querySelector('.admin-item-editor-modal.active')) {
+        if (!editor) return;
+        editor.classList.remove('active');
+        editor.setAttribute('aria-hidden', 'true');
+        if (!document.querySelector('.modal.active, .admin-item-editor-modal.active')) {
+            document.body.classList.remove('admin-editor-open');
+        }
+    }
+
+    function openAdminItemEditor(card) {
+        const editor = card?.querySelector('.admin-item-editor-modal');
+        if (!editor) return;
+        document.querySelectorAll('.admin-item-editor-modal.active').forEach(item => closeAdminItemEditor(item));
+        const label = card.querySelector('.media-admin-title-input')?.value.trim()
+            || card.querySelector('.artist-info-wrap h3')?.textContent.trim()
+            || 'Kart';
+        const title = editor.querySelector('.admin-item-editor-title');
+        if (title) title.textContent = `${label} Düzenle`;
+        editor.classList.add('active');
+        editor.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('admin-editor-open');
+        editor.querySelector('[data-close-admin-editor]')?.focus();
+    }
+
+    document.addEventListener('click', event => {
+        const openButton = event.target.closest('[data-open-admin-editor]');
+        if (openButton) {
+            openAdminItemEditor(openButton.closest('.media-admin-card, .artist-admin-card'));
+            return;
+        }
+        const closeButton = event.target.closest('[data-close-admin-editor]');
+        if (closeButton) {
+            closeAdminItemEditor(closeButton.closest('.admin-item-editor-modal'));
+            return;
+        }
+        const editor = event.target.closest('.admin-item-editor-modal');
+        if (editor && event.target === editor) closeAdminItemEditor(editor);
+    });
+
+    document.addEventListener('keydown', event => {
+        if (event.key === 'Escape') closeAdminItemEditor();
+    });
+
     function revealNewestAdminCard(container, searchInputId, selector) {
         const searchInput = document.getElementById(searchInputId);
         if (searchInput) searchInput.value = '';
@@ -602,9 +662,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         else refreshMediaSearch(container);
         const cards = container ? [...container.querySelectorAll(selector)] : [];
         const card = cards.at(-1);
-        const details = card?.querySelector('.media-admin-details');
-        if (details) details.open = true;
-        card?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        if (card) openAdminItemEditor(card);
     }
 
     function renderCreativeProjectsForm(container, items, options) {
@@ -626,17 +684,21 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <input type="text" class="media-admin-title-input creative-admin-label" value="${escapeHtml(adminLabel)}" placeholder="${escapeHtml(options.itemLabel)} ${index + 1}" aria-label="Admin kart adı">
                     <span class="admin-order-actions"><button class="btn btn-secondary btn-sm" type="button" data-move-creative="up" aria-label="Yukarı taşı"><i class="fas fa-arrow-up"></i></button><button class="btn btn-secondary btn-sm" type="button" data-move-creative="down" aria-label="Aşağı taşı"><i class="fas fa-arrow-down"></i></button><button class="btn btn-danger btn-sm" type="button" data-delete-creative aria-label="${escapeHtml(options.itemLabel)} projesini sil"><i class="fas fa-trash-alt"></i></button></span>
                 </div>
-                <details class="media-admin-details">
-                    <summary><i class="fas fa-sliders" aria-hidden="true"></i><span>Düzenle</span><i class="fas fa-chevron-down media-details-arrow" aria-hidden="true"></i></summary>
-                    <div class="form-grid">
+                <button class="media-admin-edit" type="button" data-open-admin-editor><i class="fas fa-pen" aria-hidden="true"></i><span>Düzenle</span><i class="fas fa-expand-alt" aria-hidden="true"></i></button>
+                <div class="modal admin-item-editor-modal" aria-hidden="true">
+                    <div class="modal-content admin-item-editor-content" role="dialog" aria-modal="true">
+                        <div class="modal-header admin-item-editor-header"><h2 class="admin-item-editor-title">${escapeHtml(adminLabel)} Düzenle</h2><button class="modal-close" type="button" data-close-admin-editor aria-label="Düzenleme penceresini kapat">&times;</button></div>
+                        <div class="form-grid">
                     <label class="admin-toggle form-full"><input type="checkbox" class="creative-enabled" ${project.enabled !== false ? 'checked' : ''}><span><strong>Yayında</strong><small>Kapatılırsa kart sayfada görünmez.</small></span></label>
                     <div class="form-group"><label>Proje / Sanatçı Adı</label><input type="text" class="form-control creative-title" value="${escapeHtml(project.title)}" placeholder="${escapeHtml(options.titlePlaceholder)}"></div>
                     <div class="form-group"><label>Yıl</label><input type="text" class="form-control creative-year" value="${escapeHtml(project.year)}" placeholder="2026"></div>
                     ${options.showCategory ? `<div class="form-group form-full"><label>Etiket (isteğe bağlı)</label><input type="text" class="form-control creative-category" value="${escapeHtml(project.category ?? '')}" placeholder="Boş bırakırsanız sitede gösterilmez"></div>` : ''}
                     <div class="form-group form-full"><label>${options.isVideo ? 'Özel Kapak Görseli (isteğe bağlı)' : 'Proje Görseli'}</label><input type="file" class="form-control creative-image-file" accept="image/*"><input type="hidden" class="creative-image" value="${escapeHtml(project.image)}"><p class="form-help">${options.isVideo ? 'Görsel yüklemezseniz YouTube kapağı otomatik kullanılır.' : 'Görseli doğrudan bilgisayarınızdan seçin.'}</p></div>
                     ${options.isVideo ? `<div class="form-group form-full"><label>Video Dosyası (reklamsız oynatma)</label><input type="file" class="form-control creative-video-file" accept="video/mp4,video/webm,video/quicktime"><input type="hidden" class="creative-video" value="${escapeHtml(project.videoFile || '')}"><p class="form-help">Bilgisayardan yüklenen video YouTube kullanılmadan, doğrudan sitede oynatılır.</p></div><div class="form-group form-full"><label>YouTube Video Bağlantısı (isteğe bağlı)</label><input type="url" class="form-control creative-url" value="${escapeHtml(project.url)}" placeholder="https://www.youtube.com/watch?v=..."><p class="form-help">Yalnızca video dosyası yüklenmediyse kullanılır. YouTube reklamları site tarafından kapatılamaz.</p></div>` : '<input type="hidden" class="creative-url" value="">'}
+                        </div>
+                        <div class="admin-item-editor-footer"><button class="btn btn-primary" type="button" data-close-admin-editor><i class="fas fa-check"></i> Düzenlemeyi Bitir</button></div>
                     </div>
-                </details>`;
+                </div>`;
             container.appendChild(card);
         });
         refreshMediaSearch(container);
@@ -742,9 +804,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <input type="text" class="media-admin-title-input youtube-admin-label" value="${escapeHtml(adminLabel)}" placeholder="Klip Çekimi ${index + 1}" aria-label="Admin kart adı">
                     <span class="admin-order-actions"><button class="btn btn-secondary btn-sm" type="button" data-move-youtube="up" aria-label="Yukarı taşı"><i class="fas fa-arrow-up"></i></button><button class="btn btn-secondary btn-sm" type="button" data-move-youtube="down" aria-label="Aşağı taşı"><i class="fas fa-arrow-down"></i></button><button class="btn btn-danger btn-sm" type="button" data-delete-youtube aria-label="Klip çekimini sil"><i class="fas fa-trash-alt"></i></button></span>
                 </div>
-                <details class="media-admin-details">
-                    <summary><i class="fas fa-sliders" aria-hidden="true"></i><span>Düzenle</span><i class="fas fa-chevron-down media-details-arrow" aria-hidden="true"></i></summary>
-                    <div class="form-grid">
+                <button class="media-admin-edit" type="button" data-open-admin-editor><i class="fas fa-pen" aria-hidden="true"></i><span>Düzenle</span><i class="fas fa-expand-alt" aria-hidden="true"></i></button>
+                <div class="modal admin-item-editor-modal" aria-hidden="true">
+                    <div class="modal-content admin-item-editor-content" role="dialog" aria-modal="true">
+                        <div class="modal-header admin-item-editor-header"><h2 class="admin-item-editor-title">${escapeHtml(adminLabel)} Düzenle</h2><button class="modal-close" type="button" data-close-admin-editor aria-label="Düzenleme penceresini kapat">&times;</button></div>
+                        <div class="form-grid">
                     <label class="admin-toggle form-full"><input type="checkbox" class="youtube-enabled" ${project.enabled !== false ? 'checked' : ''}><span><strong>Yayında</strong><small>Kapatılırsa bu kart klip çekimleri sayfasında görünmez.</small></span></label>
                     <div class="form-group"><label>Sanatçı Adı</label><input type="text" class="form-control youtube-artist" value="${escapeHtml(artistName)}" placeholder="Kubilay Karça"></div>
                     <div class="form-group"><label>Şarkı Adı</label><input type="text" class="form-control youtube-song" value="${escapeHtml(project.song || '')}" placeholder="Şarkı adı"></div>
@@ -753,8 +817,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <div class="form-group"><label>Kapak Yerleşimi</label><select class="form-control youtube-fit"><option value="cover" ${project.thumbnailFit !== 'contain' ? 'selected' : ''}>Görseli kapla</option><option value="contain" ${project.thumbnailFit === 'contain' ? 'selected' : ''}>Logoyu sığdır</option></select></div>
                     <div class="form-group form-full"><label>Özel Kapak Görseli (isteğe bağlı)</label><input type="file" class="form-control youtube-thumbnail-file" accept="image/*"><input type="hidden" class="youtube-thumbnail" value="${escapeHtml(project.thumbnail)}"><p class="form-help">Yüklemezseniz YouTube kapağı otomatik alınır.</p></div>
                     <div class="form-group form-full"><label>YouTube Klip Bağlantısı</label><input type="url" class="form-control youtube-url" value="${escapeHtml(project.url)}" placeholder="https://www.youtube.com/watch?v=..."><p class="form-help">Klip sitedeki oynatıcıda YouTube üzerinden açılır. Özel kapak yüklemezseniz YouTube kapağı otomatik alınır.</p></div>
+                        </div>
+                        <div class="admin-item-editor-footer"><button class="btn btn-primary" type="button" data-close-admin-editor><i class="fas fa-check"></i> Düzenlemeyi Bitir</button></div>
                     </div>
-                </details>`;
+                </div>`;
             youtubeProjectsAdmin.appendChild(card);
         });
         refreshYoutubeSearch();
@@ -838,9 +904,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <input type="text" class="media-admin-title-input partner-admin-label" value="${escapeHtml(adminLabel)}" placeholder="Kurum Logosu ${index + 1}" aria-label="Admin kart adı">
                     <button class="btn btn-danger btn-sm" type="button" data-delete-partner aria-label="Kurum logosunu sil"><i class="fas fa-trash-alt"></i></button>
                 </div>
-                <details class="media-admin-details">
-                    <summary><i class="fas fa-sliders" aria-hidden="true"></i><span>Düzenle</span><i class="fas fa-chevron-down media-details-arrow" aria-hidden="true"></i></summary>
-                    <div class="form-grid">
+                <button class="media-admin-edit" type="button" data-open-admin-editor><i class="fas fa-pen" aria-hidden="true"></i><span>Düzenle</span><i class="fas fa-expand-alt" aria-hidden="true"></i></button>
+                <div class="modal admin-item-editor-modal" aria-hidden="true">
+                    <div class="modal-content admin-item-editor-content" role="dialog" aria-modal="true">
+                        <div class="modal-header admin-item-editor-header"><h2 class="admin-item-editor-title">${escapeHtml(adminLabel)} Düzenle</h2><button class="modal-close" type="button" data-close-admin-editor aria-label="Düzenleme penceresini kapat">&times;</button></div>
+                        <div class="form-grid">
                     <label class="admin-toggle"><input type="checkbox" class="partner-enabled" ${partner.enabled !== false ? 'checked' : ''}><span><strong>Referanslarda Yayında</strong><small>Kapatılırsa Referanslarımız sayfasında görünmez.</small></span></label>
                     <label class="admin-toggle"><input type="checkbox" class="partner-home-featured" ${partner.homeFeatured === true ? 'checked' : ''}><span><strong>Ana Sayfa Şeridinde Göster</strong><small>En fazla 8 farklı logo seçebilirsiniz.</small></span></label>
                     <div class="form-group"><label>Kurum Adı</label><input type="text" class="form-control partner-name" value="${escapeHtml(partner.name)}" placeholder="Afyonkarahisar Belediyesi"></div>
@@ -852,8 +920,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <p class="form-help">PNG, JPG, WebP veya SVG dosyasını bilgisayarınızdan seçin.</p>
                         <div class="partner-file-preview"><img alt="${escapeHtml(partner.name || 'Kurum')} logo önizlemesi"></div>
                     </div>
+                        </div>
+                        <div class="admin-item-editor-footer"><button class="btn btn-primary" type="button" data-close-admin-editor><i class="fas fa-check"></i> Düzenlemeyi Bitir</button></div>
                     </div>
-                </details>`;
+                </div>`;
             partnersAdmin.appendChild(card);
             const preview = card.querySelector('.partner-file-preview img');
             resolveAdminMedia(partner.logo).then(source => {
