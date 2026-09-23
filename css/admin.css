@@ -1373,3 +1373,420 @@ textarea.form-control {
     color: #ff7779;
     font-size: 0.84rem;
 }
+
+/* Compact content management workspace */
+.admin-list-search {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 9px;
+    width: min(100%, 560px);
+    margin: 0 0 14px;
+    padding: 8px 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 9px;
+    background: var(--bg-darker);
+}
+
+.admin-list-search > i {
+    color: var(--text-secondary);
+    font-size: 0.78rem;
+}
+
+.admin-list-search input {
+    min-width: 0;
+    padding: 2px 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: var(--text-primary);
+    font: 500 0.82rem/1.4 var(--font-main);
+}
+
+.admin-list-search input::placeholder {
+    color: #6f6f6f;
+}
+
+.admin-list-search button {
+    display: grid;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    place-items: center;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.admin-list-search button.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.admin-list-search button:hover,
+.admin-list-search button:focus-visible {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-primary);
+    outline: none;
+}
+
+.admin-search-empty {
+    margin: 0 0 14px;
+    padding: 12px;
+    border: 1px dashed var(--border-color);
+    border-radius: 8px;
+    color: var(--text-secondary);
+    font-size: 0.78rem;
+    text-align: center;
+}
+
+.media-admin-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+    gap: 12px;
+    align-items: start;
+}
+
+.media-admin-grid > .admin-empty {
+    grid-column: 1 / -1;
+}
+
+.media-admin-card {
+    min-width: 0;
+    margin: 0;
+    padding: 11px;
+    border-radius: 9px;
+}
+
+.media-admin-card-header {
+    gap: 8px;
+    margin: 0;
+    padding: 0 0 8px;
+}
+
+.media-admin-title-input {
+    width: 100%;
+    min-width: 0;
+    padding: 6px 7px;
+    border: 1px dashed transparent;
+    border-radius: 6px;
+    outline: 0;
+    background: transparent;
+    color: var(--text-primary);
+    font: 700 0.82rem/1.25 var(--font-main);
+}
+
+.media-admin-title-input:hover {
+    border-color: var(--border-color);
+    background: rgba(255, 255, 255, 0.025);
+}
+
+.media-admin-title-input:focus {
+    border-color: var(--accent);
+    background: rgba(201, 11, 14, 0.07);
+}
+
+.media-admin-card .admin-order-actions {
+    gap: 4px;
+}
+
+.media-admin-card .btn-sm {
+    min-width: 31px;
+    min-height: 31px;
+    justify-content: center;
+    padding: 6px 8px;
+}
+
+.media-admin-details > summary {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 5px 2px;
+    color: var(--text-secondary);
+    font-size: 0.72rem;
+    font-weight: 600;
+    list-style: none;
+    cursor: pointer;
+    user-select: none;
+}
+
+.media-admin-details > summary::-webkit-details-marker {
+    display: none;
+}
+
+.media-admin-details > summary:hover,
+.media-admin-details > summary:focus-visible {
+    color: var(--text-primary);
+    outline: none;
+}
+
+.media-details-arrow {
+    margin-left: auto;
+    transition: transform 0.2s ease;
+}
+
+.media-admin-details[open] .media-details-arrow {
+    transform: rotate(180deg);
+}
+
+.media-admin-card .media-admin-details > .form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 8px;
+    padding-top: 11px;
+    border-top: 1px solid var(--border-color);
+}
+
+.media-admin-card .form-group {
+    min-width: 0;
+    margin-bottom: 0;
+}
+
+.media-admin-card .form-group label {
+    margin-bottom: 5px;
+    font-size: 0.72rem;
+}
+
+.media-admin-card .form-control {
+    min-width: 0;
+    min-height: 38px;
+    padding: 8px 9px;
+    border-radius: 6px;
+    font-size: 0.78rem;
+}
+
+.media-admin-card .form-help {
+    margin-top: 4px;
+    font-size: 0.66rem;
+    line-height: 1.4;
+}
+
+.media-admin-card .admin-toggle {
+    gap: 7px;
+    padding: 8px 9px;
+    border-radius: 7px;
+}
+
+.media-admin-card .admin-toggle input {
+    width: 17px;
+    height: 17px;
+    flex-basis: 17px;
+}
+
+.media-admin-card .admin-toggle strong {
+    font-size: 0.74rem;
+}
+
+.media-admin-card .admin-toggle small {
+    font-size: 0.63rem;
+    line-height: 1.35;
+}
+
+.media-admin-card .partner-file-preview {
+    width: min(100%, 220px);
+    margin-top: 8px;
+}
+
+.artists-admin-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 470px), 1fr));
+    gap: 12px;
+    align-items: start;
+}
+
+.artist-admin-card {
+    min-width: 0;
+    padding: 14px;
+}
+
+.artist-card-header {
+    display: grid;
+    grid-template-columns: 64px minmax(0, 1fr);
+    gap: 11px;
+    align-items: start;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+}
+
+.artist-cover-wrap {
+    width: 64px;
+    height: 82px;
+}
+
+.artist-info-wrap h3 {
+    margin-bottom: 3px;
+    font-size: 1rem;
+}
+
+.artist-bio-preview {
+    margin-top: 6px;
+    font-size: 0.75rem;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+}
+
+.artist-actions-wrap {
+    grid-column: 1 / -1;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.artist-actions-wrap .btn-sm {
+    padding: 6px 9px;
+    font-size: 0.7rem;
+}
+
+.artist-concerts-admin-list {
+    gap: 9px;
+}
+
+.admin-concert-card {
+    padding: 11px;
+}
+
+.admin-concert-header {
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.artist-subphotos-grid {
+    grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
+    gap: 7px;
+}
+
+.admin-scroll-to-top {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 700;
+    display: grid;
+    width: 46px;
+    height: 46px;
+    padding: 0;
+    place-items: center;
+    border: 1px solid rgba(201, 11, 14, 0.65);
+    border-radius: 50%;
+    background: rgba(10, 10, 10, 0.92);
+    color: #fff;
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.45);
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(12px);
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease, background 0.2s ease;
+}
+
+.admin-scroll-to-top.is-visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.admin-scroll-to-top:hover,
+.admin-scroll-to-top:focus-visible {
+    background: var(--accent);
+    outline: none;
+}
+
+@media (min-width: 761px) {
+    .admin-main {
+        padding: 28px 32px 60px;
+    }
+
+    .admin-header {
+        margin-bottom: 24px;
+        padding-bottom: 14px;
+    }
+
+    .admin-card {
+        margin-bottom: 18px;
+        padding: 20px;
+    }
+
+    .card-header {
+        margin-bottom: 16px;
+        padding-bottom: 10px;
+    }
+
+    .form-grid {
+        gap: 14px;
+    }
+
+    .form-group {
+        margin-bottom: 10px;
+    }
+
+    .form-control {
+        padding: 10px 12px;
+        font-size: 0.86rem;
+    }
+
+    textarea.form-control {
+        min-height: 90px;
+    }
+
+    .admin-toggle {
+        padding: 10px 12px;
+    }
+}
+
+@media (max-width: 760px) {
+    .media-admin-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    .media-admin-card {
+        padding: 8px;
+    }
+
+    .media-admin-card-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .media-admin-card .admin-order-actions {
+        width: 100%;
+    }
+
+    .media-admin-card .btn-sm {
+        width: auto;
+        min-width: 34px;
+        min-height: 34px;
+        padding: 6px;
+    }
+
+    .media-admin-card .media-admin-details > .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .media-admin-card .form-full {
+        grid-column: span 1;
+    }
+
+    .media-admin-card .form-control {
+        min-height: 42px;
+        font-size: 16px;
+    }
+
+    .artists-admin-list {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-scroll-to-top {
+        right: 14px;
+        bottom: calc(88px + env(safe-area-inset-bottom));
+        width: 44px;
+        height: 44px;
+    }
+}
+
+@media (max-width: 430px) {
+    .media-admin-grid {
+        grid-template-columns: 1fr;
+    }
+}

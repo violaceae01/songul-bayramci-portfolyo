@@ -224,8 +224,37 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
+    const normalizeAdminSearch = value => String(value || '').toLocaleLowerCase('tr-TR').trim();
+    function setupAdminSearch(inputId, container, itemSelector, emptyId) {
+        const input = document.getElementById(inputId);
+        const empty = document.getElementById(emptyId);
+        const clearButton = document.querySelector(`[data-admin-search-clear="${inputId}"]`);
+        const refresh = () => {
+            if (!input || !container) return;
+            const query = normalizeAdminSearch(input.value);
+            const cards = [...container.querySelectorAll(itemSelector)];
+            let visibleCount = 0;
+            cards.forEach(card => {
+                const fieldValues = [...card.querySelectorAll('input, textarea, select')].map(field => field.value);
+                const matches = !query || normalizeAdminSearch([card.textContent, ...fieldValues].join(' ')).includes(query);
+                card.hidden = !matches;
+                if (matches) visibleCount += 1;
+            });
+            if (empty) empty.hidden = !query || visibleCount > 0 || cards.length === 0;
+            if (clearButton) clearButton.classList.toggle('is-visible', Boolean(query));
+        };
+        input?.addEventListener('input', refresh);
+        clearButton?.addEventListener('click', () => {
+            input.value = '';
+            refresh();
+            input.focus();
+        });
+        return refresh;
+    }
+
     const artistsListEl = document.getElementById('artistsList');
     const artistsCount = document.getElementById('artistsCount');
+    const refreshArtistSearch = setupAdminSearch('portfolioAdminSearch', artistsListEl, '.artist-admin-card', 'portfolioAdminSearchEmpty');
     const artistModal = document.getElementById('artistModal');
     const artistForm = document.getElementById('artistForm');
     const editArtistId = document.getElementById('editArtistId');
@@ -266,6 +295,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (!artists.length) {
             artistsListEl.innerHTML = '<p class="admin-empty">Henüz sanatçı eklenmedi.</p>';
+            refreshArtistSearch();
             return;
         }
 
@@ -301,6 +331,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (window.SiteMediaStore?.isStored(reference)) resolveAdminMedia(reference).then(source => { if (source) image.src = source; });
             });
         });
+        refreshArtistSearch();
     }
 
     function renderConcertAdminCard(artist, concert) {
@@ -555,12 +586,33 @@ document.addEventListener('DOMContentLoaded', async () => {
     const videoClipsAdmin = document.getElementById('videoClipsAdmin');
     const graphicProjectsAdmin = document.getElementById('graphicProjectsAdmin');
     const partnersAdmin = document.getElementById('partnersAdmin');
+    const refreshYoutubeSearch = setupAdminSearch('clipsAdminSearch', youtubeProjectsAdmin, '[data-youtube-project]', 'clipsAdminSearchEmpty');
+    const refreshVideoClipsSearch = setupAdminSearch('videoClipsAdminSearch', videoClipsAdmin, '[data-creative-project]', 'videoClipsAdminSearchEmpty');
+    const refreshGraphicsSearch = setupAdminSearch('graphicsAdminSearch', graphicProjectsAdmin, '[data-creative-project]', 'graphicsAdminSearchEmpty');
+    const refreshReferencesSearch = setupAdminSearch('referencesAdminSearch', partnersAdmin, '[data-partner]', 'referencesAdminSearchEmpty');
+    const refreshMediaSearch = container => {
+        if (container === videoClipsAdmin) refreshVideoClipsSearch();
+        if (container === graphicProjectsAdmin) refreshGraphicsSearch();
+    };
+    function revealNewestAdminCard(container, searchInputId, selector) {
+        const searchInput = document.getElementById(searchInputId);
+        if (searchInput) searchInput.value = '';
+        if (container === youtubeProjectsAdmin) refreshYoutubeSearch();
+        else if (container === partnersAdmin) refreshReferencesSearch();
+        else refreshMediaSearch(container);
+        const cards = container ? [...container.querySelectorAll(selector)] : [];
+        const card = cards.at(-1);
+        const details = card?.querySelector('.media-admin-details');
+        if (details) details.open = true;
+        card?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
 
     function renderCreativeProjectsForm(container, items, options) {
         if (!container) return;
         container.innerHTML = '';
         if (!items.length) {
             container.innerHTML = `<p class="admin-empty compact">Henüz ${escapeHtml(options.emptyLabel)} eklenmedi.</p>`;
+            refreshMediaSearch(container);
             return;
         }
 
@@ -571,20 +623,23 @@ document.addEventListener('DOMContentLoaded', async () => {
             card.dataset.creativeProject = String(project.id || Date.now() + index);
             card.innerHTML = `
                 <div class="media-admin-card-header">
-                    <strong>${escapeHtml(adminLabel)}</strong>
+                    <input type="text" class="media-admin-title-input creative-admin-label" value="${escapeHtml(adminLabel)}" placeholder="${escapeHtml(options.itemLabel)} ${index + 1}" aria-label="Admin kart adı">
                     <span class="admin-order-actions"><button class="btn btn-secondary btn-sm" type="button" data-move-creative="up" aria-label="Yukarı taşı"><i class="fas fa-arrow-up"></i></button><button class="btn btn-secondary btn-sm" type="button" data-move-creative="down" aria-label="Aşağı taşı"><i class="fas fa-arrow-down"></i></button><button class="btn btn-danger btn-sm" type="button" data-delete-creative aria-label="${escapeHtml(options.itemLabel)} projesini sil"><i class="fas fa-trash-alt"></i></button></span>
                 </div>
-                <div class="form-grid">
+                <details class="media-admin-details">
+                    <summary><i class="fas fa-sliders" aria-hidden="true"></i><span>Düzenle</span><i class="fas fa-chevron-down media-details-arrow" aria-hidden="true"></i></summary>
+                    <div class="form-grid">
                     <label class="admin-toggle form-full"><input type="checkbox" class="creative-enabled" ${project.enabled !== false ? 'checked' : ''}><span><strong>Yayında</strong><small>Kapatılırsa kart sayfada görünmez.</small></span></label>
-                    <div class="form-group form-full"><label>Admin Kart Adı</label><input type="text" class="form-control creative-admin-label" value="${escapeHtml(adminLabel)}" placeholder="${escapeHtml(options.itemLabel)} ${index + 1}"><p class="form-help">Yalnızca yönetim panelinde görünür; projeleri kolay ayırt etmenizi sağlar.</p></div>
                     <div class="form-group"><label>Proje / Sanatçı Adı</label><input type="text" class="form-control creative-title" value="${escapeHtml(project.title)}" placeholder="${escapeHtml(options.titlePlaceholder)}"></div>
                     <div class="form-group"><label>Yıl</label><input type="text" class="form-control creative-year" value="${escapeHtml(project.year)}" placeholder="2026"></div>
                     ${options.showCategory ? `<div class="form-group form-full"><label>Etiket (isteğe bağlı)</label><input type="text" class="form-control creative-category" value="${escapeHtml(project.category ?? '')}" placeholder="Boş bırakırsanız sitede gösterilmez"></div>` : ''}
                     <div class="form-group form-full"><label>${options.isVideo ? 'Özel Kapak Görseli (isteğe bağlı)' : 'Proje Görseli'}</label><input type="file" class="form-control creative-image-file" accept="image/*"><input type="hidden" class="creative-image" value="${escapeHtml(project.image)}"><p class="form-help">${options.isVideo ? 'Görsel yüklemezseniz YouTube kapağı otomatik kullanılır.' : 'Görseli doğrudan bilgisayarınızdan seçin.'}</p></div>
                     ${options.isVideo ? `<div class="form-group form-full"><label>Video Dosyası (reklamsız oynatma)</label><input type="file" class="form-control creative-video-file" accept="video/mp4,video/webm,video/quicktime"><input type="hidden" class="creative-video" value="${escapeHtml(project.videoFile || '')}"><p class="form-help">Bilgisayardan yüklenen video YouTube kullanılmadan, doğrudan sitede oynatılır.</p></div><div class="form-group form-full"><label>YouTube Video Bağlantısı (isteğe bağlı)</label><input type="url" class="form-control creative-url" value="${escapeHtml(project.url)}" placeholder="https://www.youtube.com/watch?v=..."><p class="form-help">Yalnızca video dosyası yüklenmediyse kullanılır. YouTube reklamları site tarafından kapatılamaz.</p></div>` : '<input type="hidden" class="creative-url" value="">'}
-                </div>`;
+                    </div>
+                </details>`;
             container.appendChild(card);
         });
+        refreshMediaSearch(container);
     }
 
     function readCreativeProjectsForm(container, defaultCategory) {
@@ -618,14 +673,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         appData.videoClips = readCreativeProjectsForm(videoClipsAdmin, '');
         appData.videoClips.push({ id: Date.now(), adminLabel: `Video Klip ${(appData.videoClips?.length || 0) + 1}`, title: '', year: String(new Date().getFullYear()), category: '', image: '', videoFile: '', url: '', enabled: true });
         renderVideoClipsForm();
-        videoClipsAdmin.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        revealNewestAdminCard(videoClipsAdmin, 'videoClipsAdminSearch', '[data-creative-project]');
     });
 
     document.getElementById('btnAddGraphicProject')?.addEventListener('click', () => {
         appData.graphicProjects = readCreativeProjectsForm(graphicProjectsAdmin, '');
         appData.graphicProjects.push({ id: Date.now(), adminLabel: `Grafik Tasarım ${(appData.graphicProjects?.length || 0) + 1}`, title: '', year: String(new Date().getFullYear()), category: '', image: '', url: '', enabled: true });
         renderGraphicProjectsForm();
-        graphicProjectsAdmin.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        revealNewestAdminCard(graphicProjectsAdmin, 'graphicsAdminSearch', '[data-creative-project]');
     });
 
     function bindCreativeActions(container, dataKey, defaultCategory, render, label) {
@@ -672,6 +727,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const projects = appData.youtubeProjects || [];
         if (!projects.length) {
             youtubeProjectsAdmin.innerHTML = '<p class="admin-empty compact">Henüz klip çekimi eklenmedi.</p>';
+            refreshYoutubeSearch();
             return;
         }
 
@@ -683,12 +739,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             card.dataset.youtubeProject = String(project.id || Date.now() + index);
             card.innerHTML = `
                 <div class="media-admin-card-header">
-                    <strong>${escapeHtml(adminLabel)}</strong>
+                    <input type="text" class="media-admin-title-input youtube-admin-label" value="${escapeHtml(adminLabel)}" placeholder="Klip Çekimi ${index + 1}" aria-label="Admin kart adı">
                     <span class="admin-order-actions"><button class="btn btn-secondary btn-sm" type="button" data-move-youtube="up" aria-label="Yukarı taşı"><i class="fas fa-arrow-up"></i></button><button class="btn btn-secondary btn-sm" type="button" data-move-youtube="down" aria-label="Aşağı taşı"><i class="fas fa-arrow-down"></i></button><button class="btn btn-danger btn-sm" type="button" data-delete-youtube aria-label="Klip çekimini sil"><i class="fas fa-trash-alt"></i></button></span>
                 </div>
-                <div class="form-grid">
+                <details class="media-admin-details">
+                    <summary><i class="fas fa-sliders" aria-hidden="true"></i><span>Düzenle</span><i class="fas fa-chevron-down media-details-arrow" aria-hidden="true"></i></summary>
+                    <div class="form-grid">
                     <label class="admin-toggle form-full"><input type="checkbox" class="youtube-enabled" ${project.enabled !== false ? 'checked' : ''}><span><strong>Yayında</strong><small>Kapatılırsa bu kart klip çekimleri sayfasında görünmez.</small></span></label>
-                    <div class="form-group form-full"><label>Admin Kart Adı</label><input type="text" class="form-control youtube-admin-label" value="${escapeHtml(adminLabel)}" placeholder="Klip Çekimi ${index + 1}"><p class="form-help">Yalnızca yönetim panelinde görünür.</p></div>
                     <div class="form-group"><label>Sanatçı Adı</label><input type="text" class="form-control youtube-artist" value="${escapeHtml(artistName)}" placeholder="Kubilay Karça"></div>
                     <div class="form-group"><label>Şarkı Adı</label><input type="text" class="form-control youtube-song" value="${escapeHtml(project.song || '')}" placeholder="Şarkı adı"></div>
                     <div class="form-group"><label>Yıl</label><input type="text" class="form-control youtube-year" value="${escapeHtml(project.year)}" placeholder="2026"></div>
@@ -696,9 +753,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <div class="form-group"><label>Kapak Yerleşimi</label><select class="form-control youtube-fit"><option value="cover" ${project.thumbnailFit !== 'contain' ? 'selected' : ''}>Görseli kapla</option><option value="contain" ${project.thumbnailFit === 'contain' ? 'selected' : ''}>Logoyu sığdır</option></select></div>
                     <div class="form-group form-full"><label>Özel Kapak Görseli (isteğe bağlı)</label><input type="file" class="form-control youtube-thumbnail-file" accept="image/*"><input type="hidden" class="youtube-thumbnail" value="${escapeHtml(project.thumbnail)}"><p class="form-help">Yüklemezseniz YouTube kapağı otomatik alınır.</p></div>
                     <div class="form-group form-full"><label>YouTube Klip Bağlantısı</label><input type="url" class="form-control youtube-url" value="${escapeHtml(project.url)}" placeholder="https://www.youtube.com/watch?v=..."><p class="form-help">Klip sitedeki oynatıcıda YouTube üzerinden açılır. Özel kapak yüklemezseniz YouTube kapağı otomatik alınır.</p></div>
-                </div>`;
+                    </div>
+                </details>`;
             youtubeProjectsAdmin.appendChild(card);
         });
+        refreshYoutubeSearch();
     }
 
     function readYoutubeProjectsForm() {
@@ -723,7 +782,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         readYoutubeProjectsForm();
         appData.youtubeProjects.push({ id: Date.now(), adminLabel: `Klip Çekimi ${(appData.youtubeProjects?.length || 0) + 1}`, title: '', artist: '', song: '', year: String(new Date().getFullYear()), category: '', thumbnail: '', thumbnailFit: 'cover', videoFile: '', url: '', enabled: true });
         renderYoutubeProjectsForm();
-        youtubeProjectsAdmin.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        revealNewestAdminCard(youtubeProjectsAdmin, 'clipsAdminSearch', '[data-youtube-project]');
     });
 
     youtubeProjectsAdmin?.addEventListener('click', event => {
@@ -765,6 +824,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const partners = appData.partners || [];
         if (!partners.length) {
             partnersAdmin.innerHTML = '<p class="admin-empty compact">Henüz kurum logosu eklenmedi.</p>';
+            refreshReferencesSearch();
             return;
         }
 
@@ -775,13 +835,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             card.dataset.partner = String(partner.id || Date.now() + index);
             card.innerHTML = `
                 <div class="media-admin-card-header">
-                    <strong>${escapeHtml(adminLabel)}</strong>
+                    <input type="text" class="media-admin-title-input partner-admin-label" value="${escapeHtml(adminLabel)}" placeholder="Kurum Logosu ${index + 1}" aria-label="Admin kart adı">
                     <button class="btn btn-danger btn-sm" type="button" data-delete-partner aria-label="Kurum logosunu sil"><i class="fas fa-trash-alt"></i></button>
                 </div>
-                <div class="form-grid">
+                <details class="media-admin-details">
+                    <summary><i class="fas fa-sliders" aria-hidden="true"></i><span>Düzenle</span><i class="fas fa-chevron-down media-details-arrow" aria-hidden="true"></i></summary>
+                    <div class="form-grid">
                     <label class="admin-toggle"><input type="checkbox" class="partner-enabled" ${partner.enabled !== false ? 'checked' : ''}><span><strong>Referanslarda Yayında</strong><small>Kapatılırsa Referanslarımız sayfasında görünmez.</small></span></label>
                     <label class="admin-toggle"><input type="checkbox" class="partner-home-featured" ${partner.homeFeatured === true ? 'checked' : ''}><span><strong>Ana Sayfa Şeridinde Göster</strong><small>En fazla 8 farklı logo seçebilirsiniz.</small></span></label>
-                    <div class="form-group form-full"><label>Admin Kart Adı</label><input type="text" class="form-control partner-admin-label" value="${escapeHtml(adminLabel)}" placeholder="Kurum Logosu ${index + 1}"><p class="form-help">Yalnızca yönetim panelinde görünür.</p></div>
                     <div class="form-group"><label>Kurum Adı</label><input type="text" class="form-control partner-name" value="${escapeHtml(partner.name)}" placeholder="Afyonkarahisar Belediyesi"></div>
                     <div class="form-group"><label>Kurum Web Sitesi</label><input type="url" class="form-control partner-url" value="${escapeHtml(partner.url)}" placeholder="https://..."></div>
                     <div class="form-group form-full">
@@ -791,7 +852,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <p class="form-help">PNG, JPG, WebP veya SVG dosyasını bilgisayarınızdan seçin.</p>
                         <div class="partner-file-preview"><img alt="${escapeHtml(partner.name || 'Kurum')} logo önizlemesi"></div>
                     </div>
-                </div>`;
+                    </div>
+                </details>`;
             partnersAdmin.appendChild(card);
             const preview = card.querySelector('.partner-file-preview img');
             resolveAdminMedia(partner.logo).then(source => {
@@ -799,6 +861,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 card.querySelector('.partner-file-preview')?.classList.toggle('is-empty', !source);
             });
         });
+        refreshReferencesSearch();
     }
 
     function readPartnersForm() {
@@ -818,7 +881,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         readPartnersForm();
         appData.partners.push({ id: Date.now(), adminLabel: `Kurum Logosu ${(appData.partners?.length || 0) + 1}`, name: '', logo: '', url: '', enabled: true, homeFeatured: false });
         renderPartnersForm();
-        partnersAdmin.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        revealNewestAdminCard(partnersAdmin, 'referencesAdminSearch', '[data-partner]');
     });
 
     partnersAdmin?.addEventListener('click', event => {
@@ -1034,6 +1097,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         const link = document.createElement('a'); const url = URL.createObjectURL(blob); link.href = url; link.download = 'data.js'; document.body.appendChild(link); link.click(); link.remove(); URL.revokeObjectURL(url); showToast('data.js dosyası indirildi.');
     });
     document.getElementById('btnCopyJson')?.addEventListener('click', () => { readAllForms(); navigator.clipboard.writeText(JSON.stringify(appData, null, 2)).then(() => showToast('JSON panoya kopyalandı.')).catch(() => showToast('Kopyalama başarısız.', 'error')); });
+
+    const adminScrollToTop = document.getElementById('adminScrollToTop');
+    const updateAdminScrollButton = () => adminScrollToTop?.classList.toggle('is-visible', window.scrollY > 420);
+    window.addEventListener('scroll', updateAdminScrollButton, { passive: true });
+    adminScrollToTop?.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+    updateAdminScrollButton();
 
     function initAll() {
         renderArtistsList();
