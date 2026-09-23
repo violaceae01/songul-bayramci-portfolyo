@@ -1312,10 +1312,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <span class="youtube-project-media ${project.thumbnailFit === 'contain' && !usesAutomaticThumbnail ? 'is-contain' : ''} ${thumbnail ? '' : 'is-missing'}">
                         ${thumbnail ? `<img src="${escapeHtml(thumbnail)}" alt="${escapeHtml(accessibleTitle)}" loading="lazy" decoding="async"${usesAutomaticThumbnail ? ` data-youtube-video-id="${escapeHtml(videoId)}"` : ''}>` : ''}
                         <span class="youtube-project-placeholder"><i class="fab fa-youtube" aria-hidden="true"></i><small>${escapeHtml(accessibleTitle)}</small></span>
+                        ${String(project.category || '').trim() ? `<small class="youtube-project-type">${escapeHtml(project.category)}</small>` : ''}
                         ${hasPlayableMedia ? '<span class="youtube-project-play"><i class="fas fa-play" aria-hidden="true"></i></span>' : ''}
                     </span>
                     <span class="youtube-project-info">
-                        ${String(project.category || '').trim() ? `<small class="youtube-project-type">${escapeHtml(project.category)}</small>` : ''}
                         <strong>${escapeHtml(artistName)}</strong>
                         ${songName ? `<em>${escapeHtml(songName)}</em>` : ''}
                         <span><small>${escapeHtml(project.year || '')}</small><small>${videoId ? 'Sitede İzle' : projectUrl ? 'Videoyu Aç' : 'Yakında'}</small></span>
