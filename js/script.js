@@ -859,10 +859,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                         </div>` : ''}
                 </header>
                 <div class="concert-gallery-shell">
-                    <div class="concert-gallery-nav" ${gallery.length > 1 ? '' : 'hidden'}>
-                        <button type="button" class="concert-gallery-arrow is-prev" aria-label="Önceki görsel"><i class="fas fa-arrow-left"></i></button>
-                        <button type="button" class="concert-gallery-arrow is-next" aria-label="Sonraki görsel"><i class="fas fa-arrow-right"></i></button>
-                    </div>
                     <div class="concert-photo-grid" tabindex="0" aria-label="${escapeHtml(concert.name)} fotoğraf galerisi"></div>
                 </div>
             `;
@@ -880,29 +876,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <img src="${escapeHtml(image.src)}" alt="${escapeHtml(image.title || artist.name)}" loading="lazy">
                         <span><strong>${escapeHtml(image.title || artist.name)}</strong><small>${escapeHtml(image.desc || concert.name)}</small></span>
                     `;
-                    button.addEventListener('click', () => openLightbox(image));
+                    button.addEventListener('click', () => openLightbox(image, gallery));
                     photoGrid.appendChild(button);
                     const photo = button.querySelector('img');
                     if (photo && window.SiteMediaStore?.isStored(image.src)) setStoredImageSource(photo, image.src);
                 });
-
-                const previousButton = article.querySelector('.concert-gallery-arrow.is-prev');
-                const nextButton = article.querySelector('.concert-gallery-arrow.is-next');
-                const updateGalleryButtons = () => {
-                    const maxScroll = Math.max(0, photoGrid.scrollWidth - photoGrid.clientWidth - 2);
-                    if (previousButton) previousButton.disabled = photoGrid.scrollLeft <= 2;
-                    if (nextButton) nextButton.disabled = photoGrid.scrollLeft >= maxScroll;
-                };
-                const moveGallery = direction => {
-                    const card = photoGrid.querySelector('.concert-photo-card');
-                    const gap = Number.parseFloat(getComputedStyle(photoGrid).columnGap || getComputedStyle(photoGrid).gap) || 20;
-                    const distance = (card?.getBoundingClientRect().width || photoGrid.clientWidth * 0.75) + gap;
-                    photoGrid.scrollBy({ left: direction * distance, behavior: 'smooth' });
-                };
-                previousButton?.addEventListener('click', () => moveGallery(-1));
-                nextButton?.addEventListener('click', () => moveGallery(1));
-                photoGrid.addEventListener('scroll', updateGalleryButtons, { passive: true });
-                requestAnimationFrame(updateGalleryButtons);
             }
 
             artistConcertsList.appendChild(article);
@@ -1592,24 +1570,64 @@ document.addEventListener('DOMContentLoaded', async () => {
     const lightboxTitle = document.getElementById('lightboxTitle');
     const lightboxDesc = document.getElementById('lightboxDesc');
     const lightboxClose = document.getElementById('lightboxClose');
+    const lightboxPrev = document.getElementById('lightboxPrev');
+    const lightboxNext = document.getElementById('lightboxNext');
+    const lightboxCounter = document.getElementById('lightboxCounter');
+    let lightboxItems = [];
+    let lightboxIndex = 0;
+    let lightboxRenderToken = 0;
+    let lightboxTouchStartX = 0;
+    let lightboxTouchStartY = 0;
 
-    async function openLightbox(item) {
-        if (!lightbox || !lightboxImage) return;
+    function updateLightboxControls() {
+        const hasMultipleItems = lightboxItems.length > 1;
+        if (lightboxPrev) lightboxPrev.hidden = !hasMultipleItems;
+        if (lightboxNext) lightboxNext.hidden = !hasMultipleItems;
+        if (lightboxCounter) {
+            lightboxCounter.hidden = !hasMultipleItems;
+            lightboxCounter.textContent = hasMultipleItems ? `${lightboxIndex + 1} / ${lightboxItems.length}` : '';
+        }
+    }
 
+    async function renderLightboxItem() {
+        const item = lightboxItems[lightboxIndex];
+        if (!item || !lightboxImage) return false;
+        const renderToken = ++lightboxRenderToken;
+        lightboxImage.classList.add('is-switching');
         const source = await resolveMediaUrl(item.src || item.image || '');
-        if (!source) return;
+        if (!source || renderToken !== lightboxRenderToken) return false;
         lightboxImage.src = source;
         lightboxImage.alt = item.title || '';
         if (lightboxTitle) lightboxTitle.textContent = item.title || '';
         if (lightboxDesc) lightboxDesc.textContent = item.desc || '';
+        updateLightboxControls();
+        requestAnimationFrame(() => lightboxImage.classList.remove('is-switching'));
+        return true;
+    }
 
+    function moveLightbox(direction) {
+        if (lightboxItems.length < 2) return;
+        lightboxIndex = (lightboxIndex + direction + lightboxItems.length) % lightboxItems.length;
+        renderLightboxItem();
+    }
+
+    async function openLightbox(item, items = null) {
+        if (!lightbox || !lightboxImage) return;
+        const requestedItems = Array.isArray(items) && items.length ? items : [item];
+        lightboxItems = requestedItems.filter(entry => entry && (entry.src || entry.image));
+        lightboxIndex = Math.max(0, lightboxItems.findIndex(entry => entry === item || (entry.id != null && String(entry.id) === String(item?.id)) || (entry.src || entry.image) === (item?.src || item?.image)));
+        if (!lightboxItems.length || !(await renderLightboxItem())) return;
         lightbox.classList.add('active');
+        lightbox.setAttribute('aria-hidden', 'false');
         document.body.style.overflow = 'hidden';
+        lightboxClose?.focus();
     }
 
     function closeLightbox() {
         if (!lightbox) return;
+        lightboxRenderToken += 1;
         lightbox.classList.remove('active');
+        lightbox.setAttribute('aria-hidden', 'true');
         document.body.style.overflow = '';
     }
 
@@ -1617,10 +1635,35 @@ document.addEventListener('DOMContentLoaded', async () => {
         lightboxClose.addEventListener('click', closeLightbox);
     }
 
+    lightboxPrev?.addEventListener('click', event => {
+        event.stopPropagation();
+        moveLightbox(-1);
+    });
+
+    lightboxNext?.addEventListener('click', event => {
+        event.stopPropagation();
+        moveLightbox(1);
+    });
+
     if (lightbox) {
         lightbox.addEventListener('click', (e) => {
             if (e.target === lightbox) closeLightbox();
         });
+        lightbox.addEventListener('touchstart', event => {
+            const touch = event.changedTouches?.[0];
+            if (!touch) return;
+            lightboxTouchStartX = touch.clientX;
+            lightboxTouchStartY = touch.clientY;
+        }, { passive: true });
+        lightbox.addEventListener('touchend', event => {
+            if (!lightbox.classList.contains('active') || lightboxItems.length < 2) return;
+            const touch = event.changedTouches?.[0];
+            if (!touch) return;
+            const deltaX = touch.clientX - lightboxTouchStartX;
+            const deltaY = touch.clientY - lightboxTouchStartY;
+            if (Math.abs(deltaX) < 48 || Math.abs(deltaX) <= Math.abs(deltaY) * 1.15) return;
+            moveLightbox(deltaX < 0 ? 1 : -1);
+        }, { passive: true });
     }
 
     // Escape key listener
@@ -1633,6 +1676,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 closeYouTubeModal();
             }
         }
+        if (lightbox?.classList.contains('active') && e.key === 'ArrowLeft') moveLightbox(-1);
+        if (lightbox?.classList.contains('active') && e.key === 'ArrowRight') moveLightbox(1);
     });
 
     // ============================================

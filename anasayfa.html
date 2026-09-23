@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/styles.css?v=20260923-content1">
+    <link rel="stylesheet" href="css/styles.css?v=20260923-lightbox1">
 </head>
 <body>
     <!-- Cursor -->
@@ -302,10 +302,13 @@
 
     <div class="lightbox" id="lightbox">
         <button class="lightbox-close" id="lightboxClose" type="button" aria-label="Fotoğrafı kapat">&times;</button>
+        <button class="lightbox-nav lightbox-prev" id="lightboxPrev" type="button" aria-label="Önceki fotoğraf" hidden><i class="fas fa-chevron-left" aria-hidden="true"></i></button>
         <img src="" alt="" class="lightbox-image" id="lightboxImage">
+        <button class="lightbox-nav lightbox-next" id="lightboxNext" type="button" aria-label="Sonraki fotoğraf" hidden><i class="fas fa-chevron-right" aria-hidden="true"></i></button>
         <div class="lightbox-info">
             <h3 id="lightboxTitle"></h3>
             <p id="lightboxDesc"></p>
+            <span class="lightbox-counter" id="lightboxCounter" hidden></span>
         </div>
     </div>
 
@@ -317,6 +320,6 @@
     <script src="js/data-utils.js?v=20260923-content1"></script>
     <script src="js/server-api.js?v=20260923-content1"></script>
     <script src="js/media-store.js?v=20260923-content1"></script>
-    <script src="js/script.js?v=20260923-content1"></script>
+    <script src="js/script.js?v=20260923-lightbox1"></script>
 </body>
 </html>

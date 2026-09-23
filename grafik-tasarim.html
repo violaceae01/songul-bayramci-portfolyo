@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/styles.css?v=20260923-content1">
+    <link rel="stylesheet" href="css/styles.css?v=20260923-lightbox1">
 </head>
 <body class="creative-page" data-page-section="graphicDesign">
     <div class="cursor-dot"></div>
@@ -51,8 +51,10 @@
 
     <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Grafik tasarım önizlemesi">
         <button class="lightbox-close" id="lightboxClose" type="button" aria-label="Görseli kapat">&times;</button>
+        <button class="lightbox-nav lightbox-prev" id="lightboxPrev" type="button" aria-label="Önceki fotoğraf" hidden><i class="fas fa-chevron-left" aria-hidden="true"></i></button>
         <img src="" alt="" class="lightbox-image" id="lightboxImage">
-        <div class="lightbox-info"><h3 id="lightboxTitle"></h3><p id="lightboxDesc"></p></div>
+        <button class="lightbox-nav lightbox-next" id="lightboxNext" type="button" aria-label="Sonraki fotoğraf" hidden><i class="fas fa-chevron-right" aria-hidden="true"></i></button>
+        <div class="lightbox-info"><h3 id="lightboxTitle"></h3><p id="lightboxDesc"></p><span class="lightbox-counter" id="lightboxCounter" hidden></span></div>
     </div>
 
     <button class="scroll-to-top" id="scrollToTop" type="button" aria-label="Sayfanın başına dön"><i class="fas fa-arrow-up" aria-hidden="true"></i></button>
@@ -60,6 +62,6 @@
     <script src="js/data-utils.js?v=20260923-content1"></script>
     <script src="js/server-api.js?v=20260923-content1"></script>
     <script src="js/media-store.js?v=20260923-content1"></script>
-    <script src="js/script.js?v=20260923-content1"></script>
+    <script src="js/script.js?v=20260923-lightbox1"></script>
 </body>
 </html>
