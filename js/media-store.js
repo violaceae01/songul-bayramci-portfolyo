@@ -25,19 +25,46 @@
         return value.startsWith(PREFIX) ? value.slice(PREFIX.length) : '';
     }
 
+    async function prepareImageForUpload(file) {
+        if (!(file instanceof File) || !/^image\/(jpeg|png|webp)$/i.test(file.type)) return file;
+        if (file.size < 4 * 1024 * 1024) return file;
+        let bitmap;
+        try {
+            bitmap = await createImageBitmap(file);
+            const maxDimension = 2560;
+            const scale = Math.min(1, maxDimension / Math.max(bitmap.width, bitmap.height));
+            const width = Math.max(1, Math.round(bitmap.width * scale));
+            const height = Math.max(1, Math.round(bitmap.height * scale));
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            canvas.getContext('2d', { alpha: true }).drawImage(bitmap, 0, 0, width, height);
+            const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/webp', 0.88));
+            if (!blob || blob.size >= file.size) return file;
+            const baseName = String(file.name || 'gorsel').replace(/\.[^.]+$/, '');
+            return new File([blob], `${baseName}.webp`, { type: 'image/webp', lastModified: Date.now() });
+        } catch (error) {
+            console.warn('Görsel otomatik sıkıştırılamadı, özgün dosya kullanılacak:', error);
+            return file;
+        } finally {
+            bitmap?.close?.();
+        }
+    }
+
     async function save(file, category = 'media') {
         if (!(file instanceof Blob)) throw new Error('Geçerli bir dosya seçilmedi.');
+        const uploadFile = await prepareImageForUpload(file);
         const serverStatus = await window.SiteServer?.status?.();
-        if (serverStatus) return window.SiteServer.upload(file, category);
+        if (serverStatus) return window.SiteServer.upload(uploadFile, category);
         const id = `${category}-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
         const database = await openDatabase();
         await new Promise((resolve, reject) => {
             const transaction = database.transaction(STORE_NAME, 'readwrite');
             transaction.objectStore(STORE_NAME).put({
                 id,
-                blob: file,
-                name: file.name || id,
-                type: file.type || '',
+                blob: uploadFile,
+                name: uploadFile.name || id,
+                type: uploadFile.type || '',
                 updatedAt: Date.now()
             });
             transaction.oncomplete = resolve;

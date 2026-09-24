@@ -54,6 +54,10 @@
         return request('delete-media', { method: 'POST', body: JSON.stringify({ reference }) });
     }
 
+    async function changePassword(currentPassword, newPassword) {
+        return request('change-password', { method: 'POST', body: JSON.stringify({ currentPassword, newPassword }) });
+    }
+
     function createAuthOverlay(currentStatus) {
         const setupToken = new URLSearchParams(window.location.search).get('setup') || '';
         const isSetup = !currentStatus.configured;
@@ -112,6 +116,5 @@
         });
     }
 
-    window.SiteServer = { status, loadData, saveData, upload, remove, ensureAdminSession };
+    window.SiteServer = { status, loadData, saveData, upload, remove, changePassword, ensureAdminSession };
 })();
-

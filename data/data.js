@@ -1,5 +1,5 @@
 const siteData = {
-  "contentVersion": 7,
+  "contentVersion": 9,
   "hero": {
     "tag": "KONSER & ETKİNLİK ÇEKİMİ",
     "titleLine1": "HER ANI",
@@ -214,6 +214,7 @@ const siteData = {
     }
   ],
   "siteMedia": {
+    "logo": "assets/images/les-mejor-logo-white.png",
     "testimonialsBanner": "assets/images/home-testimonials-banner.png",
     "footerBackground": "assets/images/footer-banner.jpg",
     "aboutBackground": "assets/images/home-about-background.jpg"
@@ -287,21 +288,30 @@ const siteData = {
       "name": "Zeynep Bastık",
       "title": "Sanatçı",
       "text": "Les Mejor Creative ekibi, konser çekimlerimizde profesyonellik ve yaratıcılığı bir arada sundu. Görüntüler tam istediğimiz gibiydi!",
-      "enabled": true
+      "enabled": true,
+      "mobileFeatured": true,
+      "pageOrder": 0,
+      "homeOrder": 0
     },
     {
       "id": 2,
       "name": "Emre Fel",
       "title": "Şarkıcı",
       "text": "Etkinlik videomuz sosyal medyada binlerce görüntülenme aldı. Çekim kalitesi gerçekten üst düzey.",
-      "enabled": true
+      "enabled": true,
+      "mobileFeatured": true,
+      "pageOrder": 1,
+      "homeOrder": 1
     },
     {
       "id": 3,
       "name": "Dedub Lüman",
       "title": "Müzik Grubu",
       "text": "Klip çekiminde bize eşlik etti. Işık ve kamera açılarıyla muhteşem bir atmosfer yarattı.",
-      "enabled": true
+      "enabled": true,
+      "mobileFeatured": true,
+      "pageOrder": 2,
+      "homeOrder": 2
     }
   ],
   "typography": {
@@ -323,7 +333,7 @@ const siteData = {
     "navContact": "İLETİŞİM",
     "featuredTag": "PORTFÖY",
     "featuredTitle": "ÖNE ÇIKAN SANATÇILAR",
-    "featuredMore": "Daha Fazla",
+    "featuredMore": "Tüm Çalışmalarımı Gör",
     "servicesTag": "VIDEOS",
     "servicesTitle": "ÇEKİM STİLİM",
     "service1Kicker": "4K Çözünürlük",
@@ -360,6 +370,14 @@ const siteData = {
     "youtube": "https://youtube.com/",
     "twitter": "https://twitter.com/",
     "linkedin": "https://linkedin.com/",
+    "socialVisibility": {
+      "instagram": true,
+      "youtube": true,
+      "twitter": false,
+      "linkedin": false
+    },
+    "infoOrder": ["phone", "email", "location"],
     "projectTypes": ["Konser Çekimi", "Müzik Klibi", "Etkinlik Çekimi", "Diğer"]
-  }
+  },
+  "textStyles": {}
 };

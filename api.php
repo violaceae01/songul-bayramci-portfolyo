@@ -201,6 +201,27 @@ if ($action === 'logout') {
     respond(['ok' => true]);
 }
 
+if ($action === 'change-password') {
+    requirePost();
+    requireAuth();
+    $input = inputJson();
+    $admin = readJsonFile(ADMIN_FILE);
+    $currentPassword = (string) ($input['currentPassword'] ?? '');
+    $newPassword = (string) ($input['newPassword'] ?? '');
+    if (!$admin || !password_verify($currentPassword, (string) ($admin['password_hash'] ?? ''))) {
+        respond(['ok' => false, 'message' => 'Mevcut şifre hatalı.'], 401);
+    }
+    if (strlen($newPassword) < 10) respond(['ok' => false, 'message' => 'Yeni şifre en az 10 karakter olmalıdır.'], 422);
+    writeJsonFile(ADMIN_FILE, [
+        'password_hash' => password_hash($newPassword, PASSWORD_DEFAULT),
+        'created_at' => (string) ($admin['created_at'] ?? gmdate('c')),
+        'updated_at' => gmdate('c'),
+    ]);
+    session_regenerate_id(true);
+    $_SESSION['les_mejor_authenticated'] = true;
+    respond(['ok' => true, 'message' => 'Admin şifresi değiştirildi.']);
+}
+
 if ($action === 'save') {
     requirePost();
     requireAuth();

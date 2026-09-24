@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/admin.css?v=20260924-adminmodal1">
+    <link rel="stylesheet" href="css/admin.css?v=20260924-cms1">
 </head>
 <body>
 
@@ -142,7 +142,7 @@
         <section id="tab-video-clips" class="tab-panel">
             <div class="admin-card">
                 <div class="card-header">
-                    <div><h2>Video Klipleri</h2><p class="admin-card-description">Reklamsız site içi oynatma için video dosyası yükleyin. YouTube bağlantısı yalnızca dosya yüklenmediğinde kullanılır.</p></div>
+                    <div><h2>Video Klipleri</h2><p class="admin-card-description">YouTube bağlantısını ekleyin; kapak görselini isterseniz yükleyin, isterseniz YouTube'dan otomatik alınsın.</p></div>
                     <button class="btn btn-primary btn-sm" id="btnAddVideoClip" type="button"><i class="fas fa-plus"></i> Yeni Video Klip Ekle</button>
                 </div>
                 <div class="admin-list-search">
@@ -220,6 +220,7 @@
                             <label for="heroVideoFile">Banner Videosunu Bilgisayardan Yükle</label>
                             <input type="file" id="heroVideoFile" class="form-control" accept="video/mp4,video/webm,video/quicktime">
                             <input type="hidden" id="heroBgVideo">
+                            <button type="button" class="btn btn-danger btn-sm admin-media-remove" data-media-input="#heroBgVideo" data-media-preview="#heroVideoPreview"><i class="fas fa-trash-alt"></i> Yüklü Videoyu Kaldır</button>
                             <p class="form-help">MP4 veya WebM önerilir. Video doğrudan sunucuya yüklenir; bağlantı yapıştırmanız gerekmez.</p>
                             <video id="heroVideoPreview" class="video-preview" controls muted playsinline preload="metadata"></video>
                         </div>
@@ -258,6 +259,7 @@
                             <label>Profil / Sahne Görseli</label>
                             <input type="file" id="aboutImageFile" class="form-control" accept="image/*">
                             <input type="hidden" id="aboutImage">
+                            <button type="button" class="btn btn-danger btn-sm admin-media-remove" data-media-input="#aboutImage"><i class="fas fa-trash-alt"></i> Görseli Kaldır</button>
                             <p class="form-help">Görseli doğrudan bilgisayarınızdan seçin.</p>
                         </div>
                         <div class="form-group form-full">
@@ -289,10 +291,10 @@
         <section id="tab-testimonials" class="tab-panel">
             <div class="admin-card">
                 <div class="card-header">
-                    <div><h2>Müşteri & Sanatçı Yorumları</h2><p class="admin-card-description">En fazla 8 yorum ekleyebilir, sıralamayı oklarla değiştirebilirsiniz.</p></div>
+                    <div><h2>Müşteri & Sanatçı Yorumları</h2><p class="admin-card-description">En fazla 8 yorum ekleyebilir; anasayfa ve yorum sayfası sıralarını ayrı ayrı seçebilirsiniz.</p></div>
                     <button class="btn btn-primary btn-sm" id="btnAddTestimonial" type="button"><i class="fas fa-plus"></i> Yeni Yorum Ekle</button>
                 </div>
-                <div id="testimonialsContainer">
+                <div id="testimonialsContainer" class="media-admin-grid">
                     <!-- Loaded dynamically -->
                 </div>
             </div>
@@ -316,16 +318,32 @@
                 </div>
                 <div class="form-grid" id="siteMediaAdmin">
                     <div class="form-group">
+                        <label>Site Logosu</label>
+                        <input type="file" class="form-control site-media-file" data-media-key="logo" accept="image/*">
+                        <input type="hidden" class="site-media-reference" data-media-key="logo">
+                        <button type="button" class="btn btn-danger btn-sm admin-media-remove" data-media-key="logo"><i class="fas fa-trash-alt"></i> Logoyu Kaldır</button>
+                        <img class="image-preview site-media-preview" data-media-preview="logo" alt="Site logosu önizlemesi">
+                    </div>
+                    <div class="form-group">
                         <label>Müşteri Yorumları Arka Planı</label>
                         <input type="file" class="form-control site-media-file" data-media-key="testimonialsBanner" accept="image/*">
                         <input type="hidden" class="site-media-reference" data-media-key="testimonialsBanner">
+                        <button type="button" class="btn btn-danger btn-sm admin-media-remove" data-media-key="testimonialsBanner"><i class="fas fa-trash-alt"></i> Görseli Kaldır</button>
                         <img class="image-preview site-media-preview" data-media-preview="testimonialsBanner" alt="Müşteri yorumları arka planı önizlemesi">
                     </div>
                     <div class="form-group form-full">
                         <label>Ana Sayfa Hakkımızda Arka Planı</label>
                         <input type="file" class="form-control site-media-file" data-media-key="aboutBackground" accept="image/*">
                         <input type="hidden" class="site-media-reference" data-media-key="aboutBackground">
+                        <button type="button" class="btn btn-danger btn-sm admin-media-remove" data-media-key="aboutBackground"><i class="fas fa-trash-alt"></i> Görseli Kaldır</button>
                         <img class="image-preview site-media-preview" data-media-preview="aboutBackground" alt="Ana sayfa Hakkımızda arka planı önizlemesi">
+                    </div>
+                    <div class="form-group form-full">
+                        <label>Projemiz Var ve Footer Arka Planı</label>
+                        <input type="file" class="form-control site-media-file" data-media-key="footerBackground" accept="image/*">
+                        <input type="hidden" class="site-media-reference" data-media-key="footerBackground">
+                        <button type="button" class="btn btn-danger btn-sm admin-media-remove" data-media-key="footerBackground"><i class="fas fa-trash-alt"></i> Görseli Kaldır</button>
+                        <img class="image-preview site-media-preview" data-media-preview="footerBackground" alt="Projemiz Var ve footer arka planı önizlemesi">
                     </div>
                 </div>
             </div>
@@ -342,10 +360,12 @@
                         <div class="form-group">
                             <label>E-posta Adresi</label>
                             <input type="email" id="contactEmail" class="form-control">
+                            <label class="compact-order-label">Sitedeki sırası <select id="contactEmailOrder" class="form-control contact-order-select"><option value="0">1</option><option value="1">2</option><option value="2">3</option></select></label>
                         </div>
                         <div class="form-group">
                             <label>Telefon Numarası</label>
                             <input type="text" id="contactPhone" class="form-control">
+                            <label class="compact-order-label">Sitedeki sırası <select id="contactPhoneOrder" class="form-control contact-order-select"><option value="0">1</option><option value="1">2</option><option value="2">3</option></select></label>
                         </div>
                         <div class="form-group">
                             <label><i class="fab fa-whatsapp" style="color:#25d366;"></i> WhatsApp Numarası</label>
@@ -360,22 +380,27 @@
                         <div class="form-group form-full">
                             <label>Konum / Şehir</label>
                             <input type="text" id="contactLocation" class="form-control">
+                            <label class="compact-order-label">Sitedeki sırası <select id="contactLocationOrder" class="form-control contact-order-select"><option value="0">1</option><option value="1">2</option><option value="2">3</option></select></label>
                         </div>
                         <div class="form-group">
                             <label><i class="fab fa-instagram" style="color:#C90B0E;"></i> Instagram Profili URL</label>
                             <input type="url" id="contactInstagram" class="form-control" placeholder="https://www.instagram.com/lesmejorcreative.eu/">
+                            <label class="admin-inline-toggle"><input type="checkbox" id="contactInstagramVisible"> Sitede göster</label>
                         </div>
                         <div class="form-group">
                             <label><i class="fab fa-youtube"></i> YouTube Kanalı URL</label>
                             <input type="url" id="contactYoutube" class="form-control">
+                            <label class="admin-inline-toggle"><input type="checkbox" id="contactYoutubeVisible"> Sitede göster</label>
                         </div>
                         <div class="form-group">
                             <label><i class="fab fa-twitter"></i> X (Twitter) Profili URL</label>
                             <input type="url" id="contactTwitter" class="form-control">
+                            <label class="admin-inline-toggle"><input type="checkbox" id="contactTwitterVisible"> Sitede göster</label>
                         </div>
                         <div class="form-group">
                             <label><i class="fab fa-linkedin"></i> LinkedIn Profili URL</label>
                             <input type="url" id="contactLinkedin" class="form-control">
+                            <label class="admin-inline-toggle"><input type="checkbox" id="contactLinkedinVisible"> Sitede göster</label>
                         </div>
                     </div>
                 </form>
@@ -400,6 +425,15 @@
                         <i class="fas fa-copy"></i> JSON Olarak Kopyala
                     </button>
                 </div>
+            </div>
+            <div class="admin-card">
+                <div class="card-header"><div><h2>Admin Şifresini Değiştir</h2><p class="admin-card-description">Güvenlik için mevcut şifrenizi doğrulayarak yeni şifre belirleyin.</p></div></div>
+                <form id="changePasswordForm" class="form-grid">
+                    <div class="form-group"><label>Mevcut Şifre</label><input type="password" id="currentAdminPassword" class="form-control" autocomplete="current-password" required></div>
+                    <div class="form-group"><label>Yeni Şifre</label><input type="password" id="newAdminPassword" class="form-control" autocomplete="new-password" minlength="10" required></div>
+                    <div class="form-group"><label>Yeni Şifre Tekrar</label><input type="password" id="confirmAdminPassword" class="form-control" autocomplete="new-password" minlength="10" required></div>
+                    <div class="form-group"><label>&nbsp;</label><button type="submit" class="btn btn-primary"><i class="fas fa-key"></i> Şifreyi Değiştir</button></div>
+                </form>
             </div>
         </section>
     </main>
@@ -433,6 +467,7 @@
                         <input type="file" id="artistFileInput" accept="image/*" style="display: none;">
                     </div>
                     <input type="text" id="artistCover" class="form-control" placeholder="Örn: Görsel/Mert Demir.PNG">
+                    <button type="button" class="btn btn-danger btn-sm admin-media-remove" data-media-input="#artistCover" data-media-preview="#artistCoverPreview"><i class="fas fa-trash-alt"></i> Kapak Görselini Kaldır</button>
                     <img id="artistCoverPreview" class="image-preview" alt="Kapak Önizleme">
                 </div>
 
@@ -510,31 +545,19 @@
                 <input type="hidden" id="targetArtistId">
                 <input type="hidden" id="targetConcertId">
 
-                <!-- Photo Upload & Path -->
                 <div class="form-group">
-                    <label>Fotoğraf (Dosya Seçin veya Yol/Link Girin)</label>
+                    <label>Fotoğrafları Toplu Seçin</label>
                     <div class="upload-box" id="photoDropZone">
                         <i class="fas fa-cloud-upload-alt"></i>
-                        <p>Fotoğraf Seçin veya Sürükleyin</p>
-                        <input type="file" id="photoFileInput" accept="image/*" style="display: none;">
+                        <p>Birden fazla fotoğraf seçin veya sürükleyin</p>
+                        <input type="file" id="photoFileInput" accept="image/*" multiple style="display: none;">
                     </div>
-                    <input type="text" id="photoSrc" class="form-control" placeholder="Örn: Görsel/Mert Demir1.PNG" required>
-                    <img id="photoPreview" class="image-preview" alt="Önizleme">
-                </div>
-
-                <div class="form-group">
-                    <label>Fotoğraf Başlığı</label>
-                    <input type="text" id="photoTitle" class="form-control" placeholder="Örn: Mert Demir - Sahne">
-                </div>
-
-                <div class="form-group">
-                    <label>Açıklama / Not</label>
-                    <input type="text" id="photoDesc" class="form-control" placeholder="Örn: Canlı Performans Çekimi">
+                    <p class="form-help" id="photoSelectionSummary">Henüz fotoğraf seçilmedi.</p>
                 </div>
 
                 <div class="modal-actions">
                     <button type="button" class="btn btn-secondary" id="btnCancelPhotoModal">İptal</button>
-                    <button type="submit" class="btn btn-primary" id="btnSavePhotoModal">Fotoğrafı Ekle</button>
+                    <button type="submit" class="btn btn-primary" id="btnSavePhotoModal">Seçilenleri Yükle</button>
                 </div>
             </form>
         </div>
@@ -547,10 +570,10 @@
         <i class="fas fa-arrow-up" aria-hidden="true"></i>
     </button>
 
-    <script src="data/data.js?v=20260923-content1"></script>
-    <script src="js/data-utils.js?v=20260923-content1"></script>
-    <script src="js/server-api.js?v=20260923-content1"></script>
-    <script src="js/media-store.js?v=20260923-content1"></script>
-    <script src="js/admin.js?v=20260924-adminmodal1"></script>
+    <script src="data/data.js?v=20260924-cms1"></script>
+    <script src="js/data-utils.js?v=20260924-cms1"></script>
+    <script src="js/server-api.js?v=20260924-cms1"></script>
+    <script src="js/media-store.js?v=20260924-cms1"></script>
+    <script src="js/admin.js?v=20260924-cms1"></script>
 </body>
 </html>

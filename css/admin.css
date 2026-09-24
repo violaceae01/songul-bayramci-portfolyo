@@ -164,6 +164,126 @@ body {
     gap: 15px;
 }
 
+/* Compact, client-friendly CMS controls */
+.admin-media-remove {
+    width: fit-content;
+    margin-top: 9px;
+}
+
+.admin-order-picker {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-secondary);
+    font-size: 0.72rem;
+    white-space: nowrap;
+}
+
+.admin-order-picker select,
+.subphoto-order,
+.inline-text-style select,
+.inline-text-style input[type="number"] {
+    min-height: 32px;
+    border: 1px solid var(--border-color);
+    border-radius: 7px;
+    background: #101010;
+    color: var(--text-primary);
+}
+
+.admin-order-picker select {
+    max-width: 104px;
+    padding: 5px 7px;
+}
+
+.subphoto-order {
+    position: absolute;
+    right: 5px;
+    bottom: 5px;
+    z-index: 2;
+    width: 82px;
+    padding: 3px 5px;
+    font-size: 0.68rem;
+}
+
+.inline-text-style {
+    display: grid;
+    grid-template-columns: auto auto 48px minmax(120px, 1fr) minmax(135px, 1fr);
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    padding: 8px 10px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 9px;
+    background: rgba(255, 255, 255, 0.025);
+    color: var(--text-secondary);
+    font-size: 0.7rem;
+}
+
+.inline-text-style strong {
+    color: var(--text-primary);
+    font-size: 0.72rem;
+}
+
+.inline-text-style label {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin: 0;
+}
+
+.inline-text-style input[type="color"] {
+    width: 38px;
+    height: 30px;
+    padding: 2px;
+    border: 1px solid var(--border-color);
+    border-radius: 7px;
+    background: #101010;
+}
+
+.inline-text-style input[type="number"] {
+    width: 72px;
+    padding: 4px 6px;
+}
+
+.inline-text-style select {
+    width: 84px;
+    padding: 4px 6px;
+}
+
+.admin-inline-toggle,
+.compact-order-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: 8px;
+    color: var(--text-secondary);
+    font-size: 0.76rem;
+}
+
+.contact-order-select {
+    width: 96px;
+    min-height: 34px;
+    padding: 5px 8px;
+}
+
+@media (max-width: 760px) {
+    .inline-text-style {
+        grid-template-columns: 1fr auto 42px;
+    }
+
+    .inline-text-style label:not(.style-color-toggle) {
+        grid-column: span 2;
+    }
+
+    .artist-actions-wrap {
+        align-items: stretch;
+    }
+
+    .admin-order-picker {
+        justify-content: space-between;
+    }
+}
+
 .backup-actions,
 .modal-actions {
     display: flex;
@@ -1466,6 +1586,7 @@ textarea.form-control {
     gap: 8px;
     margin: 0;
     padding: 0 0 8px;
+    flex-wrap: wrap;
 }
 
 .media-admin-title-input {
@@ -1492,6 +1613,7 @@ textarea.form-control {
 
 .media-admin-card .admin-order-actions {
     gap: 4px;
+    flex-wrap: wrap;
 }
 
 .media-admin-card .btn-sm {

@@ -233,6 +233,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                     parsed.contact = { ...(siteData.contact || {}), ...(parsed.contact || {}) };
                     parsed.siteText = { ...(siteData.siteText || {}), ...(parsed.siteText || {}) };
                     parsed.typography = { ...(siteData.typography || {}), ...(parsed.typography || {}) };
+                    parsed.textStyles = { ...(siteData.textStyles || {}), ...(parsed.textStyles || {}) };
+                    parsed.contact.socialVisibility = { ...(siteData.contact?.socialVisibility || {}), ...(parsed.contact?.socialVisibility || {}) };
+                    parsed.contact.infoOrder = Array.isArray(parsed.contact.infoOrder) ? parsed.contact.infoOrder : (siteData.contact?.infoOrder || ['phone', 'email', 'location']);
+                    parsed.testimonials = (parsed.testimonials || siteData.testimonials || []).map((item, index) => ({ ...item, mobileFeatured: item.mobileFeatured === undefined ? index < 4 : item.mobileFeatured === true, pageOrder: Number.isFinite(Number(item.pageOrder)) ? Number(item.pageOrder) : index, homeOrder: Number.isFinite(Number(item.homeOrder)) ? Number(item.homeOrder) : index }));
+                    if (!parsed.siteText.featuredMore || parsed.siteText.featuredMore === 'Daha Fazla') parsed.siteText.featuredMore = 'Tüm Çalışmalarımı Gör';
                     const savedContentVersion = Number(parsed.contentVersion || 0);
                     const currentContentVersion = Number(siteData.contentVersion || 0);
                     if (savedContentVersion < 5) {
@@ -314,14 +319,33 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
         const serverData = await window.SiteServer?.loadData?.();
         if (serverData) {
-            currentSiteData = serverData;
-            localStorage.setItem('sb_site_data', JSON.stringify(serverData));
+            currentSiteData = {
+                ...(typeof siteData !== 'undefined' ? siteData : {}),
+                ...serverData,
+                hero: { ...(typeof siteData !== 'undefined' ? siteData.hero || {} : {}), ...(serverData.hero || {}) },
+                contact: { ...(typeof siteData !== 'undefined' ? siteData.contact || {} : {}), ...(serverData.contact || {}), socialVisibility: { ...(typeof siteData !== 'undefined' ? siteData.contact?.socialVisibility || {} : {}), ...(serverData.contact?.socialVisibility || {}) } },
+                siteMedia: { ...(typeof siteData !== 'undefined' ? siteData.siteMedia || {} : {}), ...(serverData.siteMedia || {}) },
+                siteText: { ...(typeof siteData !== 'undefined' ? siteData.siteText || {} : {}), ...(serverData.siteText || {}) },
+                textStyles: { ...(typeof siteData !== 'undefined' ? siteData.textStyles || {} : {}), ...(serverData.textStyles || {}) },
+                sectionVisibility: { ...(typeof siteData !== 'undefined' ? siteData.sectionVisibility || {} : {}), ...(serverData.sectionVisibility || {}) }
+            };
+            currentSiteData.testimonials = (currentSiteData.testimonials || []).map((item, index) => ({ ...item, mobileFeatured: item.mobileFeatured === undefined ? index < 4 : item.mobileFeatured === true, pageOrder: Number.isFinite(Number(item.pageOrder)) ? Number(item.pageOrder) : index, homeOrder: Number.isFinite(Number(item.homeOrder)) ? Number(item.homeOrder) : index }));
+            if (!currentSiteData.siteText.featuredMore || currentSiteData.siteText.featuredMore === 'Daha Fazla') currentSiteData.siteText.featuredMore = 'Tüm Çalışmalarımı Gör';
+            localStorage.setItem('sb_site_data', JSON.stringify(currentSiteData));
         }
     } catch (error) {
         console.error('Sunucu verisi yüklenemedi, yerel veri kullanılıyor:', error);
     }
     const dataUtils = window.SiteDataUtils;
     const escapeHtml = value => dataUtils ? dataUtils.escapeHtml(value) : String(value || '');
+    const applyElementTextStyle = (element, key) => {
+        const style = currentSiteData.textStyles?.[key];
+        if (!element || !style) return;
+        if (/^#[0-9a-f]{6}$/i.test(String(style.color || ''))) element.style.color = style.color;
+        const size = Number(style.size);
+        if (size >= 8 && size <= 160) element.style.fontSize = `${size}px`;
+        if (/^(300|400|500|600|700|800)$/.test(String(style.weight || ''))) element.style.fontWeight = style.weight;
+    };
     const resolveMediaUrl = async value => {
         const reference = String(value || '');
         if (!window.SiteMediaStore?.isStored(reference)) return reference;
@@ -416,35 +440,40 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Testimonials
         const testimonialsGrid = document.getElementById('testimonialsGrid');
         if (testimonialsGrid) {
-            const testimonials = (data.testimonials || []).filter(item => item && item.enabled !== false).slice(0, 8);
-            testimonialsGrid.innerHTML = testimonials.length ? testimonials.map(tm => `<article class="testimonial-card reveal active"><i class="fas fa-quote-left quote-icon" aria-hidden="true"></i><p class="testimonial-text">${escapeHtml(tm.text || '')}</p><div class="testimonial-author"><span class="author-name">${escapeHtml(tm.name || '')}</span><span class="author-title">${escapeHtml(tm.title || '')}</span></div></article>`).join('') : '<p class="featured-artists-empty">Henüz yorum eklenmedi.</p>';
+            const isHomeTestimonials = document.body.classList.contains('home-page');
+            const orderKey = isHomeTestimonials ? 'homeOrder' : 'pageOrder';
+            const testimonials = [...(data.testimonials || [])].filter(item => item && item.enabled !== false).sort((a, b) => (Number(a[orderKey]) || 0) - (Number(b[orderKey]) || 0)).slice(0, 8);
+            testimonialsGrid.innerHTML = testimonials.length ? testimonials.map((tm, index) => `<article class="testimonial-card reveal active ${isHomeTestimonials && !(tm.mobileFeatured === true || (tm.mobileFeatured === undefined && index < 4)) ? 'mobile-testimonial-hidden' : ''}" data-testimonial-id="${escapeHtml(tm.id)}"><i class="fas fa-quote-left quote-icon" aria-hidden="true"></i><p class="testimonial-text">${escapeHtml(tm.text || '')}</p><div class="testimonial-author"><span class="author-name">${escapeHtml(tm.name || '')}</span><span class="author-title">${escapeHtml(tm.title || '')}</span></div></article>`).join('') : '<p class="featured-artists-empty">Henüz yorum eklenmedi.</p>';
+            testimonials.forEach(tm => {
+                const card = testimonialsGrid.querySelector(`[data-testimonial-id="${CSS.escape(String(tm.id))}"]`);
+                applyElementTextStyle(card?.querySelector('.testimonial-text'), `testimonial.${tm.id}.text`);
+                applyElementTextStyle(card?.querySelector('.author-name'), `testimonial.${tm.id}.name`);
+                applyElementTextStyle(card?.querySelector('.author-title'), `testimonial.${tm.id}.title`);
+            });
         }
 
         // Contact & Social Links
         if (data.contact) {
-            const contactItems = document.querySelectorAll('.contact-item');
-            if (contactItems[0] && data.contact.email) {
-                const p = contactItems[0].querySelector('p');
-                if (p) p.textContent = data.contact.email;
-            }
-            if (contactItems[1] && data.contact.phone) {
-                const p = contactItems[1].querySelector('p');
-                if (p) p.textContent = data.contact.phone;
-            }
-            if (contactItems[2] && data.contact.location) {
-                const p = contactItems[2].querySelector('p');
-                if (p) p.textContent = data.contact.location;
-            }
+            const contactInfoMap = {};
+            document.querySelectorAll('.contact-info').forEach(contactInfo => {
+                contactInfo.querySelectorAll('.contact-item').forEach(item => {
+                    const key = item.querySelector('.fa-phone') ? 'phone' : item.querySelector('.fa-envelope') ? 'email' : item.querySelector('.fa-map-marker-alt') ? 'location' : '';
+                    if (!key) return;
+                    item.dataset.contactKey = key;
+                    const p = item.querySelector('p');
+                    if (p) p.textContent = data.contact[key] || '';
+                    contactInfoMap[key] = item;
+                });
+                const social = contactInfo.querySelector('.social-links');
+                const order = Array.isArray(data.contact.infoOrder) ? data.contact.infoOrder : ['phone', 'email', 'location'];
+                order.forEach(key => { if (contactInfoMap[key]) contactInfo.insertBefore(contactInfoMap[key], social || null); });
+            });
 
-            const instaLink = document.querySelector('.social-links a[href*="instagram"], .social-links a:first-child');
-            if (instaLink && data.contact.instagram) {
-                instaLink.href = data.contact.instagram;
-            }
-            const socialLinks = document.querySelectorAll('.social-links a');
-            const socialUrls = [data.contact.instagram, data.contact.youtube, data.contact.twitter, data.contact.linkedin];
-            socialLinks.forEach((link, index) => {
-                const url = safeExternalUrl(socialUrls[index]);
-                link.hidden = !url;
+            const socialVisibility = data.contact.socialVisibility || {};
+            document.querySelectorAll('.social-links a').forEach(link => {
+                const key = link.querySelector('.fa-instagram') ? 'instagram' : link.querySelector('.fa-youtube') ? 'youtube' : link.querySelector('.fa-twitter') ? 'twitter' : link.querySelector('.fa-linkedin') ? 'linkedin' : '';
+                const url = safeExternalUrl(data.contact[key]);
+                link.hidden = !key || socialVisibility[key] === false || !url;
                 if (url) {
                     link.href = url;
                     link.target = '_blank';
@@ -454,7 +483,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    hydrateStaticContent(currentSiteData);
+    hydrateStaticContent(currentSiteData).then(() => applyEditableTextAndTypography());
 
     // ============================================
     // CUSTOM CURSOR (DESKTOP ONLY)
@@ -583,6 +612,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupCorporateNavigation();
     function applyEditableTextAndTypography() {
         const text = currentSiteData.siteText || {};
+        const textStyles = currentSiteData.textStyles || {};
+        const applyTextStyle = (key, selector) => {
+            const style = textStyles[key];
+            if (!style) return;
+            document.querySelectorAll(selector).forEach(element => {
+                if (style.color) element.style.color = style.color;
+                if (style.size) element.style.fontSize = `${Number(style.size)}px`;
+                if (style.weight) element.style.fontWeight = style.weight;
+            });
+        };
         const selectors = {
             navHome: 'a.nav-link[href*="anasayfa#home"]', navWorks: '[data-nav-section="worksPage"]', navClip: '[data-nav-section="clipShootings"]', navVideo: '[data-nav-section="videoClips"]', navGraphic: '[data-nav-section="graphicDesign"]', navReferences: '[data-nav-section="referencesPage"]', navAbout: '[data-nav-section="aboutPage"]', navTestimonials: '[data-nav-section="testimonialsPage"]', navContact: '[data-nav-section="contactPage"]',
             footerCopyright: '.footer .copyright', footerLegal: '.footer .footer-signature'
@@ -590,6 +629,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         Object.entries(selectors).forEach(([key, selector]) => {
             if (!text[key]) return;
             document.querySelectorAll(selector).forEach(element => { element.textContent = text[key]; });
+            applyTextStyle(`siteText.${key}`, selector);
         });
         const pageSection = document.body.dataset.pageSection || '';
         const pageMap = {
@@ -600,6 +640,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             const tag = document.querySelector('main .section-tag'); const title = document.querySelector('main .section-title');
             if (tag && text[pageKeys[0]]) tag.textContent = text[pageKeys[0]];
             if (title && text[pageKeys[1]]) title.textContent = text[pageKeys[1]];
+            applyTextStyle(`siteText.${pageKeys[0]}`, 'main .section-tag');
+            applyTextStyle(`siteText.${pageKeys[1]}`, 'main .section-title');
         }
         if (document.body.classList.contains('home-page') || document.getElementById('featuredArtistsGrid')) {
             const serviceSection = document.querySelector('[data-section-key="homeServices"]');
@@ -614,13 +656,24 @@ document.addEventListener('DOMContentLoaded', async () => {
                     if (!Object.prototype.hasOwnProperty.call(text, key)) return;
                     const element = serviceSection.querySelector(selector);
                     if (element) element.textContent = text[key] || '';
+                    applyTextStyle(`siteText.${key}`, `[data-section-key="homeServices"] ${selector}`);
                 });
             }
             const featured = document.querySelector('[data-section-key="featuredArtists"]');
             if (featured) { const tag = featured.querySelector('.section-tag'); const title = featured.querySelector('.section-title'); if (tag && text.featuredTag) tag.textContent = text.featuredTag; if (title && text.featuredTitle) title.textContent = text.featuredTitle; }
+            applyTextStyle('siteText.featuredTag', '[data-section-key="featuredArtists"] .section-tag');
+            applyTextStyle('siteText.featuredTitle', '[data-section-key="featuredArtists"] .section-title');
             const testimonialSection = document.querySelector('[data-section-key="testimonials"]');
             if (testimonialSection) { const tag = testimonialSection.querySelector('.section-tag'); const title = testimonialSection.querySelector('.section-title'); if (tag && text.testimonialsTag) tag.textContent = text.testimonialsTag; if (title && text.testimonialsTitle) title.textContent = text.testimonialsTitle; }
+            applyTextStyle('siteText.testimonialsTag', '[data-section-key="testimonials"] .section-tag');
+            applyTextStyle('siteText.testimonialsTitle', '[data-section-key="testimonials"] .section-title');
         }
+        const contentStyleSelectors = {
+            'hero.tag': '.hero-tag', 'hero.subtitle': '.hero-subtitle', 'hero.titleLine1': '.hero-title .title-line:not(.accent)', 'hero.titleLine2': '.hero-title .title-line.accent',
+            'about.name': '.about-content h1, .about-content h2', 'about.lead': '.about-content .lead', 'about.p1': '.about-content .about-copy:nth-of-type(1)', 'about.p2': '.about-content .about-copy:nth-of-type(2)', 'about.vision': '#aboutVision', 'about.mission': '#aboutMission',
+            'contact.email': '.contact-item[data-contact-key="email"] p', 'contact.phone': '.contact-item[data-contact-key="phone"] p', 'contact.location': '.contact-item[data-contact-key="location"] p'
+        };
+        Object.entries(contentStyleSelectors).forEach(([key, selector]) => applyTextStyle(key, selector));
         const typography = currentSiteData.typography || {};
         const root = document.documentElement;
         root.style.setProperty('--body-weight', typography.bodyWeight || '400');
@@ -786,6 +839,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 </span>
             `;
             grid.appendChild(link);
+            applyElementTextStyle(link.querySelector('.artist-directory-overlay strong'), `artist.${artist.id}.name`);
             const cover = link.querySelector('img');
             if (cover && window.SiteMediaStore?.isStored(artist.cover)) setStoredImageSource(cover, artist.cover);
         });
@@ -822,9 +876,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             setStoredImageSource(artistDetailCover, artist.cover);
             artistDetailCover.alt = artist.name;
         }
-        if (artistDetailName) artistDetailName.textContent = artist.name;
+        if (artistDetailName) { artistDetailName.textContent = artist.name; applyElementTextStyle(artistDetailName, `artist.${artist.id}.name`); }
         if (artistDetailTag) artistDetailTag.textContent = `${artist.concerts.length} KONSER ARŞİVİ`;
-        if (artistDetailBio) artistDetailBio.textContent = artist.bio || `${artist.name} konser çekimleri ve sahne çalışmalarından oluşan arşiv.`;
+        if (artistDetailBio) { artistDetailBio.textContent = artist.bio || `${artist.name} konser çekimleri ve sahne çalışmalarından oluşan arşiv.`; applyElementTextStyle(artistDetailBio, `artist.${artist.id}.bio`); }
 
         const concerts = [...artist.concerts].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
         artistConcertsList.innerHTML = '';
@@ -872,10 +926,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                     button.type = 'button';
                     button.className = 'concert-photo-card';
                     button.setAttribute('aria-label', `${image.title || artist.name} görselini büyüt`);
-                    button.innerHTML = `
-                        <img src="${escapeHtml(image.src)}" alt="${escapeHtml(image.title || artist.name)}" loading="lazy">
-                        <span><strong>${escapeHtml(image.title || artist.name)}</strong><small>${escapeHtml(image.desc || concert.name)}</small></span>
-                    `;
+                    const hasCaption = Boolean(String(image.title || '').trim() || String(image.desc || '').trim());
+                    button.innerHTML = `<img src="${escapeHtml(image.src)}" alt="${escapeHtml(image.title || artist.name)}" loading="lazy">${hasCaption ? `<span><strong>${escapeHtml(image.title || '')}</strong><small>${escapeHtml(image.desc || '')}</small></span>` : ''}`;
                     button.addEventListener('click', () => openLightbox(image, gallery));
                     photoGrid.appendChild(button);
                     const photo = button.querySelector('img');
@@ -921,26 +973,20 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <span><small>${artist.concerts.length} konser</small><small>${photoCount} kare</small></span>
                 </span>`;
             featuredArtistsGrid.appendChild(card);
+            applyElementTextStyle(card.querySelector('.featured-artist-info strong'), `artist.${artist.id}.name`);
             const coverImage = card.querySelector('img');
             if (coverImage && window.SiteMediaStore?.isStored(artist.cover)) setStoredImageSource(coverImage, artist.cover);
         });
 
         if (featuredArtistsActions) featuredArtistsActions.hidden = featuredArtists.length <= initialLimit;
         if (featuredArtistsMore) {
-            featuredArtistsMore.setAttribute('aria-expanded', 'false');
-            featuredArtistsMore.innerHTML = `${escapeHtml(currentSiteData.siteText?.featuredMore || 'Daha Fazla')} <i class="fas fa-arrow-down" aria-hidden="true"></i>`;
+            featuredArtistsMore.removeAttribute('aria-expanded');
+            featuredArtistsMore.innerHTML = `${escapeHtml(currentSiteData.siteText?.featuredMore || 'Tüm Çalışmalarımı Gör')} <i class="fas fa-arrow-right" aria-hidden="true"></i>`;
         }
     }
 
     featuredArtistsMore?.addEventListener('click', () => {
-        const expanded = featuredArtistsMore.getAttribute('aria-expanded') === 'true';
-        featuredArtistsGrid?.querySelectorAll('[data-featured-extra="true"]').forEach(card => {
-            card.hidden = expanded;
-        });
-        featuredArtistsMore.setAttribute('aria-expanded', String(!expanded));
-        featuredArtistsMore.innerHTML = expanded
-            ? `${escapeHtml(currentSiteData.siteText?.featuredMore || 'Daha Fazla')} <i class="fas fa-arrow-down" aria-hidden="true"></i>`
-            : 'Daha Az <i class="fas fa-arrow-up" aria-hidden="true"></i>';
+        window.location.href = 'calismalarim';
     });
 
     function safeExternalUrl(value) {
@@ -1002,6 +1048,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             const source = await resolveMediaUrl(reference);
             if (source) image.src = source;
         }
+        const logoSource = await resolveMediaUrl(media.logo || '');
+        document.querySelectorAll('.nav-logo img').forEach(image => {
+            image.hidden = !logoSource;
+            if (logoSource) image.src = logoSource;
+        });
     }
 
     function applySectionVisibility() {
@@ -1324,6 +1375,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             `;
             const media = article.querySelector('.youtube-project-media');
             const image = article.querySelector('img');
+            applyElementTextStyle(article.querySelector('.youtube-project-info > strong'), `youtube.${project.id}.artist`);
+            applyElementTextStyle(article.querySelector('.youtube-project-info > em'), `youtube.${project.id}.song`);
+            applyElementTextStyle(article.querySelector('.youtube-project-info span small:first-child'), `youtube.${project.id}.year`);
+            applyElementTextStyle(article.querySelector('.youtube-project-type'), `youtube.${project.id}.category`);
             if (videoId) {
                 article.querySelector('.youtube-project-link')?.addEventListener('click', () => openYouTubeModal(videoId, accessibleTitle));
             }
@@ -1364,7 +1419,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const automaticThumbnail = isVideo && !item.image && Boolean(videoId);
             const imageReference = item.image || youtubeThumbnail(videoId);
             const imageUrl = await resolveMediaUrl(imageReference);
-            const hasPlayableMedia = isVideo && Boolean(item.videoFile || videoId);
+            const hasPlayableMedia = isVideo && Boolean(videoId);
             const card = document.createElement(hasPlayableMedia ? 'button' : isVideo && projectUrl ? 'a' : isVideo ? 'article' : 'button');
             card.className = 'creative-project-card reveal active';
             card.dataset.searchText = `${item.title || ''} ${item.category || ''} ${item.year || ''}`.toLocaleLowerCase('tr-TR');
@@ -1396,6 +1451,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const media = card.querySelector('.creative-project-media');
             const image = card.querySelector('img');
+            applyElementTextStyle(card.querySelector('.creative-project-info strong'), `creative.${item.id}.title`);
+            applyElementTextStyle(card.querySelector(isVideo ? '.creative-project-info span small:last-child' : '.creative-project-info span small:first-child'), `creative.${item.id}.year`);
+            applyElementTextStyle(card.querySelector('.creative-project-badge'), `creative.${item.id}.category`);
             image?.addEventListener('error', () => {
                 const automaticVideoId = image.dataset.youtubeVideoId;
                 if (automaticVideoId && image.dataset.thumbnailFallback !== 'true') {
@@ -1411,8 +1469,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                     title: item.title,
                     desc: item.year || ''
                 }));
-            } else if (item.videoFile) {
-                card.addEventListener('click', () => openUploadedVideo(item.videoFile, item.title));
             } else if (videoId) {
                 card.addEventListener('click', event => { event.preventDefault(); openYouTubeModal(videoId, item.title); });
             }
@@ -1452,6 +1508,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const name = document.createElement('strong');
         name.textContent = partner.name || 'Kurum';
+        applyElementTextStyle(name, `partner.${partner.id}.name`);
         element.appendChild(name);
         return element;
     }
@@ -1465,7 +1522,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (seen.has(key)) return false;
                 seen.add(key);
                 return true;
-            });
+            })
+            .sort((a, b) => homeOnly ? (Number(a.homeOrder) || 0) - (Number(b.homeOrder) || 0) : 0);
         return homeOnly ? partners.slice(0, 8) : partners;
     }
 

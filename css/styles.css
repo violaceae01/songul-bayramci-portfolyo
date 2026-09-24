@@ -4919,3 +4919,36 @@ body .btn, body button { font-weight: var(--button-weight); }
         display: none !important;
     }
 }
+
+@media (max-width: 600px) {
+    .testimonials-grid .mobile-testimonial-hidden {
+        display: none !important;
+    }
+
+    .artist-detail-heading h1 {
+        max-width: 100%;
+        font-size: clamp(2rem, 11vw, 3.35rem);
+        line-height: 1.02;
+        text-wrap: balance;
+    }
+
+    .artist-directory-overlay strong {
+        font-size: clamp(0.72rem, 3.4vw, 0.95rem);
+        line-height: 1.08;
+        overflow-wrap: anywhere;
+    }
+
+    .footer,
+    .contact-footer-scene .footer {
+        min-height: 0;
+        padding-top: 26px;
+        padding-bottom: calc(28px + env(safe-area-inset-bottom));
+    }
+
+    .contact-footer-scene .footer-content,
+    .footer .footer-content {
+        width: 100%;
+        padding: 12px 10px;
+        border-radius: 10px;
+    }
+}

@@ -46,6 +46,7 @@
             cover: artist?.cover || '',
             visible: artist?.visible !== false,
             featured: artist?.featured === undefined ? true : (artist.featured === true || artist.featured === 1 || artist.featured === 'true'),
+            siteOrder: Number.isFinite(Number(artist?.siteOrder)) ? Number(artist.siteOrder) : index,
             featuredOrder: Number.isFinite(Number(artist?.featuredOrder)) ? Number(artist.featuredOrder) : index,
             concerts: []
         };
@@ -72,7 +73,10 @@
     }
 
     function sortArtists(artists) {
-        return [...normalizeArtists(artists)].sort((a, b) => a.name.localeCompare(b.name, 'tr', { sensitivity: 'base' }));
+        return [...normalizeArtists(artists)].sort((a, b) => {
+            const orderDifference = (Number(a.siteOrder) || 0) - (Number(b.siteOrder) || 0);
+            return orderDifference || a.name.localeCompare(b.name, 'tr', { sensitivity: 'base' });
+        });
     }
 
     function escapeHtml(value = '') {
